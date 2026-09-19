@@ -22,7 +22,11 @@ Transcribed from page images of the official PDF, supplied by the tutor, because
 
 2. **Codes.** The PDF numbers specific expectations within each strand section, for example "1.1" under heading "1. Representing Functions" in strand A. Ontario teachers write this as A1.1. These files use the A1.1 form throughout.
 
-3. **Footnote asterisks.** Three places carry a footnote asterisk in the original: MCR3U heading A3, MCV4U A3.5, and MCV4U B2.3. The MCR3U A3 footnote reads: "The knowledge and skills described in the expectations in this section are to be introduced as needed, and applied and consolidated, as appropriate, in solving problems throughout the course". It is recorded in the file at that heading. The two MCV4U footnotes were cut off in the page images and are not recorded. They are probably the same standard note, but that is unconfirmed, so check a copy of the PDF before relying on it.
+3. **Footnote asterisks.** Three places carry a footnote asterisk in the original: MCR3U heading A3, MCV4U A3.5, and MCV4U B2.3. The MCR3U A3 footnote reads: "The knowledge and skills described in the expectations in this section are to be introduced as needed, and applied and consolidated, as appropriate, in solving problems throughout the course". It is recorded in the file at that heading.
+
+   The MCV4U B2.3 footnote reads: "The emphasis of this expectation is on the application of the derivative rules and not on the simplification of resulting complex algebraic expressions". It is recorded at that expectation.
+
+   The MCV4U A3.5 footnote was cut off in the page images and is not recorded. Given where it sits, it is plausibly the same note as B2.3, but that is unconfirmed. Check a copy of the PDF before relying on it.
 
 4. **Figures described, not reproduced.** Four expectations reference a diagram: MCR3U C2.3 (a cube array), MCV4U A1.2 (a graph with a corner at P), MCV4U B1.4 (a parabola), and MHF4U D3.3 (a table, which is reproduced in full). Each carries a bracketed description of what the figure shows.
 

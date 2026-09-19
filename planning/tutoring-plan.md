@@ -38,6 +38,20 @@ From the structure of the course, these are where to concentrate.
 
 **Planes and their intersections, MCV4U C4.4 and C4.7.** The algebra is elimination, which he can do. The difficulty is spatial: seeing what a solution means geometrically. Use physical objects. Three sheets of cardboard will teach the configurations of three planes faster than any diagram on paper, and the curriculum itself suggests exactly this in C3.3.
 
+## Do not let him waste time simplifying
+
+MCV4U B2.3 carries this footnote in the curriculum:
+
+> The emphasis of this expectation is on the application of the derivative rules and not on the simplification of resulting complex algebraic expressions
+
+That is the Ministry saying, in writing, that getting the derivative is the skill and tidying it up is not. It is worth knowing for two reasons.
+
+First, students burn enormous time on this. A product-and-chain-rule derivative comes out ugly, the student assumes ugly means wrong, and spends ten minutes of a test forcing it into a tidier form. Often they introduce an error doing so. Teach him to check the derivative is right, then stop and answer the actual question.
+
+Second, it tells you what an examiner is looking for. If a question asks for a rate of change at a point, the efficient route is to differentiate and substitute immediately. Simplifying first is optional and usually slower.
+
+This does not apply everywhere. Curve sketching needs a factored f′ to build a sign chart, so there the simplification is the work. The distinction is whether the simplified form is needed for the next step or is just cosmetic.
+
 ## Vectors is where to build his confidence
 
 Strand C has almost no prerequisite in Grade 11 or MHF4U. Whatever went wrong before, it did not damage his ability to do vectors.
