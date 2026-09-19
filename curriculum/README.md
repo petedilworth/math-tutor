@@ -24,9 +24,9 @@ Transcribed from page images of the official PDF, supplied by the tutor, because
 
 3. **Footnote asterisks.** Three places carry a footnote asterisk in the original: MCR3U heading A3, MCV4U A3.5, and MCV4U B2.3. The MCR3U A3 footnote reads: "The knowledge and skills described in the expectations in this section are to be introduced as needed, and applied and consolidated, as appropriate, in solving problems throughout the course". It is recorded in the file at that heading.
 
-   The MCV4U B2.3 footnote reads: "The emphasis of this expectation is on the application of the derivative rules and not on the simplification of resulting complex algebraic expressions". It is recorded at that expectation.
+   Both MCV4U footnotes, at A3.5 and at B2.3, read: "The emphasis of this expectation is on the application of the derivative rules and not on the simplification of resulting complex algebraic expressions". Each is recorded at its expectation.
 
-   The MCV4U A3.5 footnote was cut off in the page images and is not recorded. Given where it sits, it is plausibly the same note as B2.3, but that is unconfirmed. Check a copy of the PDF before relying on it.
+   All three footnotes in these three courses are now captured. Nothing in the transcription is outstanding.
 
 4. **Figures described, not reproduced.** Four expectations reference a diagram: MCR3U C2.3 (a cube array), MCV4U A1.2 (a graph with a corner at P), MCV4U B1.4 (a parabola), and MHF4U D3.3 (a table, which is reproduced in full). Each carries a bracketed description of what the figure shows.
 

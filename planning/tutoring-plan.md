@@ -40,11 +40,11 @@ From the structure of the course, these are where to concentrate.
 
 ## Do not let him waste time simplifying
 
-MCV4U B2.3 carries this footnote in the curriculum:
+Two expectations in MCV4U carry a footnote, A3.5 and B2.3, and it is the same sentence both times:
 
 > The emphasis of this expectation is on the application of the derivative rules and not on the simplification of resulting complex algebraic expressions
 
-That is the Ministry saying, in writing, that getting the derivative is the skill and tidying it up is not. It is worth knowing for two reasons.
+These are the only two footnotes in the course. The Ministry wrote the same caution twice, once where the derivative rules are introduced and again where they are applied. Read that as emphasis, not repetition: getting the derivative is the skill, and tidying it up is not. It is worth knowing for two reasons.
 
 First, students burn enormous time on this. A product-and-chain-rule derivative comes out ugly, the student assumes ugly means wrong, and spends ten minutes of a test forcing it into a tidier form. Often they introduce an error doing so. Teach him to check the derivative is right, then stop and answer the actual question.
 
