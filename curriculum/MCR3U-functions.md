@@ -171,4 +171,55 @@ By the end of this course, students will:
 
 ## D. Trigonometric Functions
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **D1.** determine the values of the trigonometric ratios for angles less than 360°; prove simple trigonometric identities; and solve problems using the primary trigonometric ratios, the sine law, and the cosine law;
+- **D2.** demonstrate an understanding of periodic relationships and sinusoidal functions, and make connections between the numeric, graphical, and algebraic representations of sinusoidal functions;
+- **D3.** identify and represent sinusoidal functions, and solve problems involving sinusoidal functions, including problems arising from real-world applications.
+
+### D1. Determining and Applying Trigonometric Ratios
+
+By the end of this course, students will:
+
+- **D1.1** determine the exact values of the sine, cosine, and tangent of the special angles: 0°, 30°, 45°, 60°, and 90°
+- **D1.2** determine the values of the sine, cosine, and tangent of angles from 0° to 360°, through investigation using a variety of tools (e.g., dynamic geometry software, graphing tools) and strategies (e.g., applying the unit circle; examining angles related to special angles)
+- **D1.3** determine the measures of two angles from 0° to 360° for which the value of a given trigonometric ratio is the same
+- **D1.4** define the secant, cosecant, and cotangent ratios for angles in a right triangle in terms of the sides of the triangle (e.g., sec A = hypotenuse/adjacent), and relate these ratios to the cosine, sine, and tangent ratios (e.g., sec A = 1/cos A)
+- **D1.5** prove simple trigonometric identities, using the Pythagorean identity sin²x + cos²x = 1; the quotient identity tan x = sin x / cos x; and the reciprocal identities sec x = 1/cos x, csc x = 1/sin x, and cot x = 1/tan x
+  - *Sample problem:* Prove that 1 − cos²x = sin x cos x tan x.
+- **D1.6** pose problems involving right triangles and oblique triangles in two-dimensional settings, and solve these and other such problems using the primary trigonometric ratios, the cosine law, and the sine law (including the ambiguous case)
+- **D1.7** pose problems involving right triangles and oblique triangles in three-dimensional settings, and solve these and other such problems using the primary trigonometric ratios, the cosine law, and the sine law
+  - *Sample problem:* Explain how a surveyor could find the height of a vertical cliff that is on the other side of a raging river, using a measuring tape, a theodolite, and some trigonometry. Determine what the surveyor might measure, and use hypothetical values for these data to calculate the height of the cliff.
+
+### D2. Connecting Graphs and Equations of Sinusoidal Functions
+
+By the end of this course, students will:
+
+- **D2.1** describe key properties (e.g., cycle, amplitude, period) of periodic functions arising from real-world applications (e.g., natural gas consumption in Ontario, tides in the Bay of Fundy), given a numeric or graphical representation
+- **D2.2** predict, by extrapolating, the future behaviour of a relationship modelled using a numeric or graphical representation of a periodic function (e.g., predicting hours of daylight on a particular date from previous measurements; predicting natural gas consumption in Ontario from previous consumption)
+- **D2.3** make connections between the sine ratio and the sine function and between the cosine ratio and the cosine function by graphing the relationship between angles from 0° to 360° and the corresponding sine ratios or cosine ratios, with or without technology (e.g., by generating a table of values using a calculator; by unwrapping the unit circle), defining this relationship as the function f(x) = sin x or f(x) = cos x, and explaining why the relationship is a function
+- **D2.4** sketch the graphs of f(x) = sin x and f(x) = cos x for angle measures expressed in degrees, and determine and describe their key properties (i.e., cycle, domain, range, intercepts, amplitude, period, maximum and minimum values, increasing/decreasing intervals)
+- **D2.5** determine, through investigation using technology, the roles of the parameters a, k, d, and c in functions of the form y = af(k(x − d)) + c, where f(x) = sin x or f(x) = cos x with angles expressed in degrees, and describe these roles in terms of transformations on the graphs of f(x) = sin x and f(x) = cos x (i.e., translations; reflections in the axes; vertical and horizontal stretches and compressions to and from the x- and y-axes)
+  - *Sample problem:* Investigate the graph f(x) = 2 sin(x − d) + 10 for various values of d, using technology, and describe the effects of changing d in terms of a transformation.
+- **D2.6** determine the amplitude, period, phase shift, domain, and range of sinusoidal functions whose equations are given in the form f(x) = a sin(k(x − d)) + c or f(x) = a cos(k(x − d)) + c
+- **D2.7** sketch graphs of y = af(k(x − d)) + c by applying one or more transformations to the graphs of f(x) = sin x and f(x) = cos x, and state the domain and range of the transformed functions
+  - *Sample problem:* Transform the graph of f(x) = cos x to sketch g(x) = 3 cos 2x − 1, and state the domain and range of each function.
+- **D2.8** represent a sinusoidal function with an equation, given its graph or its properties
+  - *Sample problem:* A sinusoidal function has an amplitude of 2 units, a period of 180°, and a maximum at (0, 3). Represent the function with an equation in two different ways.
+
+### D3. Solving Problems Involving Sinusoidal Functions
+
+By the end of this course, students will:
+
+- **D3.1** collect data that can be modelled as a sinusoidal function (e.g., voltage in an AC circuit, sound waves), through investigation with and without technology, from primary sources, using a variety of tools (e.g., concrete materials, measurement tools such as motion sensors), or from secondary sources (e.g., websites such as Statistics Canada, E-STAT), and graph the data
+  - *Sample problem:* Measure and record distance–time data for a swinging pendulum, using a motion sensor or other measurement tools, and graph the data.
+- **D3.2** identify periodic and sinusoidal functions, including those that arise from real-world applications involving periodic phenomena, given various representations (i.e., tables of values, graphs, equations), and explain any restrictions that the context places on the domain and range
+  - *Sample problem:* Using data from Statistics Canada, investigate to determine if there was a period of time over which changes in the population of Canadians aged 20–24 could be modelled using a sinusoidal function.
+- **D3.3** determine, through investigation, how sinusoidal functions can be used to model periodic phenomena that do not involve angles
+  - *Sample problem:* Investigate, using graphing technology in degree mode, and explain how the function h(t) = 5 sin(30(t + 3)) approximately models the relationship between the height and the time of day for a tide with an amplitude of 5 m, if high tide is at midnight.
+- **D3.4** predict the effects on a mathematical model (i.e., graph, equation) of an application involving periodic phenomena when the conditions in the application are varied (e.g., varying the conditions, such as speed and direction, when walking in a circle in front of a motion sensor)
+  - *Sample problem:* The relationship between the height above the ground of a person riding a Ferris wheel and time can be modelled using a sinusoidal function. Describe the effect on this function if the platform from which the person enters the ride is raised by 1 m and if the Ferris wheel turns twice as fast.
+- **D3.5** pose problems based on applications involving a sinusoidal function, and solve these and other such problems by using a given graph or a graph generated with technology from a table of values or from its equation
+  - *Sample problem:* The height above the ground of a rider on a Ferris wheel can be modelled by the sinusoidal function h(t) = 25 sin(3(t − 30)) + 27, where h(t) is the height, in metres, and t is the time, in seconds. Graph the function, using graphing technology in degree mode, and determine the maximum and minimum heights of the rider, the height after 30 s, and the time required to complete one revolution.
