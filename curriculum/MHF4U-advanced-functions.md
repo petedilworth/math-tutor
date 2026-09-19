@@ -175,4 +175,73 @@ By the end of this course, students will:
 
 ## D. Characteristics of Functions
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **D1.** demonstrate an understanding of average and instantaneous rate of change, and determine, numerically and graphically, and interpret the average rate of change of a function over a given interval and the instantaneous rate of change of a function at a given point;
+- **D2.** determine functions that result from the addition, subtraction, multiplication, and division of two functions and from the composition of two functions, describe some properties of the resulting functions, and solve related problems;
+- **D3.** compare the characteristics of functions, and solve problems by modelling and reasoning with functions, including problems with solutions that are not accessible by standard algebraic techniques.
+
+### D1. Understanding Rates of Change
+
+By the end of this course, students will:
+
+- **D1.1** gather, interpret, and describe information about real-world applications of rates of change, and recognize different ways of representing rates of change (e.g., in words, numerically, graphically, algebraically)
+- **D1.2** recognize that the rate of change for a function is a comparison of changes in the dependent variable to changes in the independent variable, and distinguish situations in which the rate of change is zero, constant, or changing by examining applications, including those arising from real-world situations (e.g., rate of change of the area of a circle as the radius increases, inflation rates, the rising trend in graduation rates among Aboriginal youth, speed of a cruising aircraft, speed of a cyclist climbing a hill, infection rates)
+  - *Sample problem:* The population of bacteria in a sample is 250 000 at 1:00 p.m., 500 000 at 3:00 p.m., and 1 000 000 at 5:00 p.m. Compare methods used to calculate the change in the population and the rate of change in the population between 1:00 p.m. to 5:00 p.m. Is the rate of change constant? Explain your reasoning.
+- **D1.3** sketch a graph that represents a relationship involving rate of change, as described in words, and verify with technology (e.g., motion sensor) when possible
+  - *Sample problem:* John rides his bicycle at a constant cruising speed along a flat road. He then decelerates (i.e., decreases speed) as he climbs a hill. At the top, he accelerates (i.e., increases speed) on a flat road back to his constant cruising speed, and he then accelerates down a hill. Finally, he comes to another hill and glides to a stop as he starts to climb. Sketch a graph of John's speed versus time and a graph of his distance travelled versus time.
+- **D1.4** calculate and interpret average rates of change of functions (e.g., linear, quadratic, exponential, sinusoidal) arising from real-world applications (e.g., in the natural, physical, and social sciences), given various representations of the functions (e.g., tables of values, graphs, equations)
+  - *Sample problem:* Fluorine-20 is a radioactive substance that decays over time. At time 0, the mass of a sample of the substance is 20 g. The mass decreases to 10 g after 11 s, to 5 g after 22 s, and to 2.5 g after 33 s. Compare the average rate of change over the 33-s interval with the average rate of change over consecutive 11-s intervals.
+- **D1.5** recognize examples of instantaneous rates of change arising from real-world situations, and make connections between instantaneous rates of change and average rates of change (e.g., an average rate of change can be used to approximate an instantaneous rate of change)
+  - *Sample problem:* In general, does the speedometer of a car measure instantaneous rate of change (i.e., instantaneous speed) or average rate of change (i.e., average speed)? Describe situations in which the instantaneous speed and the average speed would be the same.
+- **D1.6** determine, through investigation using various representations of relationships (e.g., tables of values, graphs, equations), approximate instantaneous rates of change arising from real-world applications (e.g., in the natural, physical, and social sciences) by using average rates of change and reducing the interval over which the average rate of change is determined
+  - *Sample problem:* The distance, d metres, travelled by a falling object in t seconds is represented by d = 5t². When t = 3, the instantaneous speed of the object is 30 m/s. Compare the average speeds over different time intervals starting at t = 3 with the instantaneous speed when t = 3. Use your observations to select an interval that can be used to provide a good approximation of the instantaneous speed at t = 3.
+- **D1.7** make connections, through investigation, between the slope of a secant on the graph of a function (e.g., quadratic, exponential, sinusoidal) and the average rate of change of the function over an interval, and between the slope of the tangent to a point on the graph of a function and the instantaneous rate of change of the function at that point
+  - *Sample problem:* Use tangents to investigate the behaviour of a function when the instantaneous rate of change is zero, positive, or negative.
+- **D1.8** determine, through investigation using a variety of tools and strategies (e.g., using a table of values to calculate slopes of secants or graphing secants and measuring their slopes with technology), the approximate slope of the tangent to a given point on the graph of a function (e.g., quadratic, exponential, sinusoidal) by using the slopes of secants through the given point (e.g., investigating the slopes of secants that approach the tangent at that point more and more closely), and make connections to average and instantaneous rates of change
+- **D1.9** solve problems involving average and instantaneous rates of change, including problems arising from real-world applications, by using numerical and graphical methods (e.g., by using graphing technology to graph a tangent and measure its slope)
+  - *Sample problem:* The height, h metres, of a ball above the ground can be modelled by the function h(t) = −5t² + 20t, where t is the time in seconds. Use average speeds to determine the approximate instantaneous speed at t = 3.
+
+### D2. Combining Functions
+
+By the end of this course, students will:
+
+- **D2.1** determine, through investigation using graphing technology, key features (e.g., domain, range, maximum/minimum points, number of zeros) of the graphs of functions created by adding, subtracting, multiplying, or dividing functions [e.g., f(x) = 2⁻ˣ sin 4x, g(x) = x² + 2ˣ, h(x) = sin x / cos x], and describe factors that affect these properties
+  - *Sample problem:* Investigate the effect of the behaviours of f(x) = sin x, f(x) = sin 2x, and f(x) = sin 4x on the shape of f(x) = sin x + sin 2x + sin 4x.
+- **D2.2** recognize real-world applications of combinations of functions (e.g., the motion of a damped pendulum can be represented by a function that is the product of a trigonometric function and an exponential function; the frequencies of tones associated with the numbers on a telephone involve the addition of two trigonometric functions), and solve related problems graphically
+  - *Sample problem:* The rate at which a contaminant leaves a storm sewer and enters a lake depends on two factors: the concentration of the contaminant in the water from the sewer and the rate at which the water leaves the sewer. Both of these factors vary with time. The concentration of the contaminant, in kilograms per cubic metre of water, is given by c(t) = t², where t is in seconds. The rate at which water leaves the sewer, in cubic metres per second, is given by w(t) = 1/(t⁴ + 10). Determine the time at which the contaminant leaves the sewer and enters the lake at the maximum rate.
+- **D2.3** determine, through investigation, and explain some properties (i.e., odd, even, or neither; increasing/decreasing behaviours) of functions formed by adding, subtracting, multiplying, and dividing general functions [e.g., f(x) + g(x), f(x)g(x)]
+  - *Sample problem:* Investigate algebraically, and verify numerically and graphically, whether the product of two functions is even or odd if the two functions are both even or both odd, or if one function is even and the other is odd.
+- **D2.4** determine the composition of two functions [i.e., f(g(x))] numerically (i.e., by using a table of values) and graphically, with technology, for functions represented in a variety of ways (e.g., function machines, graphs, equations), and interpret the composition of two functions in real-world applications
+  - *Sample problem:* For a car travelling at a constant speed, the distance driven, d kilometres, is represented by d(t) = 80t, where t is the time in hours. The cost of gasoline, in dollars, for the drive is represented by C(d) = 0.09d. Determine numerically and interpret C(d(5)), and describe the relationship represented by C(d(t)).
+- **D2.5** determine algebraically the composition of two functions [i.e., f(g(x))], verify that f(g(x)) is not always equal to g(f(x)) [e.g., by determining f(g(x)) and g(f(x)), given f(x) = x + 1 and g(x) = 2x], and state the domain [i.e., by defining f(g(x)) for those x-values for which g(x) is defined and for which it is included in the domain of f(x)] and the range of the composition of two functions
+  - *Sample problem:* Determine f(g(x)) and g(f(x)) given f(x) = cos x and g(x) = 2x + 1, state the domain and range of f(g(x)) and g(f(x)), compare f(g(x)) with g(f(x)) algebraically, and verify numerically and graphically with technology.
+- **D2.6** solve problems involving the composition of two functions, including problems arising from real-world applications
+  - *Sample problem:* The speed of a car, v kilometres per hour, at a time of t hours is represented by v(t) = 40 + 3t + t². The rate of gasoline consumption of the car, c litres per kilometre, at a speed of v kilometres per hour is represented by c(v) = (v/500 − 0.1)² + 0.15. Determine algebraically c(v(t)), the rate of gasoline consumption as a function of time. Determine, using technology, the time when the car is running most economically during a four-hour trip.
+- **D2.7** demonstrate, by giving examples for functions represented in a variety of ways (e.g., function machines, graphs, equations), the property that the composition of a function and its inverse function maps a number onto itself [i.e., f⁻¹(f(x)) = x and f(f⁻¹(x)) = x demonstrate that the inverse function is the reverse process of the original function and that it undoes what the function does]
+- **D2.8** make connections, through investigation using technology, between transformations (i.e., vertical and horizontal translations; reflections in the axes; vertical and horizontal stretches and compressions to and from the x- and y-axes) of simple functions f(x) [e.g., f(x) = x³ + 20, f(x) = sin x, f(x) = log x] and the composition of these functions with a linear function of the form g(x) = A(x + B)
+  - *Sample problem:* Compare the graph of f(x) = x² with the graphs of f(g(x)) and g(f(x)), where g(x) = 2(x − d), for various values of d. Describe the effects of d in terms of transformations of f(x).
+
+### D3. Using Function Models to Solve Problems
+
+By the end of this course, students will:
+
+- **D3.1** compare, through investigation using a variety of tools and strategies (e.g., graphing with technology; comparing algebraic representations; comparing finite differences in tables of values) the characteristics (e.g., key features of the graphs, forms of the equations) of various functions (i.e., polynomial, rational, trigonometric, exponential, logarithmic)
+- **D3.2** solve graphically and numerically equations and inequalities whose solutions are not accessible by standard algebraic techniques
+  - *Sample problem:* Solve: 2x² < 2ˣ; cos x = x, with x in radians.
+- **D3.3** solve problems, using a variety of tools and strategies, including problems arising from real-world applications, by reasoning with functions and by applying concepts and procedures involving functions (e.g., by constructing a function model from data, using the model to determine mathematical results, and interpreting and communicating the results within the context of the problem)
+  - *Sample problem:* The pressure of a car tire with a slow leak is given in the following table of values:
+
+    | Time, t (min) | Pressure, P (kPa) |
+    |---|---|
+    | 0 | 400 |
+    | 5 | 335 |
+    | 10 | 295 |
+    | 15 | 255 |
+    | 20 | 225 |
+    | 25 | 195 |
+    | 30 | 170 |
+
+    Use technology to investigate linear, quadratic, and exponential models for the relationship of the tire pressure and time, and describe how well each model fits the data. Use each model to predict the pressure after 60 min. Which model gives the most realistic answer?
