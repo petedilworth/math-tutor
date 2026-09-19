@@ -107,7 +107,69 @@ By the end of this course, students will:
 
 ## C. Polynomial and Rational Functions
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **C1.** identify and describe some key features of polynomial functions, and make connections between the numeric, graphical, and algebraic representations of polynomial functions;
+- **C2.** identify and describe some key features of the graphs of rational functions, and represent rational functions graphically;
+- **C3.** solve problems involving polynomial and simple rational equations graphically and algebraically;
+- **C4.** demonstrate an understanding of solving polynomial and simple rational inequalities.
+
+### C1. Connecting Graphs and Equations of Polynomial Functions
+
+By the end of this course, students will:
+
+- **C1.1** recognize a polynomial expression (i.e., a series of terms where each term is the product of a constant and a power of x with a non-negative integral exponent, such as x³ − 5x² + 2x − 1); recognize the equation of a polynomial function, give reasons why it is a function, and identify linear and quadratic functions as examples of polynomial functions
+- **C1.2** compare, through investigation using graphing technology, the numeric, graphical, and algebraic representations of polynomial (i.e., linear, quadratic, cubic, quartic) functions (e.g., compare finite differences in tables of values; investigate the effect of the degree of a polynomial function on the shape of its graph and the maximum number of x-intercepts; investigate the effect of varying the sign of the leading coefficient on the end behaviour of the function for very large positive or negative x-values)
+  - *Sample problem:* Investigate the maximum number of x-intercepts for linear, quadratic, cubic, and quartic functions using graphing technology.
+- **C1.3** describe key features of the graphs of polynomial functions (e.g., the domain and range, the shape of the graphs, the end behaviour of the functions for very large positive or negative x-values)
+  - *Sample problem:* Describe and compare the key features of the graphs of the functions f(x) = x, f(x) = x², f(x) = x³, f(x) = x³ + x², and f(x) = x³ + x.
+- **C1.4** distinguish polynomial functions from sinusoidal and exponential functions [e.g., f(x) = sin x, g(x) = 2ˣ], and compare and contrast the graphs of various polynomial functions with the graphs of other types of functions
+- **C1.5** make connections, through investigation using graphing technology (e.g., dynamic geometry software), between a polynomial function given in factored form [e.g., f(x) = 2(x − 3)(x + 2)(x − 1)] and the x-intercepts of its graph, and sketch the graph of a polynomial function given in factored form using its key features (e.g., by determining intercepts and end behaviour; by locating positive and negative regions using test values between and on either side of the x-intercepts)
+  - *Sample problem:* Investigate, using graphing technology, the x-intercepts and the shapes of the graphs of polynomial functions with one or more repeated factors, for example, f(x) = (x − 2)(x − 3), f(x) = (x − 2)(x − 2)(x − 3), f(x) = (x − 2)(x − 2)(x − 2)(x − 3), and f(x) = (x + 2)(x + 2)(x − 2)(x − 2)(x − 3), by considering whether the factor is repeated an even or an odd number of times. Use your conclusions to sketch f(x) = (x + 1)(x + 1)(x − 3)(x − 3), and verify using technology.
+- **C1.6** determine, through investigation using technology, the roles of the parameters a, k, d, and c in functions of the form y = af(k(x − d)) + c, and describe these roles in terms of transformations on the graphs of f(x) = x³ and f(x) = x⁴ (i.e., vertical and horizontal translations; reflections in the axes; vertical and horizontal stretches and compressions to and from the x- and y-axes)
+  - *Sample problem:* Investigate, using technology, the graph of f(x) = 2(x − d)³ + c for various values of d and c, and describe the effects of changing d and c in terms of transformations.
+- **C1.7** determine an equation of a polynomial function that satisfies a given set of conditions (e.g., degree of the polynomial, intercepts, points on the function), using methods appropriate to the situation (e.g., using the x-intercepts of the function; using a trial-and-error process with a graphing calculator or graphing software; using finite differences), and recognize that there may be more than one polynomial function that can satisfy a given set of conditions (e.g., an infinite number of polynomial functions satisfy the condition that they have three given x-intercepts)
+  - *Sample problem:* Determine an equation for a fifth-degree polynomial function that intersects the x-axis at only 5, 1, and −5, and sketch the graph of the function.
+- **C1.8** determine the equation of the family of polynomial functions with a given set of zeros and of the member of the family that passes through another given point [e.g., a family of polynomial functions of degree 3 with zeros 5, −3, and −2 is defined by the equation f(x) = k(x − 5)(x + 3)(x + 2), where k is a real number, k ≠ 0; the member of the family that passes through (−1, 24) is f(x) = −2(x − 5)(x + 3)(x + 2)]
+  - *Sample problem:* Investigate, using graphing technology, and determine a polynomial function that can be used to model the function f(x) = sin x over the interval 0 ≤ x ≤ 2π.
+- **C1.9** determine, through investigation, and compare the properties of even and odd polynomial functions [e.g., symmetry about the y-axis or the origin; the power of each term; the number of x-intercepts; f(x) = f(−x) or f(−x) = −f(x)], and determine whether a given polynomial function is even, odd, or neither
+  - *Sample problem:* Investigate numerically, graphically, and algebraically, with and without technology, the conditions under which an even function has an even number of x-intercepts.
+
+### C2. Connecting Graphs and Equations of Rational Functions
+
+By the end of this course, students will:
+
+- **C2.1** determine, through investigation with and without technology, key features (i.e., vertical and horizontal asymptotes, domain and range, intercepts, positive/negative intervals, increasing/decreasing intervals) of the graphs of rational functions that are the reciprocals of linear and quadratic functions, and make connections between the algebraic and graphical representations of these rational functions [e.g., make connections between f(x) = 1/(x² − 4) and its graph by using graphing technology and by reasoning that there are vertical asymptotes at x = 2 and x = −2 and a horizontal asymptote at y = 0 and that the function maintains the same sign as f(x) = x² − 4]
+  - *Sample problem:* Investigate, with technology, the key features of the graphs of families of rational functions of the form f(x) = 1/(x + n) and f(x) = 1/(x² + n), where n is an integer, and make connections between the equations and key features of the graphs.
+- **C2.2** determine, through investigation with and without technology, key features (i.e., vertical and horizontal asymptotes, domain and range, intercepts, positive/negative intervals, increasing/decreasing intervals) of the graphs of rational functions that have linear expressions in the numerator and denominator [e.g., f(x) = 2x/(x − 3), h(x) = (x − 2)/(3x + 4)], and make connections between the algebraic and graphical representations of these rational functions
+  - *Sample problem:* Investigate, using graphing technology, key features of the graphs of the family of rational functions of the form f(x) = 8x/(nx + 1) for n = 1, 2, 4, and 8, and make connections between the equations and the asymptotes.
+- **C2.3** sketch the graph of a simple rational function using its key features, given the algebraic representation of the function
+
+### C3. Solving Polynomial and Rational Equations
+
+By the end of this course, students will:
+
+- **C3.1** make connections, through investigation using technology (e.g., computer algebra systems), between the polynomial function f(x), the divisor x − a, the remainder from the division f(x)/(x − a), and f(a) to verify the remainder theorem and the factor theorem
+  - *Sample problem:* Divide f(x) = x⁴ + 4x³ − x² − 16x − 14 by x − a for various integral values of a using a computer algebra system. Compare the remainder from each division with f(a).
+- **C3.2** factor polynomial expressions in one variable, of degree no higher than four, by selecting and applying strategies (i.e., common factoring, difference of squares, trinomial factoring, factoring by grouping, remainder theorem, factor theorem)
+  - *Sample problem:* Factor: x³ + 2x² − x − 2; x⁴ − 6x³ + 4x² + 6x − 5.
+- **C3.3** determine, through investigation using technology (e.g., graphing calculator, computer algebra systems), the connection between the real roots of a polynomial equation and the x-intercepts of the graph of the corresponding polynomial function, and describe this connection [e.g., the real roots of the equation x⁴ − 13x² + 36 = 0 are the x-intercepts of the graph of f(x) = x⁴ − 13x² + 36]
+  - *Sample problem:* Describe the relationship between the x-intercepts of the graphs of linear and quadratic functions and the real roots of the corresponding equations. Investigate, using technology, whether this relationship exists for polynomial functions of higher degree.
+- **C3.4** solve polynomial equations in one variable, of degree no higher than four (e.g., 2x³ − 3x² + 8x − 12 = 0), by selecting and applying strategies (i.e., common factoring, difference of squares, trinomial factoring, factoring by grouping, remainder theorem, factor theorem), and verify solutions using technology (e.g., using computer algebra systems to determine the roots; using graphing technology to determine the x-intercepts of the graph of the corresponding polynomial function)
+- **C3.5** determine, through investigation using technology (e.g., graphing calculator, computer algebra systems), the connection between the real roots of a rational equation and the x-intercepts of the graph of the corresponding rational function, and describe this connection [e.g., the real root of the equation (x − 2)/(x − 3) = 0 is 2, which is the x-intercept of the function f(x) = (x − 2)/(x − 3); the equation 1/(x − 3) = 0 has no real roots, and the function f(x) = 1/(x − 3) does not intersect the x-axis]
+- **C3.6** solve simple rational equations in one variable algebraically, and verify solutions using technology (e.g., using computer algebra systems to determine the roots; using graphing technology to determine the x-intercepts of the graph of the corresponding rational function)
+- **C3.7** solve problems involving applications of polynomial and simple rational functions and equations [e.g., problems involving the factor theorem or remainder theorem, such as determining the values of k for which the function f(x) = x³ + 6x² + kx − 4 gives the same remainder when divided by x − 1 and x + 2]
+  - *Sample problem:* Use long division to express the given function f(x) = (x² + 3x − 5)/(x − 1) as the sum of a polynomial function and a rational function of the form A/(x − 1) (where A is a constant), make a conjecture about the relationship between the given function and the polynomial function for very large positive and negative x-values, and verify your conjecture using graphing technology.
+
+### C4. Solving Inequalities
+
+By the end of this course, students will:
+
+- **C4.1** explain, for polynomial and simple rational functions, the difference between the solution to an equation in one variable and the solution to an inequality in one variable, and demonstrate that given solutions satisfy an inequality (e.g., demonstrate numerically and graphically that the solution to 1/(x + 1) < 5 is x < −1 or x > −4/5)
+- **C4.2** determine solutions to polynomial inequalities in one variable [e.g., solve f(x) ≥ 0, where f(x) = x³ − x² + 3x − 9] and to simple rational inequalities in one variable by graphing the corresponding functions, using graphing technology, and identifying intervals for which x satisfies the inequalities
+- **C4.3** solve linear inequalities and factorable polynomial inequalities in one variable (e.g., x³ + x² > 0) in a variety of ways (e.g., by determining intervals using x-intercepts and evaluating the corresponding function for a single x-value within each interval; by factoring the polynomial and identifying the conditions for which the product satisfies the inequality), and represent the solutions on a number line or algebraically (e.g., for the inequality x⁴ − 5x² + 4 < 0, the solution represented algebraically is −2 < x < −1 or 1 < x < 2)
 
 ---
 
