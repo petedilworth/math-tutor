@@ -108,4 +108,69 @@ By the end of this course, students will:
 
 ## C. Geometry and Algebra of Vectors
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **C1.** demonstrate an understanding of vectors in two-space and three-space by representing them algebraically and geometrically and by recognizing their applications;
+- **C2.** perform operations on vectors in two-space and three-space, and use the properties of these operations to solve problems, including those arising from real-world applications;
+- **C3.** distinguish between the geometric representations of a single linear equation or a system of two linear equations in two-space and three-space, and determine different geometric configurations of lines and planes in three-space;
+- **C4.** represent lines and planes using scalar, vector, and parametric equations, and solve problems involving distances and intersections.
+
+### C1. Representing Vectors Geometrically and Algebraically
+
+By the end of this course, students will:
+
+- **C1.1** recognize a vector as a quantity with both magnitude and direction, and identify, gather, and interpret information about real-world applications of vectors (e.g., displacement, forces involved in structural design, simple animation of computer graphics, velocity determined using GPS)
+  - *Sample problem:* Position is represented using vectors. Explain why knowing that someone is 69 km from Lindsay, Ontario, is not sufficient to identify their exact position.
+- **C1.2** represent a vector in two-space geometrically as a directed line segment, with directions expressed in different ways (e.g., 320°; N 40° W), and algebraically (e.g., using Cartesian coordinates; using polar coordinates), and recognize vectors with the same magnitude and direction but different positions as equal vectors
+- **C1.3** determine, using trigonometric relationships [e.g., x = r cos θ, y = r sin θ, θ = tan⁻¹(y/x) or tan⁻¹(y/x) + 180°, r = √(x² + y²)], the Cartesian representation of a vector in two-space given as a directed line segment, or the representation as a directed line segment of a vector in two-space given in Cartesian form [e.g., representing the vector (8, 6) as a directed line segment]
+  - *Sample problem:* Represent the vector with a magnitude of 8 and a direction of 30° anticlockwise to the positive x-axis in Cartesian form.
+- **C1.4** recognize that points and vectors in three-space can both be represented using Cartesian coordinates, and determine the distance between two points and the magnitude of a vector using their Cartesian representations
+
+### C2. Operating With Vectors
+
+By the end of this course, students will:
+
+- **C2.1** perform the operations of addition, subtraction, and scalar multiplication on vectors represented as directed line segments in two-space, and on vectors represented in Cartesian form in two-space and three-space
+- **C2.2** determine, through investigation with and without technology, some properties (e.g., commutative, associative, and distributive properties) of the operations of addition, subtraction, and scalar multiplication of vectors
+- **C2.3** solve problems involving the addition, subtraction, and scalar multiplication of vectors, including problems arising from real-world applications
+  - *Sample problem:* A plane on a heading of N 27° E has an air speed of 375 km/h. The wind is blowing from the south at 62 km/h. Determine the actual direction of travel of the plane and its ground speed.
+- **C2.4** perform the operation of dot product on two vectors represented as directed line segments (i.e., using a⃗ • b⃗ = |a⃗||b⃗| cos θ) and in Cartesian form (i.e., using a⃗ • b⃗ = a₁b₁ + a₂b₂ or a⃗ • b⃗ = a₁b₁ + a₂b₂ + a₃b₃) in two-space and three-space, and describe applications of the dot product (e.g., determining the angle between two vectors; determining the projection of one vector onto another)
+  - *Sample problem:* Describe how the dot product can be used to compare the work done in pulling a wagon over a given distance in a specific direction using a given force for different positions of the handle.
+- **C2.5** determine, through investigation, properties of the dot product (e.g., investigate whether it is commutative, distributive, or associative; investigate the dot product of a vector with itself and the dot product of orthogonal vectors)
+  - *Sample problem:* Investigate geometrically and algebraically the relationship between the dot product of the vectors (1, 0, 1) and (0, 1, −1) and the dot product of scalar multiples of these vectors. Does this relationship apply to any two vectors? Find a vector that is orthogonal to both the given vectors.
+- **C2.6** perform the operation of cross product on two vectors represented in Cartesian form in three-space [i.e., using a⃗ × b⃗ = (a₂b₃ − a₃b₂, a₃b₁ − a₁b₃, a₁b₂ − a₂b₁)], determine the magnitude of the cross product (i.e., using |a⃗ × b⃗| = |a⃗||b⃗| sin θ), and describe applications of the cross product (e.g., determining a vector orthogonal to two given vectors; determining the turning effect [or torque] when a force is applied to a wrench at different angles)
+  - *Sample problem:* Explain how you maximize the torque when you use a wrench and how the inclusion of a ratchet in the design of a wrench helps you to maximize the torque.
+- **C2.7** determine, through investigation, properties of the cross product (e.g., investigate whether it is commutative, distributive, or associative; investigate the cross product of collinear vectors)
+  - *Sample problem:* Investigate algebraically the relationship between the cross product of the vectors a⃗ = (1, 0, 1) and b⃗ = (0, 1, −1) and the cross product of scalar multiples of a⃗ and b⃗. Does this relationship apply to any two vectors?
+- **C2.8** solve problems involving dot product and cross product (e.g., determining projections, the area of a parallelogram, the volume of a parallelepiped), including problems arising from real-world applications (e.g., determining work, torque, ground speed, velocity, force)
+  - *Sample problem:* Investigate the dot products a⃗ • (a⃗ × b⃗) and b⃗ • (a⃗ × b⃗) for any two vectors a⃗ and b⃗ in three-space. What property of the cross product a⃗ × b⃗ does this verify?
+
+### C3. Describing Lines and Planes Using Linear Equations
+
+By the end of this course, students will:
+
+- **C3.1** recognize that the solution points (x, y) in two-space of a single linear equation in two variables form a line and that the solution points (x, y) in two-space of a system of two linear equations in two variables determine the point of intersection of two lines, if the lines are not coincident or parallel
+  - *Sample problem:* Describe algebraically the situations in two-space in which the solution points (x, y) of a system of two linear equations in two variables do not determine a point.
+- **C3.2** determine, through investigation with technology (i.e., 3-D graphing software) and without technology, that the solution points (x, y, z) in three-space of a single linear equation in three variables form a plane and that the solution points (x, y, z) in three-space of a system of two linear equations in three variables form the line of intersection of two planes, if the planes are not coincident or parallel
+  - *Sample problem:* Use spatial reasoning to compare the shapes of the solutions in three-space with the shapes of the solutions in two-space for each of the linear equations x = 0, y = 0, and y = x. For each of the equations z = 5, y − z = 3, and x + z = 1, describe the shape of the solution points (x, y, z) in three-space. Verify the shapes of the solutions in three-space using technology.
+- **C3.3** determine, through investigation using a variety of tools and strategies (e.g., modelling with cardboard sheets and drinking straws; sketching on isometric graph paper), different geometric configurations of combinations of up to three lines and/or planes in three-space (e.g., two skew lines, three parallel planes, two intersecting planes, an intersecting line and plane); organize the configurations based on whether they intersect and, if so, how they intersect (i.e., in a point, in a line, in a plane)
+
+### C4. Describing Lines and Planes Using Scalar, Vector, and Parametric Equations
+
+By the end of this course, students will:
+
+- **C4.1** recognize a scalar equation for a line in two-space to be an equation of the form Ax + By + C = 0, represent a line in two-space using a vector equation (i.e., r⃗ = r⃗₀ + tm⃗) and parametric equations, and make connections between a scalar equation, a vector equation, and parametric equations of a line in two-space
+- **C4.2** recognize that a line in three-space cannot be represented by a scalar equation, and represent a line in three-space using the scalar equations of two intersecting planes and using vector and parametric equations (e.g., given a direction vector and a point on the line, or given two points on the line)
+  - *Sample problem:* Represent the line passing through (3, 2, −1) and (0, 2, 1) with the scalar equations of two intersecting planes, with a vector equation, and with parametric equations.
+- **C4.3** recognize a normal to a plane geometrically (i.e., as a vector perpendicular to the plane) and algebraically [e.g., one normal to the plane 3x + 5y − 2z = 6 is (3, 5, −2)], and determine, through investigation, some geometric properties of the plane (e.g., the direction of any normal to a plane is constant; all scalar multiples of a normal to a plane are also normals to that plane; three non-collinear points determine a plane; the resultant, or sum, of any two vectors in a plane also lies in the plane)
+  - *Sample problem:* How does the relationship a⃗ • (b⃗ × c⃗) = 0 help you determine whether three non-parallel planes intersect in a point, if a⃗, b⃗, and c⃗ represent normals to the three planes?
+- **C4.4** recognize a scalar equation for a plane in three-space to be an equation of the form Ax + By + Cz + D = 0 whose solution points make up the plane, determine the intersection of three planes represented using scalar equations by solving a system of three linear equations in three unknowns algebraically (e.g., by using elimination or substitution), and make connections between the algebraic solution and the geometric configuration of the three planes
+  - *Sample problem:* Determine the equation of a plane P₃ that intersects the planes P₁, x + y + z = 1, and P₂, x − y + z = 0, in a single point. Determine the equation of a plane P₄ that intersects P₁ and P₂ in more than one point.
+- **C4.5** determine, using properties of a plane, the scalar, vector, and parametric equations of a plane
+  - *Sample problem:* Determine the scalar, vector, and parametric equations of the plane that passes through the points (3, 2, 5), (0, −2, 2), and (1, 3, 1).
+- **C4.6** determine the equation of a plane in its scalar, vector, or parametric form, given another of these forms
+  - *Sample problem:* Represent the plane r⃗ = (2, 1, 0) + s(1, −1, 3) + t(2, 0, −5), where s and t are real numbers, with a scalar equation.
+- **C4.7** solve problems relating to lines and planes in three-space that are represented in a variety of ways (e.g., scalar, vector, parametric equations) and involving distances (e.g., between a point and a plane; between two skew lines) or intersections (e.g., of two lines, of a line and a plane), and interpret the result geometrically
+  - *Sample problem:* Determine the intersection of the perpendicular line drawn from the point A(−5, 3, 7) to the plane v⃗ = (0, 0, 2) + t(−1, 1, 3) + s(2, 0, −3), and determine the distance from point A to the plane.
