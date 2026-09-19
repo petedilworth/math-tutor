@@ -57,7 +57,10 @@ By the end of this course, students will:
 - **A2.5** solve problems involving the intersection of a linear function and a quadratic function graphically and algebraically (e.g., determine the time when two identical cylindrical water tanks contain equal volumes of water, if one tank is being filled at a constant rate and the other is being emptied through a hole in the bottom)
   - *Sample problem:* Determine, through investigation, the equations of the lines that have a slope of 2 and that intersect the quadratic function f(x) = x(6 − x) once; twice; never.
 
-### A3. Determining Equivalent Algebraic Expressions
+### A3. Determining Equivalent Algebraic Expressions*
+
+> \* *Footnote in the original document, attached to this heading:* "The knowledge and skills described in the expectations in this section are to be introduced as needed, and applied and consolidated, as appropriate, in solving problems throughout the course"
+
 
 By the end of this course, students will:
 

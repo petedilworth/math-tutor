@@ -59,6 +59,18 @@ Twenty-four expectations, and the only real feed-ins are the sine and cosine law
 
 Two consequences. First, a weak Grade 11 student can still do well in vectors, which makes it the best place to build a student's confidence. Second, the algebra it does need, solving a 3 by 3 linear system by elimination, appears nowhere in MCR3U or MHF4U. Students last met it in Grade 10 with two equations. C4.4 asks for three unknowns cold.
 
+## Why the algebra is the weak point
+
+MCR3U strand A3, the algebra of polynomial, radical and rational expressions, carries a footnote in the curriculum:
+
+> The knowledge and skills described in the expectations in this section are to be introduced as needed, and applied and consolidated, as appropriate, in solving problems throughout the course
+
+Read that as a design decision with a predictable failure mode. A3 is the only part of Grade 11 that the Ministry explicitly says should not be taught as a unit. It has no chapter, no test of its own, and no week on the timetable. It is meant to be absorbed while doing other things.
+
+Skills taught that way are the ones students absorb unevenly. A student can pass MCR3U with a good mark while never having been assessed directly on adding rational expressions with unlike denominators. Then MCV4U A1.5 hands him [f(a + h) − f(a)]/h and the gap surfaces as a calculus problem, which it is not.
+
+This is the strongest practical reason to run a diagnostic before teaching anything. The weakest skill is the one that was never given a unit, so neither the student nor his report card knows it is weak.
+
 ## What you can skip
 
 **MCR3U strand C, Discrete Functions.** All 17 expectations: sequences, series, Pascal's triangle, compound interest, annuities. Nothing in MCV4U uses any of it. MCV4U A1.4 mentions the Fibonacci sequence once, as an informal illustration of a limit, and that is the entire connection. This is a quarter of Grade 11 that you can set aside.
