@@ -69,7 +69,40 @@ By the end of this course, students will:
 
 ## B. Derivatives and Their Applications
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **B1.** make connections, graphically and algebraically, between the key features of a function and its first and second derivatives, and use the connections in curve sketching;
+- **B2.** solve problems, including optimization problems, that require the use of the concepts and procedures associated with the derivative, including problems arising from real-world applications and involving the development of mathematical models.
+
+### B1. Connecting Graphs and Equations of Functions and Their Derivatives
+
+By the end of this course, students will:
+
+- **B1.1** sketch the graph of a derivative function, given the graph of a function that is continuous over an interval, and recognize points of inflection of the given function (i.e., points at which the concavity changes)
+  - *Sample problem:* Investigate the effect on the graph of the derivative of applying vertical and horizontal translations to the graph of a given function.
+- **B1.2** recognize the second derivative as the rate of change of the rate of change (i.e., the rate of change of the slope of the tangent), and sketch the graphs of the first and second derivatives, given the graph of a smooth function
+- **B1.3** determine algebraically the equation of the second derivative f″(x) of a polynomial or simple rational function f(x), and make connections, through investigation using technology, between the key features of the graph of the function (e.g., increasing/decreasing intervals, local maxima and minima, points of inflection, intervals of concavity) and corresponding features of the graphs of its first and second derivatives (e.g., for an increasing interval of the function, the first derivative is positive; for a point of inflection of the function, the slopes of tangents change their behaviour from increasing to decreasing or from decreasing to increasing, the first derivative has a maximum or minimum, and the second derivative is zero)
+  - *Sample problem:* Investigate, using graphing technology, connections between key properties, such as increasing/decreasing intervals, local maxima and minima, points of inflection, and intervals of concavity, of the functions f(x) = 4x + 1, f(x) = x² + 3x − 10, f(x) = x³ + 2x² − 3x, and f(x) = x⁴ + 4x³ − 3x² − 18x and the graphs of their first and second derivatives.
+- **B1.4** describe key features of a polynomial function, given information about its first and/or second derivatives (e.g., the graph of a derivative, the sign of a derivative over specific intervals, the x-intercepts of a derivative), sketch two or more possible graphs of the function that are consistent with the given information, and explain why an infinite number of graphs is possible
+  - *Sample problem:* The following is the graph of the function g(x). *(The graph shows an upward-opening parabola with vertex on the x-axis near x = 2 and y-intercept near 2.)* If g(x) is the derivative of f(x), and f(0) = 0, sketch the graph of f(x). If you are now given the function equation g(x) = (x − 1)(x − 3), determine the equation of f″(x) and describe some features of the equation of f(x). How would f(x) change graphically and algebraically if f(0) = 2?
+- **B1.5** sketch the graph of a polynomial function, given its equation, by using a variety of strategies (e.g., using the sign of the first derivative; using the sign of the second derivative; identifying even or odd functions) to determine its key features (e.g., increasing/decreasing intervals, intercepts, local maxima and minima, points of inflection, intervals of concavity), and verify using technology
+
+### B2. Solving Problems Using Mathematical Models and Derivatives
+
+By the end of this course, students will:
+
+- **B2.1** make connections between the concept of motion (i.e., displacement, velocity, acceleration) and the concept of the derivative in a variety of ways (e.g., verbally, numerically, graphically, algebraically)
+  - *Sample problem:* Generate a displacement–time graph by walking in front of a motion sensor connected to a graphing calculator. Use your knowledge of derivatives to sketch the velocity–time and acceleration–time graphs. Verify the sketches by displaying the graphs on the graphing calculator.
+- **B2.2** make connections between the graphical or algebraic representations of derivatives and real-world applications (e.g., population and rates of population change, prices and inflation rates, volume and rates of flow, height and growth rates)
+  - *Sample problem:* Given a graph of prices over time, identify the periods of inflation and deflation, and the time at which the maximum rate of inflation occurred. Explain how derivatives helped solve the problem.
+- **B2.3** solve problems, using the derivative, that involve instantaneous rates of change, including problems arising from real-world applications (e.g., population growth, radioactive decay, temperature changes, hours of daylight, heights of tides), given the equation of a function*
+  - *Sample problem:* The size of a population of butterflies is given by the function P(t) = 6000/(1 + 49(0.6)ᵗ) where t is the time in days. Determine the rate of growth in the population after 5 days using the derivative, and verify graphically using technology.
+- **B2.4** solve optimization problems involving polynomial, simple rational, and exponential functions drawn from a variety of applications, including those arising from real-world situations
+  - *Sample problem:* The number of bus riders from the suburbs to downtown per day is represented by 1200(1.15)⁻ˣ, where x is the fare in dollars. What fare will maximize the total revenue?
+- **B2.5** solve problems arising from real-world applications by applying a mathematical model and the concepts and procedures associated with the derivative to determine mathematical results, and interpret and communicate the results
+  - *Sample problem:* A bird is foraging for berries. If it stays too long in any one patch it will be spending valuable foraging time looking for the hidden berries, but when it leaves it will have to spend time finding another patch. A model for the net amount of food energy in joules the bird gets if it spends t minutes in a patch is E = 3000t/(t + 4). Suppose the bird takes 2 min on average to find each new patch, and spends negligible energy doing so. How long should the bird spend in a patch to maximize its average rate of energy gain over the time spent flying to a patch and foraging in it? Use and compare numeric, graphical, and algebraic strategies to solve this problem.
 
 ---
 
