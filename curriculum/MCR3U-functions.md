@@ -121,7 +121,51 @@ By the end of this course, students will:
 
 ## C. Discrete Functions
 
-*(pending – awaiting pages)*
+### Overall expectations
+
+By the end of this course, students will:
+
+- **C1.** demonstrate an understanding of recursive sequences, represent recursive sequences in a variety of ways, and make connections to Pascal's triangle;
+- **C2.** demonstrate an understanding of the relationships involved in arithmetic and geometric sequences and series, and solve related problems;
+- **C3.** make connections between sequences, series, and financial applications, and solve problems involving compound interest and ordinary annuities.
+
+### C1. Representing Sequences
+
+By the end of this course, students will:
+
+- **C1.1** make connections between sequences and discrete functions, represent sequences using function notation, and distinguish between a discrete function and a continuous function [e.g., f(x) = 2x, where the domain is the set of natural numbers, is a discrete linear function and its graph is a set of equally spaced points; f(x) = 2x, where the domain is the set of real numbers, is a continuous linear function and its graph is a straight line]
+- **C1.2** determine and describe (e.g., in words; using flow charts) a recursive procedure for generating a sequence, given the initial terms (e.g., 1, 3, 6, 10, 15, 21, …), and represent sequences as discrete functions in a variety of ways (e.g., tables of values, graphs)
+- **C1.3** connect the formula for the nth term of a sequence to the representation in function notation, and write terms of a sequence given one of these representations or a recursion formula
+- **C1.4** represent a sequence algebraically using a recursion formula, function notation, or the formula for the nth term [e.g., represent 2, 4, 8, 16, 32, 64, … as t₁ = 2; tₙ = 2tₙ₋₁, as f(n) = 2ⁿ, or as tₙ = 2ⁿ, or represent 1/2, 2/3, 3/4, 4/5, 5/6, 6/7, … as t₁ = 1/2; tₙ = tₙ₋₁ + 1/(n(n + 1)), as f(n) = n/(n + 1), or as tₙ = n/(n + 1), where n is a natural number], and describe the information that can be obtained by inspecting each representation (e.g., function notation or the formula for the nth term may show the type of function; a recursion formula shows the relationship between terms)
+  - *Sample problem:* Represent the sequence 0, 3, 8, 15, 24, 35, … using a recursion formula, function notation, and the formula for the nth term. Explain why this sequence can be described as a discrete quadratic function. Explore how to identify a sequence as a discrete quadratic function by inspecting the recursion formula.
+- **C1.5** determine, through investigation, recursive patterns in the Fibonacci sequence, in related sequences, and in Pascal's triangle, and represent the patterns in a variety of ways (e.g., tables of values, algebraic notation)
+- **C1.6** determine, through investigation, and describe the relationship between Pascal's triangle and the expansion of binomials, and apply the relationship to expand binomials raised to whole-number exponents [e.g., (1 + x)⁴, (2x − 1)⁵, (2x − y)⁶, (x² + 1)⁵]
+
+### C2. Investigating Arithmetic and Geometric Sequences and Series
+
+By the end of this course, students will:
+
+- **C2.1** identify sequences as arithmetic, geometric, or neither, given a numeric or algebraic representation
+- **C2.2** determine the formula for the general term of an arithmetic sequence [i.e., tₙ = a + (n − 1)d] or geometric sequence (i.e., tₙ = arⁿ⁻¹), through investigation using a variety of tools (e.g., linking cubes, algebra tiles, diagrams, calculators) and strategies (e.g., patterning; connecting the steps in a numerical example to the steps in the algebraic development), and apply the formula to calculate any term in a sequence
+- **C2.3** determine the formula for the sum of an arithmetic or geometric series, through investigation using a variety of tools (e.g., linking cubes, algebra tiles, diagrams, calculators) and strategies (e.g., patterning; connecting the steps in a numerical example to the steps in the algebraic development), and apply the formula to calculate the sum of a given number of consecutive terms
+  - *Sample problem:* Given the following array built with grey and white connecting cubes, investigate how different ways of determining the total number of grey cubes can be used to evaluate the sum of the arithmetic series 1 + 2 + 3 + 4 + 5. Extend the series, use patterning to make generalizations for finding the sum, and test the generalizations for other arithmetic series. *(The array in the document is a 5 × 6 grid with a staircase of grey cubes: 1, 2, 3, 4, 5 grey cubes in successive rows.)*
+- **C2.4** solve problems involving arithmetic and geometric sequences and series, including those arising from real-world applications
+
+### C3. Solving Problems Involving Financial Applications
+
+By the end of this course, students will:
+
+- **C3.1** make and describe connections between simple interest, arithmetic sequences, and linear growth, through investigation with technology (e.g., use a spreadsheet or graphing calculator to make simple interest calculations, determine first differences in the amounts over time, and graph amount versus time)
+  - *Sample problem:* Describe an investment that could be represented by the function f(x) = 500(1 + 0.05x).
+- **C3.2** make and describe connections between compound interest, geometric sequences, and exponential growth, through investigation with technology (e.g., use a spreadsheet to make compound interest calculations, determine finite differences in the amounts over time, and graph amount versus time)
+  - *Sample problem:* Describe an investment that could be represented by the function f(x) = 500(1.05)ˣ.
+- **C3.3** solve problems, using a scientific calculator, that involve the calculation of the amount, A (also referred to as future value, FV), the principal, P (also referred to as present value, PV), or the interest rate per compounding period, i, using the compound interest formula in the form A = P(1 + i)ⁿ [or FV = PV(1 + i)ⁿ]
+  - *Sample problem:* Two investments are available, one at 6% compounded annually and the other at 6% compounded monthly. Investigate graphically the growth of each investment, and determine the interest earned from depositing $1000 in each investment for 10 years.
+- **C3.4** determine, through investigation using technology (e.g., scientific calculator, the TVM Solver on a graphing calculator, online tools), the number of compounding periods, n, using the compound interest formula in the form A = P(1 + i)ⁿ [or FV = PV(1 + i)ⁿ]; describe strategies (e.g., guessing and checking; using the power of a power rule for exponents; using graphs) for calculating this number; and solve related problems
+- **C3.5** explain the meaning of the term *annuity*, and determine the relationships between ordinary simple annuities (i.e., annuities in which payments are made at the *end* of each period, and compounding and payment periods are the same), geometric series, and exponential growth, through investigation with technology (e.g., use a spreadsheet to determine and graph the future value of an ordinary simple annuity for varying numbers of compounding periods; investigate how the contributions of each payment to the future value of an ordinary simple annuity are related to the terms of a geometric series)
+- **C3.6** determine, through investigation using technology (e.g., the TVM Solver on a graphing calculator, online tools), the effects of changing the conditions (i.e., the payments, the frequency of the payments, the interest rate, the compounding period) of ordinary simple annuities (e.g., long-term savings plans, loans)
+  - *Sample problem:* Compare the amounts at age 65 that would result from making an annual deposit of $1000 starting at age 20, or from making an annual deposit of $3000 starting at age 50, to an RRSP that earns 6% interest per annum, compounded annually. What is the total of the deposits in each situation?
+- **C3.7** solve problems, using technology (e.g., scientific calculator, spreadsheet, graphing calculator), that involve the amount, the present value, and the regular payment of an ordinary simple annuity (e.g., calculate the total interest paid over the life of a loan, using a spreadsheet, and compare the total interest with the original principal of the loan)
 
 ---
 
