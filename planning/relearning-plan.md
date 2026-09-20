@@ -3,8 +3,12 @@
 ## Your actual situation
 
 - First year university calculus, done well, twenty-five years ago.
+- All three OAC mathematics courses before that: Algebra and Geometry, Finite Mathematics, Calculus.
 - Under four hours a week.
 - Already tutoring, so you cannot front-load anything.
+- A second motive: refreshing all of this to help younger children with their mathematics.
+
+**Superseded in part.** This plan was written before you confirmed the OAC courses. OAC Algebra and Geometry covered vectors, lines and planes, so strand C is recall rather than new learning and the vector block drops from about ten hours to about four. See `oac-to-now.md` for what carried over and what was cut, and `reading-the-curriculum.md` if the expectations themselves read as unfamiliar.
 
 That combination changes the plan completely from a generic one. Read the next section before doing anything else.
 
