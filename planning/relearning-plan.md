@@ -1,61 +1,85 @@
-# Re-learning the material yourself
+# Getting yourself up to speed
 
-## Assumptions
+## Your actual situation
 
-You have not told me your timeline, your own maths background, or when Sebastian starts. This plan assumes you once knew this material, you have a few weeks, and you can put in five to eight hours a week. Tell me if any of that is wrong and the plan changes.
+- First year university calculus, done well, twenty-five years ago.
+- Under four hours a week.
+- Already tutoring, so you cannot front-load anything.
 
-## The principle
+That combination changes the plan completely from a generic one. Read the next section before doing anything else.
 
-You do not need to re-learn Grade 11. You need to be able to solve MCV4U problems cold, and to recognize which earlier skill a student is actually failing at. Those are two different competencies and only the first comes from studying the content.
+## Your calculus is not the problem
 
-Work problems. Do not read chapters. Reading mathematics produces a feeling of understanding that survives right up until someone asks you a question you have not seen. A tutor who has only read is exposed the first time a student brings in homework.
+Someone who did well in first-year university calculus has met everything in MCV4U strands A and B, and a good deal more. Twenty-five years of disuse does not erase that. It makes it slow to retrieve, which is a different condition and a much cheaper one to fix.
 
-## Sequence
+Expect derivatives to come back in three or four hours of working problems, not twenty. Do not budget a month for it. Test the assumption rather than trusting it: take the calibration test in `tutor-self-test.md` cold, before you study anything. It will tell you in ninety minutes what is genuinely gone and what merely felt gone.
 
-**Stage 1. Algebra fluency, about 6 hours.**
+You have two real problems instead, and neither is the one people expect.
 
-Target: MCR3U A3.1 to A3.4, plus B1.2 and B1.3.
+## Problem one: vectors
 
-Do thirty problems on simplifying rational expressions with restrictions, and twenty on rational exponents and radicals. Then do this specific exercise twenty times with different functions: given f(x), simplify [f(a + h) − f(a)]/h completely and take the limit as h goes to 0. Use polynomials first, then 1/x, then √x.
+MCV4U strand C is twenty-four expectations, close to half the course by teaching time. First-year university calculus in Canada is normally limits, derivatives and integrals. Vector geometry, dot and cross products, lines and planes in three-space, usually sits in linear algebra or a later course, and when it is taught there it is done with matrices and row reduction rather than the elimination-and-geometry approach MCV4U uses.
 
-You will know you are done when the difference quotient for f(x) = 1/x takes you under ninety seconds and you do not have to think about the common denominator.
+So this is probably either new to you or very faint, and it cannot be learned just in time. It is cumulative. Planes do not make sense until the three forms of a line are automatic, and intersections do not make sense until planes are. You cannot pick it up the night before a session the way you can pick up the product rule.
 
-This stage is the one most tutors skip and it is the one that pays.
+**One thing worth checking first.** Twenty-five years ago Ontario still had OAC, the Grade 13 year, which ran until 2003. OAC Algebra and Geometry covered vectors, lines and planes in three-space, and is the direct ancestor of MCV4U strand C. If you took it, this material is not new to you and this whole section shrinks. Worth a minute of remembering before you plan around it.
 
-**Stage 2. The derivative concept, about 5 hours.**
+## Problem two: overshoot
 
-Target: MHF4U D1.1 to D1.9, then MCV4U A1 and A2.
+This is the one that will actually cost Sebastian marks, and almost nobody anticipates it.
 
-Be able to do all of this without notes: sketch f′ given a graph of f, including at corners and where the slope is zero; explain why the tangent at a corner does not exist; explain what a secant approaching a tangent means without using the word limit; and state what [f(a + h) − f(a)]/h measures in plain language.
+You know more calculus than his course contains. When you teach, you will reach for the tools you learned, and several of them are not in MCV4U at all:
 
-Then MCV4U A2.5 to A2.8, the exponential group. Know why e is defined the way it is, not just that it is about 2.718. You will be asked.
+- **The quotient rule.** Not an expectation. A3.5 asks students to rewrite rational functions as products with negative exponents instead.
+- **Implicit differentiation.** Not in the course.
+- **Related rates.** Not in the course. B2.3 asks only for instantaneous rates of change from a given equation.
+- **Formal limits.** A1.4 is explicitly informal. No limit laws, no epsilon-delta, no continuity theorems, certainly no L'Hôpital's rule.
+- **Integration.** Not in the course at all.
 
-**Stage 3. Derivative rules and applications, about 8 hours.**
+Teaching these is worse than a waste of his time. If he writes a test solution using a method his class has not been taught, he invites a teacher to scrutinize it, and he cannot defend it under pressure. He also loses the practice at the method he was supposed to use.
 
-Target: MCV4U A3 and B in full.
+There is a second, subtler version. You learned calculus in a limit-first, proof-flavoured way, because that is how universities teach it. MCV4U is deliberately investigation-first and informal. If you teach it the way you learned it, you will be teaching a harder course than the one he is enrolled in, and he will conclude he is bad at mathematics when he is in fact doing fine at the actual course.
 
-Rules first: power, sum, difference, product, chain. Skip the quotient rule unless Sebastian's teacher uses it, and rewrite rational functions as products with negative exponents, which is what A3.5 asks for.
+The discipline is simple and hard: teach from his materials, not from your memory. When your instinct and his textbook disagree about method, his textbook wins.
 
-Then curve sketching, which is where MHF4U C4.3 lives. Build sign charts for f′ and f″ until it is mechanical. Then twenty optimization problems, because optimization is where students lose the most marks and where you need to be fastest.
+## The structural insight
 
-**Stage 4. Vectors, about 10 hours.**
+Calculus can be handled just in time. Vectors cannot.
 
-Target: MCV4U strand C, all of it.
+That single fact determines how to spend four hours a week while already tutoring:
 
-This is the largest block because it is the half you are most likely to have forgotten entirely, or never to have seen. Nothing in Grade 11 prepares you for it either.
+- **Thirty to forty-five minutes per session** on the specific topic his class is doing. Work the problems he will be set, from his textbook. This is enough for calculus, because it is retrieval rather than learning.
+- **Everything left over, two to three hours a week, goes to vectors.** Not to reviewing Grade 11, not to re-reading calculus. Vectors is the only block that will fail if you leave it to the week you need it.
 
-Order: geometric vectors and resultants, then Cartesian form in two and three dimensions, then dot product, then cross product, then lines in two and three space, then planes, then intersections and distances. Do not skip ahead to planes. The scalar, vector and parametric forms of a line have to be automatic before planes make any sense.
+If you follow nothing else here, follow that split.
 
-Budget the most time on C4.4 and C4.7, systems of three equations and the geometry of their solutions. That material is the usual site of the course's hardest test questions, and you need to be able to see the configuration, not just do the elimination.
+## The sequence for vectors
 
-**Stage 5. Teaching rehearsal, ongoing.**
+About ten hours total, so four or five weeks at your pace. Strictly in this order, because each step is load-bearing for the next.
 
-For each stage, write out how you would explain the central idea to someone who does not have it yet. Not notes for yourself. The actual words. Three or four minutes of speech.
+1. **Geometric vectors and resultants**, MCV4U C1.1, C1.2, C2.1 to C2.3. Magnitude and direction, adding vectors head to tail, navigation and force problems. About 2 hours.
+2. **Cartesian form in two and three space**, C1.3, C1.4. Converting between forms, distance, magnitude. About 1 hour.
+3. **Dot product**, C2.4, C2.5, C2.8. Both the geometric and component formulas, angle between vectors, projections. About 1.5 hours.
+4. **Cross product**, C2.6 to C2.8. The component formula, magnitude, orthogonality, area of a parallelogram. About 1.5 hours.
+5. **Lines in two and three space**, C4.1, C4.2. Vector, parametric and scalar forms, and converting between them until it is automatic. Do not move on until it is. About 2 hours.
+6. **Planes**, C4.3 to C4.6. Normals, scalar equations, the three forms again. About 2 hours.
+7. **Intersections and distances**, C3.3, C4.4, C4.7. Systems of three equations, and what each solution means geometrically. About 2 hours.
 
-The explanations that matter most, in my judgement: why the derivative of sin is cos, why e is special, what the chain rule is doing, why the dot product tells you about angle, and why three planes can fail to meet at a point in several different ways.
+Step 7 is where the course's hardest questions live, and the difficulty is spatial rather than algebraic. Get three sheets of cardboard and physically arrange them. The curriculum itself suggests exactly this in C3.3 and it works better than any diagram.
 
-If you cannot say it out loud without hedging, you do not know it well enough to teach it.
+## What to study from
 
-## Total
+Ranked by value.
 
-About 29 hours to be solid, which is four to six weeks at a realistic pace. You can compress stages 1 to 3 substantially if the algebra comes back quickly. Stage 4 does not compress.
+1. **Sebastian's own textbook.** By a wide margin the best thing you can get hold of. It fixes notation, method and problem style to match what he is actually being marked on, which is the whole point. Ask him to photograph the contents page and a worked example, or borrow it between sessions.
+2. **His course outline and unit sequence.** Tells you what is coming and therefore what to prepare. Two minutes of asking saves hours of preparing the wrong thing.
+3. **Nelson Calculus and Vectors 12** is the common Ontario text if you want your own copy. McGraw-Hill also publishes one.
+4. **Ontario teacher sites** with free unit packages, such as jensenmath.ca, emmell.org and jongarvin.com. These are written to the Ontario expectations, unlike most of what you will find by searching. I could not reach the web from the machine that wrote this, so I have not verified they are still live.
+
+Avoid generic online calculus courses. Most are built to the American AP syllabus, which includes limits, integration and related rates. You will spend your scarce hours learning material that is not on his course.
+
+## The honest bottom line
+
+Your preparation is roughly twelve hours of real work: two on calibration, ten on vectors. The calculus will come back on its own as you use it.
+
+The rest of being useful to him is not preparation at all. It is watching him work in silence, resisting the urge to show him the clever method you know, and teaching the course he is actually enrolled in.
