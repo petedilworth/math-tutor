@@ -1,0 +1,480 @@
+<title>Seven Threads to Calculus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#F5F5F2; --surface:#FFFFFF; --surface-2:#EDEDE9;
+  --ink:#171A1E; --ink-2:#565C64; --ink-3:#82888F;
+  --line:#DCDCD6; --line-2:#C9C9C2;
+  --t1:#0B6E68; --t2:#3A579B; --t3:#B4470F; --t4:#9C2B4E;
+  --t5:#664796; --t6:#4A7233; --t7:#8E6B16;
+  --shadow:0 1px 2px rgba(20,22,26,.06),0 6px 20px -8px rgba(20,22,26,.14);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131519; --surface:#1B1E23; --surface-2:#23272D;
+    --ink:#E9EAEC; --ink-2:#A3A9B2; --ink-3:#7C838C;
+    --line:#2B2F36; --line-2:#3A3F47;
+    --t1:#4FC7BC; --t2:#8AA8EA; --t3:#F08A4C; --t4:#E97995;
+    --t5:#B196E9; --t6:#93C56F; --t7:#D7B350;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -10px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131519; --surface:#1B1E23; --surface-2:#23272D;
+  --ink:#E9EAEC; --ink-2:#A3A9B2; --ink-3:#7C838C;
+  --line:#2B2F36; --line-2:#3A3F47;
+  --t1:#4FC7BC; --t2:#8AA8EA; --t3:#F08A4C; --t4:#E97995;
+  --t5:#B196E9; --t6:#93C56F; --t7:#D7B350;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -10px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding-inline:16px; padding-block:40px 64px}
+
+/* ---------- header ---------- */
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 14px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,54px);
+  line-height:1.04; letter-spacing:-.018em; margin:0 0 16px; text-wrap:balance;
+}
+.thesis{
+  font-family:var(--serif); font-size:clamp(17px,2.3vw,21px); line-height:1.5;
+  color:var(--ink-2); max-width:62ch; margin:0 0 10px;
+}
+.thesis em{color:var(--ink); font-style:italic}
+.srcnote{
+  font-size:12.5px; color:var(--ink-3); max-width:70ch; margin:20px 0 0;
+  padding-top:16px; border-top:1px solid var(--line);
+}
+
+/* ---------- section furniture ---------- */
+.sec{margin-top:52px}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(22px,3.2vw,29px);
+  letter-spacing:-.012em; margin:0 0 6px; text-wrap:balance;
+}
+.sub{color:var(--ink-2); font-size:14px; max-width:68ch; margin:0 0 22px}
+
+/* ---------- the grid ---------- */
+.scroller{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; padding-bottom:4px}
+.grid{min-width:940px}
+
+.ghead{
+  display:grid; grid-template-columns:var(--labw) repeat(8,1fr);
+  border-bottom:1px solid var(--line-2); padding-bottom:8px; margin-bottom:4px;
+}
+.ghead > div{padding-inline:8px}
+.gh-stage{
+  font-family:var(--mono); font-size:11.5px; font-weight:500;
+  color:var(--ink); letter-spacing:.01em;
+}
+.gh-yr{
+  font-family:var(--mono); font-size:10px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--ink-3); margin-top:2px;
+}
+.gh-doc{font-size:10px; color:var(--ink-3); margin-top:5px; font-style:italic}
+
+.row{
+  display:grid; grid-template-columns:var(--labw) repeat(8,1fr);
+  align-items:stretch; border-bottom:1px solid var(--line);
+  color:var(--thread);
+}
+.row:last-child{border-bottom:0}
+
+.lab{
+  display:flex; flex-direction:column; justify-content:center; gap:3px;
+  padding:16px 14px 16px 0; text-align:left; background:none; border:0;
+  font:inherit; color:inherit; cursor:pointer; border-left:3px solid transparent;
+  padding-left:11px; transition:border-color .15s, background .15s;
+}
+.lab:hover{background:var(--surface-2)}
+.lab:focus-visible{outline:2px solid var(--thread); outline-offset:-2px}
+.lab .num{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
+  color:var(--thread); font-weight:500;
+}
+.lab .nm{
+  font-family:var(--serif); font-size:18px; font-weight:600; line-height:1.15;
+  color:var(--ink); letter-spacing:-.008em;
+}
+
+.cell{position:relative; padding:16px 8px; min-height:74px}
+.cell.on .dot{
+  position:absolute; left:50%; top:26px; width:9px; height:9px;
+  margin-left:-4.5px; border-radius:50%; background:var(--thread);
+}
+.cell.link::after{
+  content:""; position:absolute; left:50%; right:-50%; top:30px;
+  height:2px; background:var(--thread); opacity:.45;
+}
+.cell.bridge::after{opacity:.16}
+.cell .txt{
+  display:block; margin-top:42px; font-size:12px; line-height:1.3;
+  color:var(--ink-2); text-align:center; text-wrap:balance;
+}
+.cell.on .txt{color:var(--ink)}
+.cell .code{
+  display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+  text-align:center; margin-top:4px; letter-spacing:.02em;
+}
+
+/* selection states */
+.grid.has-sel .row{opacity:.3; transition:opacity .18s}
+.grid.has-sel .row.sel{opacity:1}
+.row.sel .lab{border-left-color:var(--thread); background:var(--surface-2)}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important}
+}
+
+/* ---------- detail ---------- */
+.detail{
+  margin-top:26px; background:var(--surface); border:1px solid var(--line);
+  border-left:4px solid var(--thread); border-radius:3px;
+  box-shadow:var(--shadow); padding:26px 24px;
+}
+.detail h3{
+  font-family:var(--serif); font-size:25px; font-weight:600; margin:0 0 4px;
+  letter-spacing:-.012em; color:var(--ink);
+}
+.detail .kicker{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--thread); font-weight:500; margin:0 0 10px;
+}
+.detail .essence{
+  font-family:var(--serif); font-size:18px; line-height:1.48; color:var(--ink);
+  margin:0 0 20px; max-width:64ch;
+}
+.dgrid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.dblock h4{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500; margin:0 0 6px;
+}
+.dblock p{margin:0; font-size:14px; line-height:1.55; color:var(--ink-2); max-width:56ch}
+.dblock strong{color:var(--ink); font-weight:600}
+
+/* ---------- questions ---------- */
+.qs{display:grid; gap:0; border-top:1px solid var(--line)}
+.q{
+  display:grid; grid-template-columns:38px 1fr; gap:14px;
+  padding:14px 0; border-bottom:1px solid var(--line); align-items:baseline;
+}
+.q .qn{
+  font-family:var(--mono); font-size:12px; color:var(--ink-3);
+  font-variant-numeric:tabular-nums;
+}
+.q .qt{font-size:14.5px; line-height:1.5; color:var(--ink); max-width:72ch; margin:0}
+.q.hard .qn{color:var(--t3); font-weight:500}
+.q .tag{
+  font-family:var(--mono); font-size:10px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--t3); margin-left:8px; white-space:nowrap;
+}
+
+/* ---------- footer ---------- */
+footer{
+  margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-3); max-width:74ch;
+}
+footer p{margin:0 0 8px}
+code{font-family:var(--mono); font-size:.92em; color:var(--ink-2)}
+
+@media (max-width:640px){
+  .wrap{padding-block:28px 48px}
+  .detail{padding:20px 18px}
+}
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Ontario mathematics · Grade 3 to Grade 12</p>
+  <h1>Seven Threads to Calculus</h1>
+  <p class="thesis">
+    Three curriculum documents, 187 separate expectations, and about
+    <em>seven ideas</em>. Each one runs the whole length of school mathematics,
+    changing its name at every stage. The documents are organized to be audited,
+    so they hide the through-line. This is the through-line.
+  </p>
+  <p class="thesis" style="font-size:15px">
+    Select a thread to follow it. Two of them do not run the whole way, and those
+    gaps are the most useful thing on the page.
+  </p>
+
+  <div class="sec">
+    <div class="scroller">
+      <div class="grid" id="grid" style="--labw:196px"></div>
+    </div>
+    <div class="detail" id="detail"></div>
+  </div>
+
+  <div class="sec">
+    <h2>Twelve questions that test understanding</h2>
+    <p class="sub">
+      Not procedures, reasons. The curriculum asks none of these directly. If you
+      can answer them in language a ten-year-old follows, you understand this
+      material better than most people who teach it.
+    </p>
+    <div class="qs" id="qs"></div>
+  </div>
+
+  <footer>
+    <p><strong>Sources.</strong> The Grade 11 and 12 columns are transcribed from
+    <em>The Ontario Curriculum, Grades 11 and 12: Mathematics, 2007 (revised)</em>,
+    and the expectation codes shown are that document's own.</p>
+    <p><strong>What is not sourced.</strong> The Grade 3 to Grade 10 columns are
+    my reading of where each idea first appears, not transcribed expectations.
+    Grades 1 to 8 run on a 2020 document, Grade 9 on <code>MTH1W</code> from 2021,
+    Grade 10 on a 2005 document. Treat those five columns as a sketch until they
+    are checked against the real text.</p>
+  </footer>
+
+</div>
+
+<script>
+const STAGES = [
+  {s:"Gr 3–4",  y:"Primary",   d:"2020"},
+  {s:"Gr 5–6",  y:"Junior",    d:"2020"},
+  {s:"Gr 7–8",  y:"Inter.",    d:"2020"},
+  {s:"Gr 9",    y:"MTH1W",     d:"2021"},
+  {s:"Gr 10",   y:"MPM2D",     d:"2005"},
+  {s:"MCR3U",   y:"Grade 11",  d:"2007"},
+  {s:"MHF4U",   y:"Grade 12",  d:"2007"},
+  {s:"MCV4U",   y:"Grade 12",  d:"2007"}
+];
+
+const IDEAS = [
+  {
+    n:"I", name:"Function", tok:"--t1",
+    kicker:"A rule with no ambiguity",
+    essence:"One input, exactly one output. That is the whole definition. The vertical line test is simply a picture of the words “exactly one”.",
+    wrong:"The notation <strong>f(x)</strong> does three jobs and people merge them. <strong>f</strong> is the rule. <strong>x</strong> is the input. <strong>f(x)</strong> is the output. Anyone who never separates these cannot later understand composition, inverses, or f′(x), because all three treat the rule itself as an object you act on.",
+    root:"“What’s my rule?” You say 3, I say 7. You say 5, I say 11. What am I doing? That is function notation without the notation, and an eight-year-old can play it.",
+    cells:[
+      ["Input–output games",""],
+      ["Pattern rules",""],
+      ["Variables and expressions",""],
+      ["Linear relations",""],
+      ["Quadratic relations",""],
+      ["Defined; function notation","A1.1–A1.3"],
+      ["Families of functions","A, B, C"],
+      ["f becomes a thing you differentiate","A2.2"]
+    ]
+  },
+  {
+    n:"II", name:"Four representations", tok:"--t2",
+    kicker:"The same object, four sides",
+    essence:"Every function can appear as a table, a graph, an equation, or a sentence. Understanding is moving between them in any direction, not just the two you were drilled on.",
+    wrong:"Most students travel one way only: equation to table to graph. Ask for a graph back to an equation, or a sentence straight to a graph, and it stops. That one-way fluency passes tests and is not understanding.",
+    root:"Show one growing pattern four ways: as blocks on the table, a table of numbers, a drawing, a sentence. Then ask which version makes the next term easiest to find. Representations are choices.",
+    cells:[
+      ["One pattern, four ways",""],
+      ["Tables and graphs of patterns",""],
+      ["Table ↔ equation ↔ graph",""],
+      ["Linear relations four ways",""],
+      ["Quadratics four ways",""],
+      ["“Make connections between…”","A1.2, A1.5"],
+      ["Comparing function families","D3.1"],
+      ["f and f′ side by side","A2.2, A2.5"]
+    ]
+  },
+  {
+    n:"III", name:"Rate of change", tok:"--t3",
+    kicker:"One question, asked five times",
+    essence:"How fast is it changing? Each stage asks the same question with the interval made smaller. That is the only thing calculus does to the idea, and nobody tells the student it is one question.",
+    wrong:"It is taught as five unrelated topics across four years: pattern rules, then slope, then average rate of change, then instantaneous, then the derivative. A student who sees them as five things has to learn each from scratch.",
+    root:"<strong>Proportional reasoning.</strong> If three apples cost two dollars, what do twelve cost? That is slope, years before anyone says the word, and it is the strongest single predictor of later success in mathematics.",
+    cells:[
+      ["How much each time?",""],
+      ["Unit rates, proportion",""],
+      ["Ratio, rate, percent",""],
+      ["Slope of a line",""],
+      ["First differences",""],
+      ["Finite differences by family","B2.1"],
+      ["Average and instantaneous","D1.1–D1.9"],
+      ["The derivative","A1, A2, A3"]
+    ]
+  },
+  {
+    n:"IV", name:"Local linearity", tok:"--t4",
+    kicker:"Arrives in Grade 12, and is never stated",
+    essence:"Zoom in far enough on a smooth curve and it stops being curved. The derivative is the slope of the line it becomes. Every rule you will ever learn is bookkeeping on top of that one observation.",
+    wrong:"It explains what otherwise looks arbitrary. A corner has no derivative because you can zoom forever and a corner stays a corner; it never becomes a line. The tangent approximates well nearby because nearby, the curve <strong>is</strong> that line.",
+    root:"No primary root. This is the one thread of the seven that genuinely begins in Grade 12 — which is exactly why it is the one to slow down on. “Zoom in on a map until the coastline looks straight” is the intuition.",
+    cells:[
+      ["",""],["",""],["",""],["",""],["",""],
+      ["",""],
+      ["Secants approaching a tangent","D1.7, D1.8"],
+      ["The tangent; why corners fail","A1.2, A1.5"]
+    ]
+  },
+  {
+    n:"V", name:"Transformation", tok:"--t5",
+    kicker:"One formula, ten function families",
+    essence:"y = af(k(x − d)) + c. Four moves: stretch vertically, stretch horizontally, shift horizontally, shift vertically. Learn it once in Grade 11 and it never changes again.",
+    wrong:"The horizontal ones run backwards and it feels wrong every time. <strong>a</strong> and <strong>c</strong> act on the output, after the function has run, so they behave as expected. <strong>k</strong> and <strong>d</strong> act on the input, before it runs. To show at x = 5 what the original showed at x = 2, you hand the function a 2 when given a 5. You are not moving the graph; you are changing what you feed it.",
+    root:"Grade 4 and 5 geometry: translations, reflections and rotations of shapes on a grid. Same word, same idea, seven years earlier, and almost nobody connects the two.",
+    cells:[
+      ["Flips, slides, turns",""],
+      ["Translations, reflections",""],
+      ["Congruence, dilations",""],
+      ["Effect of m and b",""],
+      ["Vertex form a(x−h)²+k",""],
+      ["y = af(k(x−d)) + c","A1.8, A1.9"],
+      ["Same formula, new families","A2.3, B2.5, C1.6"],
+      ["",""]
+    ]
+  },
+  {
+    n:"VI", name:"Inverse", tok:"--t6",
+    kicker:"Undoing, every year of school",
+    essence:"Run the operation backwards. It appears in every single year from Grade 1 onward and is almost never named as one idea, which is why logarithms feel like a new invention rather than an old friend.",
+    wrong:"One row is missing from the table because it was cut: integration undoes differentiation. Worth knowing even though it is not examinable — it is the other half of calculus, and its absence is part of why this course feels like it stops mid-sentence.",
+    root:"“What plus three makes seven?” A child comfortable running an operation backwards already has the seed of inverse functions, logarithms and the natural logarithm.",
+    cells:[
+      ["Subtraction undoes addition",""],
+      ["Fact families",""],
+      ["Solving by inverse operations",""],
+      ["Rearranging formulas",""],
+      ["Roots undo powers",""],
+      ["Inverse functions; y = x","A1.4–A1.7"],
+      ["Logarithms undo exponentials","A1.1, A2.2"],
+      ["ln undoes eˣ","A2.7"]
+    ]
+  },
+  {
+    n:"VII", name:"Direction as a quantity", tok:"--t7",
+    kicker:"Geometry becomes algebra",
+    essence:"Some quantities are meaningless without a direction. 80 km/h tells you nothing; 80 km/h west does. Everything after that is machinery for calculating with such quantities.",
+    wrong:"The deep move is the translation between two worlds. A plane is a sheet of cardboard you could hold, and it is also 19x − 6y − 11z + 10 = 0. Three planes meeting becomes a system of three equations. Solve the arithmetic, read the answer back as geometry. The dot and cross products are the dictionary.",
+    root:"Note the two-column gap. Nothing in Grade 11 or Advanced Functions prepares a student for this, and it is close to half of Calculus and Vectors. That cuts both ways: no review will get them ready, and no earlier failure has damaged them here.",
+    cells:[
+      ["Position, giving directions",""],
+      ["The coordinate grid",""],
+      ["Four quadrants; (x, y) moves",""],
+      ["Points and lines on a grid",""],
+      ["Analytic geometry","MPM2D"],
+      ["",""],
+      ["",""],
+      ["Vectors, lines, planes","C1–C4"]
+    ]
+  }
+];
+
+const QUESTIONS = [
+  "Why can a function not have two outputs for one input? What actually breaks if you allow it?",
+  "Why does (x − 3) move a graph to the right rather than the left?",
+  "Why does a corner have no derivative?",
+  "Why is the derivative of a constant zero? Answer in terms of rate of change, not the rule.",
+  "Why is e special? What question is e the answer to?",
+  "Why does the derivative of sin x turn out to be cos x? Think about the slope of the sine graph at each point.",
+  "Why does log(ab) = log a + log b? What fact about exponents is this restating?",
+  "What does the second derivative mean, if the first derivative is speed?",
+  "Why does the chain rule multiply? What is each factor measuring?",
+  "Why does the dot product tell you about the angle between two vectors?",
+  "Why is the cross product perpendicular to both vectors, and why does its length measure area?",
+  "Three planes, no common point. Give two genuinely different ways that can happen."
+];
+const HARD = [6, 12];
+
+/* ---------- build grid ---------- */
+const grid = document.getElementById("grid");
+
+const head = document.createElement("div");
+head.className = "ghead";
+head.appendChild(document.createElement("div"));
+STAGES.forEach(st => {
+  const d = document.createElement("div");
+  d.innerHTML = '<div class="gh-stage">' + st.s + '</div>' +
+                '<div class="gh-yr">' + st.y + '</div>' +
+                '<div class="gh-doc">' + st.d + '</div>';
+  head.appendChild(d);
+});
+grid.appendChild(head);
+
+IDEAS.forEach((idea, i) => {
+  const row = document.createElement("div");
+  row.className = "row";
+  row.style.setProperty("--thread", "var(" + idea.tok + ")");
+  row.dataset.i = i;
+
+  const lab = document.createElement("button");
+  lab.className = "lab";
+  lab.type = "button";
+  lab.setAttribute("aria-pressed", "false");
+  lab.innerHTML = '<span class="num">' + idea.n + '</span>' +
+                  '<span class="nm">' + idea.name + '</span>';
+  row.appendChild(lab);
+
+  const filled = idea.cells.map(c => !!c[0]);
+  idea.cells.forEach((c, j) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    if (c[0]) {
+      cell.classList.add("on");
+      cell.innerHTML = '<span class="dot"></span><span class="txt">' + c[0] + '</span>' +
+                       (c[1] ? '<span class="code">' + c[1] + '</span>' : '');
+      if (filled[j + 1]) cell.classList.add("link");
+    } else if (filled[j - 1] && filled.slice(j + 1).some(Boolean)) {
+      cell.classList.add("link", "bridge");
+    }
+    row.appendChild(cell);
+  });
+
+  grid.appendChild(row);
+});
+
+/* ---------- detail ---------- */
+const detail = document.getElementById("detail");
+const rows = Array.from(grid.querySelectorAll(".row"));
+
+function select(i){
+  const idea = IDEAS[i];
+  grid.classList.add("has-sel");
+  rows.forEach((r, k) => {
+    const on = k === i;
+    r.classList.toggle("sel", on);
+    r.querySelector(".lab").setAttribute("aria-pressed", String(on));
+  });
+  detail.style.setProperty("--thread", "var(" + idea.tok + ")");
+  detail.innerHTML =
+    '<p class="kicker">Thread ' + idea.n + ' · ' + idea.kicker + '</p>' +
+    '<h3>' + idea.name + '</h3>' +
+    '<p class="essence">' + idea.essence + '</p>' +
+    '<div class="dgrid">' +
+      '<div class="dblock"><h4>What people get wrong</h4><p>' + idea.wrong + '</p></div>' +
+      '<div class="dblock"><h4>Where it starts</h4><p>' + idea.root + '</p></div>' +
+    '</div>';
+}
+
+grid.addEventListener("click", e => {
+  const row = e.target.closest(".row");
+  if (row) select(Number(row.dataset.i));
+});
+
+select(2);
+
+/* ---------- questions ---------- */
+const qs = document.getElementById("qs");
+QUESTIONS.forEach((q, i) => {
+  const n = i + 1;
+  const el = document.createElement("div");
+  el.className = "q" + (HARD.includes(n) ? " hard" : "");
+  el.innerHTML = '<div class="qn">' + String(n).padStart(2, "0") + '</div>' +
+                 '<p class="qt">' + q +
+                 (HARD.includes(n) ? '<span class="tag">most people cannot</span>' : '') +
+                 '</p>';
+  qs.appendChild(el);
+});
+</script>
