@@ -7,11 +7,12 @@
 :root{
   color-scheme:light;
   --bg:#F4F4F1; --surface:#FFFFFF; --surface-2:#EAEAE5; --surface-3:#DFDFD8;
-  --ink:#16191D; --ink-2:#555B63; --ink-3:#848A92;
+  --ink:#16191D; --ink-2:#51575F; --ink-3:#80868E;
   --line:#DBDBD4; --line-2:#C5C5BD;
-  --accent:#0B6E68; --accent-soft:#D9EBE8;
-  --good:#3F6B2B; --good-soft:#DFEBD6;
-  --miss:#A8420D; --miss-soft:#F5E2D6;
+  --accent:#0B6E68; --accent-soft:#DCEDEA; --on-accent:#FFFFFF;
+  --good:#3A6627; --good-soft:#E1EDD8;
+  --miss:#A5400C; --miss-soft:#F6E4D8;
+  --tip:#6B4E0E; --tip-soft:#F4ECD6;
   --shadow:0 1px 2px rgba(20,22,26,.05),0 10px 28px -14px rgba(20,22,26,.22);
   --serif:"Newsreader",Georgia,"Times New Roman",serif;
   --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -21,22 +22,24 @@
   :root:not([data-theme="light"]){
     color-scheme:dark;
     --bg:#121419; --surface:#1A1D22; --surface-2:#22262C; --surface-3:#2C3138;
-    --ink:#E8EAEC; --ink-2:#A2A8B1; --ink-3:#7A818A;
+    --ink:#E8EAEC; --ink-2:#A6ACB5; --ink-3:#7A818A;
     --line:#2A2E35; --line-2:#3A3F47;
-    --accent:#4FC7BC; --accent-soft:#16332F;
-    --good:#8FC36B; --good-soft:#1E2B17;
+    --accent:#4FC7BC; --accent-soft:#15302D; --on-accent:#0E1215;
+    --good:#8FC36B; --good-soft:#1C2915;
     --miss:#F0894A; --miss-soft:#33200F;
+    --tip:#DDBA5E; --tip-soft:#2C2512;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -16px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#121419; --surface:#1A1D22; --surface-2:#22262C; --surface-3:#2C3138;
-  --ink:#E8EAEC; --ink-2:#A2A8B1; --ink-3:#7A818A;
+  --ink:#E8EAEC; --ink-2:#A6ACB5; --ink-3:#7A818A;
   --line:#2A2E35; --line-2:#3A3F47;
-  --accent:#4FC7BC; --accent-soft:#16332F;
-  --good:#8FC36B; --good-soft:#1E2B17;
+  --accent:#4FC7BC; --accent-soft:#15302D; --on-accent:#0E1215;
+  --good:#8FC36B; --good-soft:#1C2915;
   --miss:#F0894A; --miss-soft:#33200F;
+  --tip:#DDBA5E; --tip-soft:#2C2512;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -16px rgba(0,0,0,.7);
 }
 
@@ -46,665 +49,986 @@ body{
   font-family:var(--sans); font-size:15px; line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:32px 60px}
-sup{font-size:.68em; line-height:0}
+.wrap{max-width:760px; margin:0 auto; padding-inline:16px; padding-block:28px 56px}
+sup{font-size:.66em; line-height:0}
 
-/* header */
-.masthead{display:flex; flex-wrap:wrap; align-items:flex-end; gap:16px 24px; margin-bottom:6px}
-h1{
-  font-family:var(--serif); font-weight:600; font-size:clamp(30px,5.5vw,42px);
-  line-height:1; letter-spacing:-.02em; margin:0;
-}
-.tally{
-  display:flex; gap:18px; font-family:var(--mono); font-size:12px;
-  color:var(--ink-2); font-variant-numeric:tabular-nums; padding-bottom:3px;
-}
+/* ---------- header ---------- */
+.masthead{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 20px}
+h1{font-family:var(--serif); font-weight:600; font-size:clamp(28px,5.5vw,38px); line-height:1; letter-spacing:-.02em; margin:0}
+.tally{display:flex; gap:16px; font-family:var(--mono); font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; padding-bottom:2px}
 .tally b{color:var(--ink); font-weight:500}
-.lede{color:var(--ink-2); font-size:14px; max-width:60ch; margin:8px 0 26px}
 
-/* topic chips */
-.pickers{display:flex; flex-direction:column; gap:10px; margin-bottom:22px}
-.prow{display:flex; flex-wrap:wrap; align-items:center; gap:7px}
-.plabel{
-  font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--ink-3); width:82px; flex:none;
+.modes{display:flex; gap:0; margin:20px 0 16px; border:1px solid var(--line-2); border-radius:3px; overflow:hidden; width:fit-content; max-width:100%}
+.mode{
+  font:inherit; font-size:13.5px; font-weight:500; padding:8px 16px; cursor:pointer;
+  background:var(--surface); color:var(--ink-2); border:0;
 }
-.chip{
-  font:inherit; font-size:12.5px; padding:5px 11px; border-radius:2px; cursor:pointer;
-  background:var(--surface); color:var(--ink-2); border:1px solid var(--line);
-  transition:background .12s,color .12s,border-color .12s;
-}
-.chip:hover{border-color:var(--line-2); color:var(--ink)}
-.chip:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-.chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--surface); font-weight:500}
-:root[data-theme="dark"] .chip[aria-pressed="true"],
-:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#101317}
-.chip.wide{width:auto}
+.mode + .mode{border-left:1px solid var(--line-2)}
+.mode[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.mode:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
 
-/* problem card */
-.card{
-  background:var(--surface); border:1px solid var(--line); border-radius:3px;
-  box-shadow:var(--shadow); padding:26px 24px 22px; margin-bottom:22px;
+/* ---------- step bar ---------- */
+.stepbar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin-bottom:12px}
+.stepname{font-size:13px; color:var(--ink-2)}
+.stepname b{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink); letter-spacing:-.01em; margin-left:4px}
+.dots{display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:11px; color:var(--ink-3)}
+.dot{width:10px; height:10px; border-radius:50%; background:var(--surface-3); border:1px solid var(--line-2)}
+.dot.y{background:var(--good); border-color:var(--good)}
+.dot.n{background:var(--miss); border-color:var(--miss)}
+.dots span{margin-left:6px}
+
+details.ladder{margin:0 0 18px; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+details.ladder summary{
+  cursor:pointer; padding:9px 0; font-size:13px; color:var(--ink-2); list-style:none;
 }
-.ctop{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:18px}
-.ctopic{
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--accent); font-weight:500;
+details.ladder summary::-webkit-details-marker{display:none}
+details.ladder summary::before{content:"+ "; font-family:var(--mono); color:var(--ink-3)}
+details.ladder[open] summary::before{content:"\2212 "}
+details.ladder summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.steps-list{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:6px; padding:4px 0 14px}
+.sbtn{
+  font:inherit; font-size:13px; text-align:left; padding:8px 10px; cursor:pointer;
+  border:1px solid var(--line); border-radius:2px; background:var(--surface); color:var(--ink-2);
+  display:flex; gap:8px; align-items:baseline;
 }
+.sbtn:hover{border-color:var(--line-2); color:var(--ink)}
+.sbtn:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.sbtn .sn{font-family:var(--mono); font-size:11px; color:var(--ink-3); min-width:18px}
+.sbtn.cur{border-color:var(--accent); color:var(--ink); background:var(--accent-soft)}
+.sbtn.done .sn{color:var(--good)}
+.sbtn.done .sn::after{content:" \2713"}
+
+/* ---------- problem card ---------- */
+.card{background:var(--surface); border:1px solid var(--line); border-radius:3px; box-shadow:var(--shadow); padding:22px 20px 20px}
+.ctop{display:flex; justify-content:space-between; gap:12px; margin-bottom:12px}
+.ctopic{font-family:var(--mono); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--accent); font-weight:500}
 .ccode{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap}
-.task{font-size:14px; color:var(--ink-2); margin:0 0 10px}
-.expr{
-  font-family:var(--serif); font-size:clamp(22px,4.2vw,30px); line-height:1.35;
-  color:var(--ink); margin:0; letter-spacing:-.005em; overflow-x:auto;
-}
-.expr .vec{font-weight:600; font-style:italic}
-.hint{font-size:13px; color:var(--ink-3); margin:12px 0 0; font-style:italic}
+.task{font-size:14.5px; color:var(--ink-2); margin:0 0 8px}
+.expr{font-family:var(--serif); font-size:clamp(22px,5vw,29px); line-height:1.35; color:var(--ink); margin:0 0 18px; overflow-x:auto}
+.expr.q{font-size:clamp(19px,4.2vw,23px); line-height:1.4}
 
-/* controls */
-.acts{display:flex; flex-wrap:wrap; gap:9px; align-items:center; margin-top:20px}
-.btn{
-  font:inherit; font-size:13.5px; font-weight:500; padding:9px 16px; border-radius:2px;
-  cursor:pointer; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink);
-  transition:background .12s,border-color .12s;
+.opts{display:grid; gap:9px; grid-template-columns:1fr 1fr}
+@media (max-width:560px){ .opts{grid-template-columns:1fr} }
+.opt{
+  font:inherit; text-align:left; cursor:pointer; padding:12px 14px; min-height:54px;
+  border:1px solid var(--line-2); border-radius:3px; background:var(--bg); color:var(--ink);
+  display:flex; align-items:center; gap:12px; transition:border-color .12s, background .12s;
 }
-.btn:hover{background:var(--surface-3)}
-.btn:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--surface)}
-:root[data-theme="dark"] .btn.primary,
-:root:not([data-theme="light"]) .btn.primary{color:#101317}
-.btn.primary:hover{filter:brightness(1.07)}
-.btn.good{border-color:var(--good); color:var(--good); background:var(--good-soft)}
-.btn.miss{border-color:var(--miss); color:var(--miss); background:var(--miss-soft)}
-input[type="text"]{
-  font-family:var(--mono); font-size:16px; padding:8px 11px; width:150px;
-  border:1px solid var(--line-2); border-radius:2px; background:var(--bg); color:var(--ink);
-}
-input[type="text"]:focus-visible{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent)}
+.opt:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft)}
+.opt:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.opt .ok{font-family:var(--mono); font-size:11px; color:var(--ink-3); flex:none; width:14px}
+.opt .ov{font-family:var(--serif); font-size:19px; line-height:1.3; overflow-x:auto}
+.opt.prose .ov{font-family:var(--sans); font-size:14.5px; line-height:1.45}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good); background:var(--good-soft)}
+.opt.right .ok{color:var(--good)}
+.opt.wrong{border-color:var(--miss); background:var(--miss-soft)}
+.opt.wrong .ok{color:var(--miss)}
+.opt.faded{opacity:.5}
 
-/* answer */
-.ans{margin-top:22px; padding-top:20px; border-top:1px solid var(--line)}
-.alabel{
-  font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--ink-3); margin:0 0 8px;
+.hintrow{margin-top:14px}
+.link{
+  font:inherit; font-size:13px; color:var(--accent); background:none; border:0; padding:0; cursor:pointer;
+  text-decoration:underline; text-underline-offset:3px;
 }
-.aval{
-  font-family:var(--serif); font-size:clamp(19px,3.4vw,25px); line-height:1.4;
-  color:var(--ink); margin:0; overflow-x:auto;
-}
-.verdict{
-  display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.06em;
-  text-transform:uppercase; padding:3px 9px; border-radius:2px; margin-bottom:12px;
-}
+.link:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ---------- feedback ---------- */
+.fb{margin-top:20px; padding-top:18px; border-top:1px solid var(--line)}
+.verdict{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.07em; text-transform:uppercase; padding:3px 9px; border-radius:2px; margin-bottom:12px}
 .verdict.y{background:var(--good-soft); color:var(--good)}
 .verdict.n{background:var(--miss-soft); color:var(--miss)}
-.steps{
-  margin:16px 0 0; padding:14px 0 0; border-top:1px dashed var(--line);
-  display:flex; flex-direction:column; gap:7px;
+.mistake{
+  margin:0 0 16px; padding:12px 14px; border-left:3px solid var(--miss); background:var(--miss-soft);
+  font-size:14.5px; line-height:1.55; color:var(--ink); border-radius:0 2px 2px 0;
 }
-.steps .sl{
-  font-family:var(--serif); font-size:16px; color:var(--ink-2); line-height:1.4;
-  overflow-x:auto; padding-left:14px; border-left:2px solid var(--line);
-}
-.steps .sl.last{color:var(--ink); border-left-color:var(--accent)}
-.prose{font-size:15px; line-height:1.62; color:var(--ink-2); margin:0; max-width:64ch}
+.mistake .lbl{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--miss); margin-bottom:4px}
+.h4{font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); margin:0 0 8px}
+.walk{display:flex; flex-direction:column; gap:8px; margin:0 0 16px}
+.walk .w{font-size:14.5px; line-height:1.55; color:var(--ink-2); padding-left:13px; border-left:2px solid var(--line); max-width:66ch; overflow-x:auto}
+.walk .w:last-child{color:var(--ink); border-left-color:var(--accent)}
+.walk .w .m{font-family:var(--serif); font-size:16.5px; color:var(--ink)}
+.prose{font-size:14.5px; line-height:1.62; color:var(--ink-2); margin:0 0 10px; max-width:66ch}
 .prose strong{color:var(--ink); font-weight:600}
-.prose + .prose{margin-top:11px}
-.selfq{font-size:13px; color:var(--ink-3); margin:18px 0 0}
 
-/* progress */
-.prog{margin-top:34px}
-.ptitle{
-  font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--ink-3); margin:0 0 12px;
-}
-.plist{display:grid; gap:0; border-top:1px solid var(--line)}
-.prow2{
-  display:grid; grid-template-columns:1fr 84px 56px; gap:12px; align-items:center;
-  padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;
-}
-.prow2 .pn{color:var(--ink-2)}
-.bar{height:5px; background:var(--surface-3); border-radius:3px; overflow:hidden}
-.bar i{display:block; height:100%; background:var(--accent)}
-.bar i.weak{background:var(--miss)}
-.pnum{
-  font-family:var(--mono); font-size:11.5px; color:var(--ink-3); text-align:right;
-  font-variant-numeric:tabular-nums;
-}
-.reset{margin-top:16px}
+.rule{border:1px solid var(--line); border-radius:3px; background:var(--bg); padding:14px 16px; margin:4px 0 16px}
+.rule .rt{font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.rule .rr{font-family:var(--serif); font-size:17px; line-height:1.45; color:var(--ink); margin:0 0 12px}
+.rule .rx{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+@media (max-width:560px){ .rule .rx{grid-template-columns:1fr} }
+.rule .rx div{font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.rule .rx b{display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:500; margin-bottom:3px}
+.rule .tipb b{color:var(--tip)}
+.rule .trapb b{color:var(--miss)}
 
-footer{margin-top:42px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3); max-width:70ch}
+.advance{margin:0 0 14px; padding:11px 14px; background:var(--good-soft); color:var(--good); border-radius:2px; font-size:14px; font-weight:500}
+
+.acts{display:flex; flex-wrap:wrap; gap:9px; align-items:center}
+.btn{
+  font:inherit; font-size:14px; font-weight:500; padding:10px 18px; border-radius:2px; cursor:pointer;
+  border:1px solid var(--accent); background:var(--accent); color:var(--on-accent);
+}
+.btn:hover{filter:brightness(1.07)}
+.btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+.keys{font-size:12px; color:var(--ink-3)}
+
+footer{margin-top:36px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3); max-width:68ch}
 footer p{margin:0 0 7px}
+.reset{font:inherit; font-size:12.5px; color:var(--ink-3); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; text-underline-offset:3px}
+.reset:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media (max-width:560px){
-  .plabel{width:100%}
-  .card{padding:20px 17px 18px}
-  .prow2{grid-template-columns:1fr 60px 52px}
-}
 </style>
 
 <div class="wrap">
-
   <div class="masthead">
     <h1>Chalk and Paper</h1>
     <div class="tally">
-      <span>done <b id="tDone">0</b></span>
+      <span>today <b id="tDone">0</b></span>
       <span>right <b id="tRight">0</b></span>
       <span>streak <b id="tStreak">0</b></span>
     </div>
   </div>
-  <p class="lede">
-    Fresh problems every time, so nothing can be memorized. Work each one on paper,
-    then reveal and mark yourself honestly. Mixed mode feeds you more of whatever
-    you are worst at.
-  </p>
 
-  <div class="pickers" id="pickers"></div>
-
-  <div class="card" id="card"></div>
-
-  <div class="prog">
-    <p class="ptitle">Where you stand</p>
-    <div class="plist" id="plist"></div>
-    <div class="reset"><button class="btn" id="reset" type="button">Clear my record</button></div>
+  <div class="modes" role="group" aria-label="What to practise">
+    <button class="mode" id="mPath" type="button" aria-pressed="true">Skills, step by step</button>
+    <button class="mode" id="mWhy" type="button" aria-pressed="false">Why it works</button>
   </div>
 
-  <footer>
-    <p>Skill problems are generated fresh each time with whole-number answers. The
-    calculus and vector topics follow the Ontario <span style="font-family:var(--mono)">MCV4U</span>
-    expectations, and the quotient rule is deliberately absent, as it is from the course.</p>
-    <p>Your record is kept in this browser only. It will not follow you to another device.</p>
-  </footer>
+  <div id="pathbar"></div>
+  <div class="card" id="card"></div>
 
+  <footer>
+    <p>Every problem is freshly generated, so you cannot memorize answers. Each wrong option is a
+    real mistake people make, and choosing one tells you which. Get four of your last five right on
+    a step and the next step opens.</p>
+    <p>The steps follow the Ontario <span style="font-family:var(--mono)">MCV4U</span> course and what
+    it rests on. Your progress is kept in this browser only.
+    <button class="reset" id="reset" type="button">Start over</button></p>
+  </footer>
 </div>
 
 <script>
-/* ============ helpers ============ */
-const M = "−";                                  /* true minus sign */
+/* ================= maths helpers ================= */
+const M = "−";
 const neg = x => String(x).replace(/-/g, M);
 const ri = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 const nz = (a,b) => { let v; do { v = ri(a,b); } while (v === 0); return v; };
 const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 const gcd = (a,b) => b ? gcd(b, a%b) : Math.abs(a);
+const sup = p => "<sup>" + neg(p) + "</sup>";
+const xp = p => p === 0 ? "" : p === 1 ? "x" : "x" + sup(p);
 
-function pow(p){ return p === 1 ? "x" : "x<sup>" + p + "</sup>"; }
-
-/* terms: [{c, p}] -> "2x³ − 5x + 4" */
 function poly(terms){
   const t = terms.filter(o => o.c !== 0).sort((a,b) => b.p - a.p);
   if (!t.length) return "0";
   return t.map((o,i) => {
     const m = Math.abs(o.c);
-    const body = o.p === 0 ? String(m) : (m === 1 ? "" : m) + pow(o.p);
+    const body = o.p === 0 ? String(m) : (m === 1 ? "" : m) + xp(o.p);
     if (i === 0) return (o.c < 0 ? M : "") + body;
     return (o.c < 0 ? " " + M + " " : " + ") + body;
   }).join("");
 }
-/* a linear factor group like (3x² + 4) */
-const grp = terms => "(" + poly(terms) + ")";
-
-function vec(v){ return "(" + v.map(neg).join(", ") + ")"; }
-const dot = (a,b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
-const cross = (a,b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
-const sub = (a,b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
-const mag = a => Math.sqrt(dot(a,a));
-const rvec = (lo,hi) => { let v; do { v = [ri(lo,hi), ri(lo,hi), ri(lo,hi)]; } while (!v.some(Boolean)); return v; };
-
-/* "3x − 2y + z + 5 = 0" */
-function linForm(n, d){
-  const names = ["x","y","z"];
-  let out = "";
-  n.forEach((c,i) => {
-    if (!c) return;
-    const m = Math.abs(c), body = (m === 1 ? "" : m) + names[i];
-    out += out === "" ? (c < 0 ? M + body : body) : (c < 0 ? " " + M + " " : " + ") + body;
-  });
-  if (d) out += (d < 0 ? " " + M + " " : " + ") + Math.abs(d);
-  return out + " = 0";
+const evalT = (t,x) => t.reduce((s,o) => s + o.c*Math.pow(x,o.p), 0);
+const grp = t => "(" + poly(t) + ")";
+function frac(n,d){
+  if (d < 0){ n = -n; d = -d; }
+  const g = gcd(n,d) || 1; n /= g; d /= g;
+  return { html: d === 1 ? neg(n) : neg(n) + "/" + d, val: n/d };
 }
+const vec = v => "(" + v.map(neg).join(", ") + ")";
+const dot = (a,b) => a.reduce((s,x,i) => s + x*b[i], 0);
+const cross = (a,b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const sub = (a,b) => a.map((x,i) => x - b[i]);
+const add = (a,b) => a.map((x,i) => x + b[i]);
+const isZero = v => v.every(x => x === 0);
+const parallel = (a,b) => isZero(cross(a.length===2?[a[0],a[1],0]:a, b.length===2?[b[0],b[1],0]:b));
+const rv = (lo,hi,n=3) => { let v; do { v = Array.from({length:n}, () => ri(lo,hi)); } while (isZero(v)); return v; };
+const sgnTerm = (c, body) => (c < 0 ? " " + M + " " : " + ") + (Math.abs(c) === 1 && body ? "" : Math.abs(c)) + body;
+const root = q => q === 2 ? "square" : "cube";
+const m_ = s => '<span class="m">' + s + '</span>';
 
-/* ============ generators ============ */
-const TOPICS = [
-  {
-    id:"power", group:"Calculus", name:"Power rule", code:"A3.1, A3.3",
-    gen(){
-      const ps = [];
-      while (ps.length < 3){ const p = ri(0,5); if (!ps.includes(p)) ps.push(p); }
-      if (!ps.some(p => p >= 2)) ps[0] = ri(2,5);
-      const f = ps.map(p => ({c: nz(-9,9), p}));
-      const d = f.filter(o => o.p > 0).map(o => ({c: o.c*o.p, p: o.p-1}));
-      return {
-        task:"Differentiate.",
-        expr:"f(x) = " + poly(f),
-        answerHtml:"f′(x) = " + poly(d)
-      };
+/* ================= the steps ================= */
+const STEPS = [
+/* ---- 1 ---- */
+{ id:"exp", name:"Exponent laws", code:"underlies MCR3U B1",
+  rule:{ r:"Multiplying: add the exponents. Dividing: subtract them. A power of a power: multiply them. Anything to the power 0 is 1.",
+    tip:"Write it out long. x² · x³ is (x·x)(x·x·x): five x's, so x⁵. Every exponent law is just counting x's.",
+    trap:"The exponent only touches what it is attached to. In 5x⁰ only the x becomes 1, so the answer is 5." },
+  gen(){
+    const t = pick(["mul","pow","div","zero"]);
+    if (t === "mul"){
+      const a = ri(2,6), b = ri(2,6);
+      return { task:"Simplify.", expr:"x"+sup(a)+" · x"+sup(b),
+        correct:{html:"x"+sup(a+b)},
+        wrong:[
+          {html:"x"+sup(a*b), why:"You multiplied the exponents. That is the rule for a power of a power, like (x²)³. Here two powers are multiplied, so you add."},
+          {html:"2x"+sup(a+b), why:"A 2 appears when you add, as in x + x = 2x. This is multiplication, so no 2 appears."},
+          {html:"2x"+sup(a*b), why:"Two slips at once: you multiplied the exponents, and you created a 2 that belongs to addition."}],
+        walk:["x"+sup(a)+" means "+a+" x's multiplied together. x"+sup(b)+" is "+b+" more.",
+              "Altogether that is "+(a+b)+" x's multiplied, so the answer is "+m_("x"+sup(a+b))+"."] };
     }
-  },
-  {
-    id:"product", group:"Calculus", name:"Product rule", code:"A3.4, A3.5",
-    gen(){
-      const m = pick([1,2,3]);
-      let n; do { n = pick([1,2,3]); } while (n === m);
-      const a = ri(1,4), b = nz(-6,6), c = ri(1,4), d = nz(-6,6);
-      const F = [{c:a,p:m},{c:b,p:0}], G = [{c:c,p:n},{c:d,p:0}];
-      const expanded = [
-        {c:a*c*(m+n), p:m+n-1},
-        {c:a*d*m,     p:m-1},
-        {c:b*c*n,     p:n-1}
+    if (t === "pow"){
+      const a = ri(2,5), b = ri(2,4);
+      return { task:"Simplify.", expr:"(x"+sup(a)+")"+sup(b),
+        correct:{html:"x"+sup(a*b)},
+        wrong:[
+          {html:"x"+sup(a+b), why:"You added the exponents. Adding is for multiplying two powers side by side, like x² · x³. A power raised to a power multiplies."},
+          {html:b+"x"+sup(a), why:"You multiplied by "+b+". The outer "+b+" is an exponent: it means the bracket is multiplied by itself "+b+" times."},
+          {html:"x"+sup(Math.pow(a,b)), why:"You raised "+a+" to the power "+b+". The exponents multiply: "+a+" × "+b+"."}],
+        walk:["(x"+sup(a)+")"+sup(b)+" means x"+sup(a)+" written down "+b+" times and multiplied.",
+              "That is "+b+" groups of "+a+" x's, which is "+a+" × "+b+" = "+(a*b)+" x's: "+m_("x"+sup(a*b))+"."] };
+    }
+    if (t === "div"){
+      const b = ri(2,4), a = b + ri(1,5);
+      return { task:"Simplify.", expr:"x"+sup(a)+" ÷ x"+sup(b),
+        correct:{html:xp(a-b)},
+        wrong:[
+          {html:"x"+sup(a+b), why:"You added the exponents. Adding is for multiplication. Division cancels x's, so you subtract."},
+          {html:"x"+sup(b-a), why:"You subtracted the wrong way round. It is top exponent minus bottom exponent."},
+          {html:(a % b === 0 ? "x"+sup(a/b) : "x"+sup(a*b)), why:(a % b === 0 ? "You divided the exponents. Division of powers subtracts the exponents." : "You multiplied the exponents. Division of powers subtracts them.")}],
+        walk:[a+" x's on top, "+b+" underneath. Each x underneath cancels one on top.",
+              a+" − "+b+" = "+(a-b)+" x's are left: "+m_(xp(a-b))+"."] };
+    }
+    const c = ri(2,9);
+    return { task:"Simplify.", expr:c+"x"+sup(0),
+      correct:{html:String(c)},
+      wrong:[
+        {html:"1", why:"The exponent 0 only applies to the x, not to the "+c+". So x⁰ becomes 1 and the "+c+" stays."},
+        {html:"0", why:"Anything to the power 0 is 1, not 0. So x⁰ = 1, and "+c+" × 1 = "+c+"."},
+        {html:c+"x", why:"x⁰ is 1, so the x disappears. You kept it as x¹."}],
+      walk:["x"+sup(0)+" = 1 for any x that is not zero.",
+            "So "+c+"x"+sup(0)+" = "+c+" × 1 = "+m_(String(c))+"."] };
+  }
+},
+/* ---- 2 ---- */
+{ id:"frac", name:"Fraction and negative exponents", code:"MCR3U B1.2, B1.3",
+  rule:{ r:"In a fractional exponent, the bottom number is a root and the top number is a power. A minus sign in the exponent means one over.",
+    tip:"Root first, then power. For 8^(2/3), the cube root of 8 is 2, then 2² is 4. Doing the root first keeps the numbers small.",
+    trap:"A negative exponent never makes the answer negative. 2⁻³ is 1/8, not −8." },
+  gen(){
+    let m, q, base; do { m = ri(2,5); q = pick([2,3]); base = Math.pow(m,q); } while (base > 125);
+    const p = ri(1,3), s = pick([1,1,-1]), val = Math.pow(m,p);
+    const correct = s > 0 ? {html:String(val), n:val} : {html:"1/"+val, n:1/val};
+    const wrong = [];
+    if (s > 0){
+      wrong.push({html:"1/"+val, n:1/val, why:"You took one over, but the exponent is positive. One over is only for a negative exponent."});
+      if (p > 1) wrong.push({html:String(m), n:m, why:"You took the "+root(q)+" root but stopped there. The top number, "+p+", says to raise that to the power "+p+"."});
+      const mult = base*p/q; if (Number.isInteger(mult)) wrong.push({html:String(mult), n:mult, why:"You multiplied "+base+" by "+p+"/"+q+". A fraction exponent is a root and a power, not a multiplier."});
+      wrong.push({html:String(m*p), n:m*p, why:"You multiplied the root by "+p+" instead of raising it to the power "+p+"."});
+      wrong.push({html:M+val, n:-val, why:"Nothing here makes the answer negative."});
+    } else {
+      wrong.push({html:String(val), n:val, why:"You ignored the minus sign. A negative exponent means one over the result."});
+      wrong.push({html:M+val, n:-val, why:"A negative exponent never makes the answer negative. It means one over."});
+      if (p > 1) wrong.push({html:"1/"+m, n:1/m, why:"You took the root and the one-over, but forgot to raise to the power "+p+"."});
+      wrong.push({html:M+"1/"+val, n:-1/val, why:"Right size, wrong sign. The minus in the exponent means one over. It does not also make the answer negative."});
+    }
+    return { task:"Work it out in your head.",
+      expr: base + "<sup>" + (s<0?M:"") + p + "/" + q + "</sup>",
+      correct, wrong, truthN: Math.pow(base, s*p/q),
+      walk:[ "The bottom of the fraction is "+q+", so take the "+root(q)+" root of "+base+": that is "+m+".",
+             p > 1 ? "The top is "+p+", so raise it to that power: "+m+sup(p)+" = "+val+"." : "The top is 1, so there is no power to apply.",
+             s < 0 ? "The minus sign means one over, so the answer is "+m_("1/"+val)+"." : "So the answer is "+m_(String(val))+"." ] };
+  }
+},
+/* ---- 3 ---- */
+{ id:"slope", name:"Slope and rate of change", code:"MHF4U D1.4",
+  rule:{ r:"Slope is rise over run: (y₂ − y₁) / (x₂ − x₁). Average rate of change is the same thing: how much the output changed, divided by how much the input changed.",
+    tip:"Subtract in the same order on top and bottom. If the second point goes first on top, it goes first on the bottom too.",
+    trap:"Average rate of change is not the average of the two heights. It is change in height per unit of x." },
+  gen(){
+    if (Math.random() < 0.5){
+      const x1 = ri(-5,4), dx = nz(-4,4), x2 = x1 + dx, m = nz(-4,4), y1 = ri(-6,6), y2 = y1 + m*dx;
+      const inv = frac(dx, m*dx), dy = m*dx;
+      return { task:"Find the slope of the line through these two points.",
+        expr:"("+neg(x1)+", "+neg(y1)+") and ("+neg(x2)+", "+neg(y2)+")",
+        correct:{html:neg(m), n:m}, truthN:(y2-y1)/(x2-x1),
+        wrong:[
+          {html:inv.html, n:inv.val, why:"You divided run by rise. Slope is rise over run: the change in y goes on top."},
+          {html:neg(-m), n:-m, why:"You subtracted in one order on top and the opposite order on the bottom. Keep the same order in both."},
+          {html:neg(dy), n:dy, why:"You found the rise, "+neg(dy)+", but did not divide by the run, "+neg(dx)+"."},
+          {html:neg(dy*dx), n:dy*dx, why:"You multiplied rise by run. Slope divides them."}],
+        walk:["Rise: "+neg(y2)+" − ("+neg(y1)+") = "+neg(dy)+".",
+              "Run: "+neg(x2)+" − ("+neg(x1)+") = "+neg(dx)+".",
+              "Slope = rise ÷ run = "+neg(dy)+" ÷ "+neg(dx)+" = "+m_(neg(m))+"."] };
+    }
+    const a = nz(-3,3), p = ri(-3,2), q = p + ri(1,3);
+    const f = x => a*x*x, rate = a*(p+q);
+    const avgH = frac(f(p)+f(q), 2);
+    return { task:"Find the average rate of change of f(x) = "+poly([{c:a,p:2}])+" from x = "+neg(p)+" to x = "+neg(q)+".",
+      expr:"f(x) = "+poly([{c:a,p:2}]),
+      correct:{html:neg(rate), n:rate}, truthN:(f(q)-f(p))/(q-p),
+      wrong:[
+        {html:neg(f(q)-f(p)), n:f(q)-f(p), why:"You found how much f changed, "+neg(f(q)-f(p))+", but did not divide by how much x changed, "+(q-p)+"."},
+        {html:neg(2*a*q), n:2*a*q, why:"That is the slope of the tangent at x = "+neg(q)+", the rate at one instant. The question asks for the average over the whole interval."},
+        {html:avgH.html, n:avgH.val, why:"You averaged the two heights. Average rate of change is change in height divided by change in x."},
+        {html:neg(2*a*p), n:2*a*p, why:"That is the slope of the tangent at x = "+neg(p)+", the rate at the starting instant, not the average."}],
+      walk:["f("+neg(q)+") = "+neg(f(q))+" and f("+neg(p)+") = "+neg(f(p))+".",
+            "Change in f: "+neg(f(q))+" − ("+neg(f(p))+") = "+neg(f(q)-f(p))+". Change in x: "+(q-p)+".",
+            "Average rate of change = "+neg(f(q)-f(p))+" ÷ "+(q-p)+" = "+m_(neg(rate))+"."] };
+  }
+},
+/* ---- 4 ---- */
+{ id:"pow1", name:"Power rule, one term", code:"MCV4U A3.1",
+  rule:{ r:"The derivative of axⁿ is a·n·xⁿ⁻¹. Bring the power down to multiply, then lower the power by one.",
+    tip:"Two beats, every time: multiply by the power, then drop the power by one. Say it out loud until it is automatic.",
+    trap:"A constant on its own has derivative 0, because it never changes. And the derivative of 5x is just 5: x¹ becomes x⁰, which is 1." },
+  gen(){
+    const k = pick(["gen","gen","gen","gen","lin","con"]);
+    if (k === "gen"){
+      const a = nz(-9,9), n = ri(2,6);
+      return { task:"Find the derivative.", expr:"f(x) = "+poly([{c:a,p:n}]),
+        src:x => a*Math.pow(x,n),
+        correct:{html:poly([{c:a*n,p:n-1}]), f:x => a*n*Math.pow(x,n-1)},
+        wrong:[
+          {html:poly([{c:a*n,p:n}]), f:x => a*n*Math.pow(x,n), why:"You multiplied by the power but did not lower it. Both beats are needed: multiply, then drop by one."},
+          {html:poly([{c:a,p:n-1}]), f:x => a*Math.pow(x,n-1), why:"You lowered the power but did not multiply by it first."},
+          {html:poly([{c:a*n,p:n+1}]), f:x => a*n*Math.pow(x,n+1), why:"You raised the power instead of lowering it."},
+          {html:poly([{c:a+n,p:n-1}]), f:x => (a+n)*Math.pow(x,n-1), why:"You added the power to the coefficient. The power multiplies it."}],
+        walk:["Bring the "+n+" down and multiply: "+neg(a)+" × "+n+" = "+neg(a*n)+".",
+              "Drop the power by one: "+n+" − 1 = "+(n-1)+".",
+              "f′(x) = "+m_(poly([{c:a*n,p:n-1}]))+"."] };
+    }
+    if (k === "lin"){
+      const a = nz(2,9) * pick([1,-1]);
+      return { task:"Find the derivative.", expr:"f(x) = "+poly([{c:a,p:1}]),
+        src:x => a*x,
+        correct:{html:neg(a), f:() => a},
+        wrong:[
+          {html:poly([{c:a,p:1}]), f:x => a*x, why:"The x should disappear. x¹ becomes x⁰, which is 1."},
+          {html:"0", f:() => 0, why:"Only a constant on its own has derivative 0. "+poly([{c:a,p:1}])+" changes at a steady rate of "+neg(a)+"."},
+          {html:"1", f:() => 1, why:"You dropped the coefficient "+neg(a)+". It stays: "+neg(a)+" × 1 = "+neg(a)+"."},
+          {html:"x", f:x => x, why:"You dropped the coefficient and kept the x. It is the other way round."}],
+        walk:["Think of "+poly([{c:a,p:1}])+" as "+neg(a)+"x¹.",
+              "Multiply by the power 1, then lower it to x⁰ = 1.",
+              "f′(x) = "+m_(neg(a))+". Also visible from the graph: a straight line with slope "+neg(a)+"."] };
+    }
+    const c = nz(-9,9);
+    return { task:"Find the derivative.", expr:"f(x) = "+neg(c),
+      src:() => c,
+      correct:{html:"0", f:() => 0},
+      wrong:[
+        {html:neg(c), f:() => c, why:"The derivative measures change. A constant never changes, so its derivative is 0, not the constant itself."},
+        {html:"1", f:() => 1, why:"A derivative of 1 would mean it rises one unit for every unit of x. A constant does not rise at all."},
+        {html:poly([{c:c,p:1}]), f:x => c*x, why:"That goes the wrong way. You found something whose derivative is "+neg(c)+", instead of the derivative of "+neg(c)+"."}],
+      walk:["f(x) = "+neg(c)+" is a flat horizontal line.",
+            "A flat line has slope 0 everywhere, so f′(x) = "+m_("0")+"."] };
+  }
+},
+/* ---- 5 ---- */
+{ id:"polyd", name:"Power rule, whole polynomials", code:"MCV4U A3.2, A3.3",
+  rule:{ r:"Differentiate each term on its own, then add the results. Any constant term disappears.",
+    tip:"Cross out the constant term first, so you cannot forget it. Then go term by term, left to right.",
+    trap:"Every term gets the power rule, not just the first one." },
+  gen(){
+    const ps = []; while (ps.length < 2){ const p = ri(1,5); if (!ps.includes(p)) ps.push(p); }
+    if (!ps.some(p => p >= 2)) ps[0] = ri(2,5);
+    const F = ps.map(p => ({c:nz(-7,7), p})).concat([{c:nz(-9,9), p:0}]);
+    const D = F.filter(o => o.p > 0).map(o => ({c:o.c*o.p, p:o.p-1}));
+    const keep = D.concat([F.find(o => o.p === 0)]);
+    const noLow = F.filter(o => o.p > 0).map(o => ({c:o.c*o.p, p:o.p}));
+    const noMul = F.filter(o => o.p > 0).map(o => ({c:o.c, p:o.p-1}));
+    const Fs = F.slice().sort((a,b) => b.p - a.p);
+    const first = [{c:Fs[0].c*Fs[0].p, p:Fs[0].p-1}].concat(Fs.slice(1).filter(o => o.p > 0));
+    return { task:"Find the derivative.", expr:"f(x) = "+poly(F),
+      src:x => evalT(F,x),
+      correct:{html:poly(D), f:x => evalT(D,x)},
+      wrong:[
+        {html:poly(keep), f:x => evalT(keep,x), why:"You kept the constant term. A constant never changes, so its derivative is 0 and it disappears."},
+        {html:poly(noLow), f:x => evalT(noLow,x), why:"You multiplied by each power but did not lower any of them."},
+        {html:poly(noMul), f:x => evalT(noMul,x), why:"You lowered each power but forgot to multiply by it first."},
+        {html:poly(first), f:x => evalT(first,x), why:"You differentiated the first term and copied the rest across. Every term gets the power rule."}],
+      walk: F.filter(o => o.p > 0).sort((a,b) => b.p - a.p).map(o =>
+              poly([o]) + " becomes " + poly([{c:o.c*o.p, p:o.p-1}]) + ".")
+            .concat(["The constant "+neg(F.find(o => o.p === 0).c)+" becomes 0.",
+                     "f′(x) = "+m_(poly(D))+"."]) };
+  }
+},
+/* ---- 6 ---- */
+{ id:"tan", name:"Slope of a tangent at a point", code:"MCV4U A3.3",
+  rule:{ r:"The slope of the tangent at x = a is f′(a). Differentiate first, then put the number in.",
+    tip:"Derivative first, number second. If you put the number in first, you have a constant, and the derivative of a constant is zero.",
+    trap:"f(a) is the height of the curve. f′(a) is how steep it is. They answer different questions." },
+  gen(){
+    const a = nz(-3,3), b = nz(-6,6), c = ri(-6,6), k = nz(-3,3);
+    const F = [{c:a,p:2},{c:b,p:1},{c:c,p:0}], D = [{c:2*a,p:1},{c:b,p:0}];
+    const ans = 2*a*k + b;
+    return { task:"Find the slope of the tangent at x = "+neg(k)+".",
+      expr:"f(x) = "+poly(F),
+      correct:{html:neg(ans), n:ans}, truthN:(evalT(F,k+1e-6)-evalT(F,k-1e-6))/2e-6,
+      wrong:[
+        {html:neg(evalT(F,k)), n:evalT(F,k), why:"That is f("+neg(k)+"), the height of the curve there. The slope is f′("+neg(k)+")."},
+        {html:neg(a*k+b), n:a*k+b, why:"You differentiated "+poly([{c:a,p:2}])+" as "+poly([{c:a,p:1}])+". The power rule brings the 2 down: "+poly([{c:2*a,p:1}])+"."},
+        {html:neg(2*a*k), n:2*a*k, why:"You dropped the derivative of "+poly([{c:b,p:1}])+", which is "+neg(b)+"."},
+        {html:neg(2*a*k*k+b), n:2*a*k*k+b, why:"You kept x² after differentiating. The power should drop from 2 to 1."}],
+      walk:["Differentiate: f′(x) = "+poly(D)+".",
+            "Put in x = "+neg(k)+": "+neg(2*a)+"("+neg(k)+")"+sgnTerm(b,"")+" = "+neg(2*a*k)+sgnTerm(b,"")+".",
+            "Slope of the tangent = "+m_(neg(ans))+"."] };
+  }
+},
+/* ---- 7 ---- */
+{ id:"prod", name:"Product rule", code:"MCV4U A3.4, A3.5",
+  rule:{ r:"(uv)′ = u′v + uv′. The derivative of the first times the second, plus the first times the derivative of the second.",
+    tip:"Chant it: “d-first times second, plus first times d-second.” Two terms, every time.",
+    trap:"The derivative of a product is not the product of the derivatives. (uv)′ is not u′v′. This is the most common mistake in the whole course." },
+  gen(){
+    const a = ri(1,4), b = nz(-5,5), c = ri(1,4), d = nz(-5,5);
+    const U = [{c:a,p:1},{c:b,p:0}], V = [{c:c,p:1},{c:d,p:0}];
+    const D = [{c:2*a*c,p:1},{c:a*d+b*c,p:0}];
+    return { task:"Find the derivative, and simplify.",
+      expr:"f(x) = "+grp(U)+grp(V),
+      src:x => evalT(U,x)*evalT(V,x),
+      correct:{html:poly(D), f:x => evalT(D,x)},
+      wrong:[
+        {html:neg(a*c), f:() => a*c, why:"You multiplied the two derivatives, "+neg(a)+" and "+neg(c)+". The derivative of a product is not the product of the derivatives. You need u′v + uv′."},
+        {html:poly([{c:a*c,p:1},{c:a*d,p:0}]), f:x => a*evalT(V,x), why:"You did only the first half, u′v = "+neg(a)+grp(V)+". The second half, uv′, is missing."},
+        {html:poly([{c:a*c,p:1},{c:b*c,p:0}]), f:x => c*evalT(U,x), why:"You did only the second half, uv′ = "+neg(c)+grp(U)+". The first half, u′v, is missing."},
+        {html:poly([{c:a*c,p:1},{c:a*d+b*c,p:0}]), f:x => a*c*x + a*d + b*c, why:"The x term is short by half. Adding u′v and uv′ gives "+neg(a*c)+"x twice, so "+neg(2*a*c)+"x."}],
+      walk:["u = "+poly(U)+", so u′ = "+neg(a)+". v = "+poly(V)+", so v′ = "+neg(c)+".",
+            "u′v = "+neg(a)+grp(V)+" = "+poly([{c:a*c,p:1},{c:a*d,p:0}])+".",
+            "uv′ = "+neg(c)+grp(U)+" = "+poly([{c:a*c,p:1},{c:b*c,p:0}])+".",
+            "Add them: f′(x) = "+m_(poly(D))+"."] };
+  }
+},
+/* ---- 8 ---- */
+{ id:"chain", name:"Chain rule", code:"MCV4U A3.4, A3.5",
+  rule:{ r:"For a function inside another: differentiate the outside and leave the inside alone, then multiply by the derivative of the inside.",
+    tip:"Outside, then inside. For (3x + 1)⁵: bring the 5 down, lower it to 4, leave (3x + 1) as it is, then multiply by 3.",
+    trap:"Forgetting to multiply by the inside's derivative is the classic slip. When the inside is just x its derivative is 1, so you get away with it, and that is why the habit never forms." },
+  gen(){
+    const a = ri(2,5), b = nz(-6,6), n = ri(2,5);
+    const I = [{c:a,p:1},{c:b,p:0}], ie = x => a*x + b;
+    const pw = k => k === 1 ? "" : sup(k);
+    const form = (co, k) => (co === 1 ? "" : neg(co)) + grp(I) + pw(k);
+    return { task:"Find the derivative.",
+      expr:"f(x) = "+grp(I)+sup(n),
+      src:x => Math.pow(ie(x),n),
+      correct:{html:form(n*a, n-1), f:x => n*a*Math.pow(ie(x),n-1)},
+      wrong:[
+        {html:form(n, n-1), f:x => n*Math.pow(ie(x),n-1), why:"You forgot to multiply by the derivative of the inside. The inside is "+poly(I)+", and its derivative is "+a+"."},
+        {html:form(n*a, n), f:x => n*a*Math.pow(ie(x),n), why:"You multiplied correctly, but forgot to lower the power from "+n+" to "+(n-1)+"."},
+        {html:form(a, n-1), f:x => a*Math.pow(ie(x),n-1), why:"You multiplied by the inside's derivative, "+a+", but forgot to bring the power "+n+" down in front."}],
+      walk:["Outside: bring the "+n+" down and lower the power: "+n+grp(I)+pw(n-1)+". The inside stays exactly as it was.",
+            "Inside: the derivative of "+poly(I)+" is "+a+".",
+            "Multiply: "+n+" × "+a+" = "+(n*a)+", so f′(x) = "+m_(form(n*a, n-1))+"."] };
+  }
+},
+/* ---- 9 ---- */
+{ id:"trigexp", name:"Sine, cosine and eˣ", code:"MCV4U A2.4, A2.6, A2.8",
+  rule:{ r:"(sin x)′ = cos x. (cos x)′ = −sin x. (eˣ)′ = eˣ. For any other base, (aˣ)′ = aˣ · ln a.",
+    tip:"Picture the graphs. Cosine starts at its peak and heads down, so its slope starts negative: that is where the minus comes from.",
+    trap:"The power rule does not work on eˣ or 2ˣ. The x is up in the exponent, not down in the base, so “bring the power down” makes no sense." },
+  gen(){
+    const t = pick(["sin","cos","ex","ekx","ax","sinkx"]);
+    if (t === "sin") return { task:"Find the derivative.", expr:"f(x) = sin x", src:Math.sin,
+      correct:{html:"cos x", f:Math.cos},
+      wrong:[
+        {html:M+"cos x", f:x => -Math.cos(x), why:"Wrong sign. At x = 0 the sine graph is climbing, so the slope there is positive, and cos 0 = 1."},
+        {html:M+"sin x", f:x => -Math.sin(x), why:"That is what you get by differentiating twice. The first derivative is cos x."},
+        {html:"sin x", f:Math.sin, why:"Sine is not its own derivative. That special property belongs to eˣ."}],
+      walk:["At x = 0, sine climbs most steeply: slope 1. At π/2 it peaks and is flat: slope 0. At π it falls most steeply: slope −1.",
+            "The slopes 1, 0, −1 trace out cosine, so the derivative is "+m_("cos x")+"."] };
+    if (t === "cos") return { task:"Find the derivative.", expr:"f(x) = cos x", src:Math.cos,
+      correct:{html:M+"sin x", f:x => -Math.sin(x)},
+      wrong:[
+        {html:"sin x", f:Math.sin, why:"Missing the minus sign. Just after x = 0 the cosine graph is falling, so its slope must be negative."},
+        {html:M+"cos x", f:x => -Math.cos(x), why:"That is what you get by differentiating twice. The first derivative is −sin x."},
+        {html:"cos x", f:Math.cos, why:"Cosine is not its own derivative. Only eˣ has that property."}],
+      walk:["Cosine starts at its peak at x = 0, so its slope there is 0, and sin 0 = 0.",
+            "Just after 0, cosine falls, so the slope is negative. That is why the answer carries a minus: "+m_(M+"sin x")+"."] };
+    if (t === "ex") return { task:"Find the derivative.", expr:"f(x) = eˣ", src:Math.exp,
+      correct:{html:"eˣ", f:Math.exp},
+      wrong:[
+        {html:"x·e<sup>x"+M+"1</sup>", f:x => x*Math.exp(x-1), why:"That is the power rule, and it does not apply. The x is in the exponent, not the base."},
+        {html:"e<sup>x"+M+"1</sup>", f:x => Math.exp(x-1), why:"Lowering the exponent by one is the power rule, which does not apply to exponentials."},
+        {html:"e", f:() => Math.E, why:"The derivative still depends on x. eˣ grows faster the further along you go."}],
+      walk:["e is defined as the one base whose exponential has a slope equal to its own height at every point.",
+            "So the derivative of eˣ is "+m_("eˣ")+", unchanged."] };
+    if (t === "ekx"){
+      const k = pick([2,3,4,5,-2,-3]);
+      return { task:"Find the derivative.", expr:"f(x) = e<sup>"+neg(k)+"x</sup>", src:x => Math.exp(k*x),
+        correct:{html:neg(k)+"e<sup>"+neg(k)+"x</sup>", f:x => k*Math.exp(k*x)},
+        wrong:[
+          {html:"e<sup>"+neg(k)+"x</sup>", f:x => Math.exp(k*x), why:"You forgot the chain rule. The exponent is "+neg(k)+"x, whose derivative is "+neg(k)+", so multiply by "+neg(k)+"."},
+          {html:neg(k)+"x·e<sup>"+neg(k)+"x"+M+"1</sup>", f:x => k*x*Math.exp(k*x-1), why:"That is the power rule, which does not apply to exponentials."},
+          {html:"e<sup>"+neg(k)+"</sup>", f:() => Math.exp(k), why:"The answer must still depend on x. Keep eˣ style, then multiply by the derivative of the exponent."}],
+        walk:["The outside is e to a power, which stays unchanged: e<sup>"+neg(k)+"x</sup>.",
+              "The inside is "+neg(k)+"x, whose derivative is "+neg(k)+". Multiply.",
+              "f′(x) = "+m_(neg(k)+"e<sup>"+neg(k)+"x</sup>")+"."] };
+    }
+    if (t === "ax"){
+      const a = pick([2,3,10]);
+      return { task:"Find the derivative.", expr:"f(x) = "+a+"ˣ", src:x => Math.pow(a,x),
+        correct:{html:a+"ˣ · ln "+a, f:x => Math.pow(a,x)*Math.log(a)},
+        wrong:[
+          {html:"x·"+a+"<sup>x"+M+"1</sup>", f:x => x*Math.pow(a,x-1), why:"That is the power rule, which does not apply. The x is in the exponent."},
+          {html:a+"ˣ", f:x => Math.pow(a,x), why:"Only eˣ is its own derivative. Any other base picks up a factor of ln "+a+"."},
+          {html:a+"ˣ / ln "+a, f:x => Math.pow(a,x)/Math.log(a), why:"Right idea, wrong direction. You multiply by ln "+a+", not divide."}],
+        walk:["Every exponential's derivative is itself times a constant. For base "+a+", that constant is ln "+a+" ≈ "+Math.log(a).toFixed(3)+".",
+              "f′(x) = "+m_(a+"ˣ · ln "+a)+". For base e, ln e = 1, which is why eˣ is its own derivative."] };
+    }
+    const k = pick([2,3,4,5]);
+    return { task:"Find the derivative.", expr:"f(x) = sin("+k+"x)", src:x => Math.sin(k*x),
+      correct:{html:k+" cos("+k+"x)", f:x => k*Math.cos(k*x)},
+      wrong:[
+        {html:"cos("+k+"x)", f:x => Math.cos(k*x), why:"You forgot the chain rule. The inside is "+k+"x, whose derivative is "+k+", so multiply by "+k+"."},
+        {html:k+" cos x", f:x => k*Math.cos(x), why:"The inside does not change when you differentiate the outside. It stays as "+k+"x."},
+        {html:M+k+" cos("+k+"x)", f:x => -k*Math.cos(k*x), why:"Sine differentiates to positive cosine. The minus only appears when differentiating cosine."}],
+      walk:["Outside: sine becomes cosine, with the inside left alone: cos("+k+"x).",
+            "Inside: the derivative of "+k+"x is "+k+". Multiply.",
+            "f′(x) = "+m_(k+" cos("+k+"x)")+"."] };
+  }
+},
+/* ---- 10 ---- */
+{ id:"maxmin", name:"Maximums and minimums", code:"MCV4U B1.3, B2.4",
+  rule:{ r:"Local maximums and minimums happen where f′(x) = 0. Then look at the second derivative: f″ > 0 is a valley (minimum), f″ < 0 is a hill (maximum).",
+    tip:"Positive second derivative smiles, so the flat point is the bottom of the smile. Negative frowns, so the flat point is the top.",
+    trap:"Solve f′(x) = 0, not f(x) = 0. The first finds flat points. The second finds where the graph crosses the x-axis." },
+  nopts:4,
+  gen(){
+    if (Math.random() < 0.55){
+      const a = nz(-3,3), h = nz(-4,4); let k; do { k = ri(-6,6); } while (k === h || k === -h || k === 0);
+      const F = [{c:a,p:2},{c:-2*a*h,p:1},{c:a*h*h+k,p:0}];
+      return { task:"At what x is the tangent horizontal?",
+        expr:"f(x) = "+poly(F),
+        correct:{html:"x = "+neg(h), n:h}, truthN:h,
+        wrong:[
+          {html:"x = "+neg(-h), n:-h, why:"Sign slip. Setting "+poly([{c:2*a,p:1},{c:-2*a*h,p:0}])+" = 0 gives x = "+neg(h)+"."},
+          {html:"x = "+neg(k), n:k, why:"That is the height of the turning point, not where it is. The turning point is at ("+neg(h)+", "+neg(k)+")."},
+          {html:"x = 0", n:0, why:"You set x = 0. Set f′(x) = 0 and solve for x instead."}],
+        walk:["f′(x) = "+poly([{c:2*a,p:1},{c:-2*a*h,p:0}])+".",
+              "Set it to zero: "+poly([{c:2*a,p:1}])+" = "+neg(2*a*h)+", so x = "+neg(h)+".",
+              "The tangent is horizontal at "+m_("x = "+neg(h))+". It is a "+(a > 0 ? "minimum" : "maximum")+", because the parabola opens "+(a > 0 ? "up" : "down")+"."] };
+    }
+    const p = ri(1,3), c = ri(-5,5), atPos = Math.random() < 0.5, x0 = atPos ? p : -p;
+    const F = [{c:1,p:3},{c:-3*p*p,p:1},{c:c,p:0}];
+    const isMin = x0 > 0;
+    const MX = "A local maximum", MN = "A local minimum", INF = "A point of inflection", NOT = "Nothing special: the slope is not zero there";
+    const right = isMin ? MN : MX;
+    const whys = {
+      [MX]:"f″("+neg(x0)+") = 6 × "+neg(x0)+" = "+neg(6*x0)+", which is positive. Positive means concave up, a valley, so it is a minimum.",
+      [MN]:"f″("+neg(x0)+") = 6 × "+neg(x0)+" = "+neg(6*x0)+", which is negative. Negative means concave down, a hill, so it is a maximum.",
+      [INF]:"An inflection point needs f″ = 0. Here f″("+neg(x0)+") = "+neg(6*x0)+", which is not zero.",
+      [NOT]:"Check it: f′("+neg(x0)+") = 3("+neg(x0)+")² − "+(3*p*p)+" = 0. The tangent is horizontal there."
+    };
+    return { task:"What happens at x = "+neg(x0)+"?",
+      expr:"f(x) = "+poly(F),
+      correct:{html:right},
+      wrong:[MX,MN,INF,NOT].filter(s => s !== right).map(s => ({html:s, why:whys[s]})),
+      prose:true,
+      walk:["f′(x) = 3x² − "+(3*p*p)+", which is 0 at x = "+p+" and x = "+M+p+". So x = "+neg(x0)+" is a flat point.",
+            "f″(x) = 6x, so f″("+neg(x0)+") = "+neg(6*x0)+", which is "+(isMin ? "positive: concave up." : "negative: concave down."),
+            "So x = "+neg(x0)+" is "+m_(right.toLowerCase())+"."] };
+  }
+},
+/* ---- 11 ---- */
+{ id:"vbasic", name:"Vector basics", code:"MCV4U C1.4, C2.1",
+  rule:{ r:"Add, subtract and scale vectors one component at a time. The length of (a, b, c) is √(a² + b² + c²).",
+    tip:"Length is just Pythagoras. In three dimensions it is Pythagoras twice.",
+    trap:"Length is not the sum of the components. Square each one, add, then take the square root." },
+  gen(){
+    const t = pick(["add","len","len","scale"]);
+    if (t === "add"){
+      const u = rv(-6,6), v = rv(-6,6), minus = Math.random() < 0.4, ans = minus ? sub(u,v) : add(u,v);
+      const slip = ans.slice(); slip[1] = minus ? u[1]+v[1] : u[1]-v[1];
+      return { task:"Find "+(minus ? "u − v" : "u + v")+".",
+        expr:"u = "+vec(u)+", &nbsp;v = "+vec(v),
+        correct:{html:vec(ans), v:ans}, truthV:minus ? u.map((x,i)=>x-v[i]) : u.map((x,i)=>x+v[i]),
+        wrong:[
+          {html:vec(minus ? add(u,v) : sub(u,v)), v:minus ? add(u,v) : sub(u,v), why:"You "+(minus ? "added" : "subtracted")+" instead of "+(minus ? "subtracting" : "adding")+"."},
+          {html:vec(u.map((x,i) => x*v[i])), v:u.map((x,i) => x*v[i]), why:"You multiplied matching components. Adding vectors adds matching components."},
+          {html:vec(slip), v:slip, why:"Sign slip in the middle component. Check each one: "+neg(u[1])+(minus ? " − " : " + ")+"("+neg(v[1])+") = "+neg(ans[1])+"."}],
+        walk:["Work one component at a time.",
+              "First: "+neg(u[0])+(minus?" − ":" + ")+"("+neg(v[0])+") = "+neg(ans[0])+". Second: "+neg(ans[1])+". Third: "+neg(ans[2])+".",
+              "So the answer is "+m_(vec(ans))+"."] };
+    }
+    if (t === "len"){
+      const three = Math.random() < 0.5;
+      const T = three ? pick([[1,2,2,3],[2,3,6,7],[1,4,8,9],[2,6,9,11],[4,4,7,9]])
+                      : pick([[3,4,5],[5,12,13],[6,8,10],[8,15,17],[7,24,25]]);
+      const L = T[T.length-1], comps = shuffle(T.slice(0,-1)).map(x => x * pick([1,-1]));
+      const sumAbs = comps.reduce((s,x) => s + Math.abs(x), 0), sq = L*L, sumS = comps.reduce((s,x) => s+x, 0);
+      return { task:"Find the length of this vector.",
+        expr:vec(comps),
+        correct:{html:String(L), n:L}, truthN:Math.sqrt(comps.reduce((s,x) => s+x*x, 0)),
+        wrong:[
+          {html:String(sumAbs), n:sumAbs, why:"You added the sizes of the components. Pythagoras squares them first, then takes a square root at the end."},
+          {html:String(sq), n:sq, why:"You squared and added correctly, but forgot the square root at the end."},
+          {html:neg(sumS), n:sumS, why:"You added the components. Length is never found by adding: square, add, then root."},
+          {html:String(L+1), n:L+1, why:"Close, but check the squares: "+comps.map(x => "("+neg(x)+")²").join(" + ")+" = "+sq+", and √"+sq+" = "+L+"."}],
+        walk:["Square each component: "+comps.map(x => "("+neg(x)+")² = "+(x*x)).join(", ")+".",
+              "Add them: "+sq+".",
+              "Take the square root: √"+sq+" = "+m_(String(L))+"."] };
+    }
+    const u = rv(-5,5), k = nz(-4,4); if (k === 1) return this.gen();
+    const ans = u.map(x => k*x);
+    const partial = u.slice(); partial[0] = k*u[0];
+    return { task:"Find "+neg(k)+"u.",
+      expr:"u = "+vec(u),
+      correct:{html:vec(ans), v:ans}, truthV:u.map(x => x*k),
+      wrong:[
+        {html:vec(partial), v:partial, why:"You multiplied only the first component. A scalar multiplies every component."},
+        {html:vec(u.map(x => x+k)), v:u.map(x => x+k), why:"You added "+neg(k)+" to each component. A scalar multiple multiplies."},
+        {html:vec(u.map(x => -k*x)), v:u.map(x => -k*x), why:"Sign slip. Multiply each component by "+neg(k)+", keeping track of negatives."}],
+      walk:["Multiply every component by "+neg(k)+".",
+            "The answer is "+m_(vec(ans))+". It points "+(k > 0 ? "the same way as" : "opposite to")+" u and is "+Math.abs(k)+" times as long."] };
+  }
+},
+/* ---- 12 ---- */
+{ id:"dotp", name:"Dot product and right angles", code:"MCV4U C2.4, C2.5",
+  rule:{ r:"u · v = u₁v₁ + u₂v₂ + u₃v₃. The answer is a single number. If it is 0, the vectors are at right angles.",
+    tip:"Pair them up, multiply each pair, add. Signs are where the errors live, so say each one out loud.",
+    trap:"The dot product is a number, not a vector." },
+  gen(){
+    if (Math.random() < 0.55){
+      const u = rv(-5,5), v = rv(-5,5), prods = u.map((x,i) => x*v[i]), ans = dot(u,v);
+      let j = prods.findIndex(p => p !== 0); if (j < 0) return this.gen();
+      const slip = ans - 2*prods[j];
+      const sumAll = u.concat(v).reduce((s,x) => s+x, 0);
+      return { task:"Find u · v.",
+        expr:"u = "+vec(u)+", &nbsp;v = "+vec(v),
+        correct:{html:neg(ans), n:ans}, truthN:u[0]*v[0]+u[1]*v[1]+u[2]*v[2],
+        wrong:[
+          {html:vec(prods), n:NaN, why:"You multiplied the pairs but stopped. The dot product adds them to make a single number."},
+          {html:neg(slip), n:slip, why:"Sign slip on one product. ("+neg(u[j])+")("+neg(v[j])+") = "+neg(prods[j])+"."},
+          {html:neg(sumAll), n:sumAll, why:"You added all six numbers. The dot product multiplies matching pairs first."}],
+        walk:["Multiply matching pairs: "+u.map((x,i) => "("+neg(x)+")("+neg(v[i])+") = "+neg(prods[i])).join(", ")+".",
+              "Add: "+prods.map(neg).join(" + ")+" = "+m_(neg(ans))+"."] };
+    }
+    let a, b; do { a = nz(-5,5); b = nz(-5,5); } while (Math.abs(a) === Math.abs(b));
+    const k = pick([1,2,-1]), u = [a,b], good = [-b*k, a*k];
+    const cands = [
+      {v:[a*pick([1,2]), b*(1)], why:"This points the same way as u. Parallel is the opposite of perpendicular."},
+      {v:[b,a], why:null},
+      {v:[-a,b], why:null},
+      {v:[a,-b], why:null}
+    ].filter(o => !parallel(o.v, good) && dot(o.v,u) !== 0);
+    cands.forEach(o => { const d = dot(o.v,u);
+      o.why = o.why || ("Its dot product with u is ("+neg(a)+")("+neg(o.v[0])+") + ("+neg(b)+")("+neg(o.v[1])+") = "+neg(d)+". Not zero, so not perpendicular."); });
+    return { task:"Which vector is perpendicular to u?",
+      expr:"u = "+vec(u),
+      correct:{html:vec(good), v:good}, perpTo:u,
+      wrong:cands.map(o => ({html:vec(o.v), v:o.v, why:o.why})),
+      walk:["Perpendicular means the dot product is 0.",
+            "Check "+vec(good)+": ("+neg(a)+")("+neg(good[0])+") + ("+neg(b)+")("+neg(good[1])+") = "+neg(a*good[0])+" + "+neg(b*good[1])+" = 0.",
+            "A quick way to build one in two dimensions: swap the components and change one sign. (a, b) becomes (−b, a)."] };
+  }
+},
+/* ---- 13 ---- */
+{ id:"crossp", name:"Cross product", code:"MCV4U C2.6, C2.7",
+  rule:{ r:"u × v = (u₂v₃ − u₃v₂,  u₃v₁ − u₁v₃,  u₁v₂ − u₂v₁). The answer is a vector at right angles to both.",
+    tip:"Each component skips its own position and uses the other two, in a cycle: 2-3, then 3-1, then 1-2.",
+    trap:"Order matters: v × u = −(u × v). And the middle component is where sign slips happen." },
+  gen(){
+    let u, v, w; do { u = rv(-3,3); v = rv(-3,3); w = cross(u,v); } while (isZero(w) || w[1] === 0);
+    const mid = [w[0], -w[1], w[2]], rev = w.map(x => -x), prods = u.map((x,i) => x*v[i]);
+    return { task:"Find u × v.",
+      expr:"u = "+vec(u)+", &nbsp;v = "+vec(v),
+      correct:{html:vec(w), v:w}, truthV:cross(u,v),
+      wrong:[
+        {html:vec(mid), v:mid, why:"Sign slip in the middle component, the most common cross product error. It is u₃v₁ − u₁v₃, in that order."},
+        {html:vec(rev), v:rev, why:"Every sign is flipped: you worked out v × u. Order matters, and v × u = −(u × v)."},
+        {html:vec(prods), v:prods, why:"You multiplied matching components. That is the start of a dot product, not a cross product."}],
+      walk:["First: ("+neg(u[1])+")("+neg(v[2])+") − ("+neg(u[2])+")("+neg(v[1])+") = "+neg(w[0])+".",
+            "Second: ("+neg(u[2])+")("+neg(v[0])+") − ("+neg(u[0])+")("+neg(v[2])+") = "+neg(w[1])+".",
+            "Third: ("+neg(u[0])+")("+neg(v[1])+") − ("+neg(u[1])+")("+neg(v[0])+") = "+neg(w[2])+".",
+            "Check: its dot product with u and with v is 0 both times, so "+m_(vec(w))+" is at right angles to both."] };
+  }
+},
+/* ---- 14 ---- */
+{ id:"lines", name:"Lines in space", code:"MCV4U C4.2",
+  rule:{ r:"A line needs a point and a direction. The direction through P and Q is Q − P. The vector equation is r = P + t(Q − P).",
+    tip:"Direction is where you end minus where you start, the same as a displacement.",
+    trap:"A point is not a direction. Adding two points gives a vector with no meaning here." },
+  gen(){
+    if (Math.random() < 0.5){
+      let P, Q; do { P = rv(-5,5); Q = rv(-5,5); } while (P.join() === Q.join());
+      const d = sub(Q,P), nzc = d.filter(Boolean).length;
+      const cands = [
+        {v:add(P,Q), why:"You added the points. Direction comes from subtracting: where you end minus where you start."},
+        {v:P.slice(), why:"That is a point, P itself, not a direction."}
       ];
-      return {
-        task:"Differentiate using the product rule, then simplify.",
-        expr:"f(x) = " + grp(F) + grp(G),
-        answerHtml:"f′(x) = " + poly(expanded),
-        steps:[
-          "f′ = u′v + uv′, with u = " + poly(F) + " and v = " + poly(G),
-          "= " + grp([{c:a*m,p:m-1}]) + grp(G) + " + " + grp(F) + grp([{c:c*n,p:n-1}]),
-          "= " + poly(expanded)
-        ]
-      };
+      if (nzc >= 2){ const j = d.findIndex(Boolean), s = d.slice(); s[j] = -s[j];
+        cands.push({v:s, why:"Sign slip in one component. Check each: Q minus P, component by component."}); }
+      cands.push({v:Q.slice(), why:"That is a point, Q itself, not a direction."});
+      const wrong = cands.filter(o => !isZero(o.v) && !parallel(o.v, d)).map(o => ({html:vec(o.v), v:o.v, why:o.why}));
+      return { task:"Which is a direction vector for the line through P and Q?",
+        expr:"P "+vec(P)+" &nbsp;and&nbsp; Q "+vec(Q),
+        correct:{html:vec(d), v:d}, dirOf:d,
+        wrong,
+        walk:["Direction = Q − P, one component at a time.",
+              "("+neg(Q[0])+" − "+neg(P[0])+", "+neg(Q[1])+" − "+neg(P[1])+", "+neg(Q[2])+" − "+neg(P[2])+") = "+m_(vec(d))+".",
+              "P − Q would also work. It points the opposite way along the same line."] };
     }
-  },
-  {
-    id:"chain", group:"Calculus", name:"Chain rule", code:"A3.4, A3.5",
-    gen(){
-      const a = ri(1,4), n = ri(1,3), b = nz(-6,6), k = ri(2,4);
-      const inner = [{c:a,p:n},{c:b,p:0}];
-      const co = k*a*n;
-      const outPow = k-1 === 1 ? "" : "<sup>" + (k-1) + "</sup>";
-      return {
-        task:"Differentiate using the chain rule.",
-        expr:"f(x) = " + grp(inner) + "<sup>" + k + "</sup>",
-        answerHtml:"f′(x) = " + poly([{c:co,p:n-1}]) + grp(inner) + outPow,
-        steps:[
-          "Outer first, inner untouched: " + k + grp(inner) + "<sup>" + (k-1) + "</sup>",
-          "Times the derivative of the inside, which is " + poly([{c:a*n,p:n-1}]),
-          "= " + poly([{c:co,p:n-1}]) + grp(inner) + outPow
-        ]
-      };
-    }
-  },
-  {
-    id:"first", group:"Calculus", name:"First principles", code:"A2.3",
-    gen(){
-      const kind = pick(["quad","cubic","recip"]);
-      if (kind === "quad"){
-        const a = nz(1,4), b = nz(-6,6), c = nz(-6,6);
-        const f = [{c:a,p:2},{c:b,p:1},{c:c,p:0}];
-        return {
-          task:"Find f′(x) from first principles, using the limit of the difference quotient.",
-          expr:"f(x) = " + poly(f),
-          answerHtml:"f′(x) = " + poly([{c:2*a,p:1},{c:b,p:0}]),
-          steps:[
-            "[f(x+h) " + M + " f(x)] / h",
-            "= [" + neg(a) + "(x+h)² + " + neg(b) + "(x+h) + " + neg(c) + " " + M + " (" + poly(f) + ")] / h",
-            "= [" + neg(2*a) + "xh + " + neg(a) + "h² + " + neg(b) + "h] / h",
-            "= " + neg(2*a) + "x + " + neg(a) + "h + " + neg(b),
-            "As h → 0 the middle term vanishes: f′(x) = " + poly([{c:2*a,p:1},{c:b,p:0}])
-          ]
-        };
-      }
-      if (kind === "cubic"){
-        const a = nz(1,3);
-        return {
-          task:"Find f′(x) from first principles, using the limit of the difference quotient.",
-          expr:"f(x) = " + poly([{c:a,p:3}]),
-          answerHtml:"f′(x) = " + poly([{c:3*a,p:2}]),
-          steps:[
-            "[" + neg(a) + "(x+h)³ " + M + " " + neg(a) + "x³] / h",
-            "= " + neg(a) + "[x³ + 3x²h + 3xh² + h³ " + M + " x³] / h",
-            "= " + neg(a) + "[3x²h + 3xh² + h³] / h",
-            "= " + neg(a) + "(3x² + 3xh + h²)",
-            "As h → 0: f′(x) = " + poly([{c:3*a,p:2}])
-          ]
-        };
-      }
-      const a = nz(1,5), k = ri(-4,4);
-      const den = k === 0 ? "x" : "(x " + (k<0 ? M + " " + Math.abs(k) : "+ " + k) + ")";
-      return {
-        task:"Find f′(x) from first principles, using the limit of the difference quotient.",
-        expr:"f(x) = " + a + " / " + den,
-        answerHtml:"f′(x) = " + M + a + " / " + den + "²",
-        steps:[
-          "[ " + a + "/" + den.replace("x","(x+h)").replace("((x+h)","(x+h") + " " + M + " " + a + "/" + den + " ] / h",
-          "Common denominator on the top, then the two x terms cancel",
-          "= " + M + a + "h / [ h · (that product of denominators) ]",
-          "The h cancels, leaving " + M + a + " / [ product of denominators ]",
-          "As h → 0 both denominators become " + den + ": f′(x) = " + M + a + " / " + den + "²"
-        ]
-      };
-    }
-  },
-  {
-    id:"expo", group:"Calculus", name:"Rational exponents", code:"B1.2, B1.3",
-    gen(){
-      let m, q, base;
-      do { m = ri(2,5); q = pick([2,3]); base = Math.pow(m,q); } while (base > 250);
-      const p = ri(1,3), sgn = pick([1,-1]);
-      const val = Math.pow(m,p);
-      const expTop = (sgn < 0 ? M : "") + p;
-      return {
-        task:"Evaluate without a calculator. A fraction like 1/8 is fine.",
-        expr:base + "<sup>" + expTop + "/" + q + "</sup>",
-        input:"num",
-        answer: sgn > 0 ? val : 1/val,
-        answerHtml: sgn > 0 ? String(val) : "1/" + val,
-        steps:[
-          "The denominator " + q + " is a root: the " + q + (q === 2 ? "nd" : "rd") + " root of " + base + " is " + m + ".",
-          "The numerator " + p + " is a power: " + m + "<sup>" + p + "</sup> = " + val + ".",
-          sgn > 0 ? "So the answer is " + val + "."
-                  : "The minus sign flips it, so the answer is 1/" + val + "."
-        ]
-      };
-    }
-  },
-  {
-    id:"curve", group:"Calculus", name:"Critical points", code:"B1.3, B1.5",
-    gen(){
-      const r = ri(-4,2), s = r + ri(1,4), d = ri(-6,6);
-      const f = [{c:2,p:3},{c:-3*(r+s),p:2},{c:6*r*s,p:1},{c:d,p:0}];
-      const at = x => 2*x*x*x - 3*(r+s)*x*x + 6*r*s*x + d;
-      const infl = (r+s)/2;
-      return {
-        task:"Find the intervals of increase and decrease, and the local maximum and minimum.",
-        expr:"f(x) = " + poly(f),
-        answerHtml:"Local maximum at (" + neg(r) + ", " + neg(at(r)) + "), local minimum at (" + neg(s) + ", " + neg(at(s)) + ")",
-        steps:[
-          "f′(x) = " + poly([{c:6,p:2},{c:-6*(r+s),p:1},{c:6*r*s,p:0}]) + " = 6(x " + (r<0 ? "+ " + Math.abs(r) : M + " " + r) + ")(x " + (s<0 ? "+ " + Math.abs(s) : M + " " + s) + ")",
-          "Zeros of f′ at x = " + neg(r) + " and x = " + neg(s) + ".",
-          "Increasing for x < " + neg(r) + " and x > " + neg(s) + "; decreasing between them.",
-          "f″(x) = " + poly([{c:12,p:1},{c:-6*(r+s),p:0}]) + ", so the inflection is at x = " + neg(infl) + "."
-        ]
-      };
-    }
-  },
-  {
-    id:"dotp", group:"Vectors", name:"Dot product", code:"C2.4",
-    gen(){
-      const u = rvec(-5,5), v = rvec(-5,5);
-      return {
-        task:"Find the dot product.",
-        expr:"<span class='vec'>u</span> = " + vec(u) + " · <span class='vec'>v</span> = " + vec(v),
-        input:"num",
-        answer: dot(u,v),
-        answerHtml: neg(dot(u,v)),
-        steps:["Multiply matching components and add: " +
-          u.map((c,i) => "(" + neg(c) + ")(" + neg(v[i]) + ")").join(" + ") + " = " + neg(dot(u,v)) + "."]
-      };
-    }
-  },
-  {
-    id:"crossp", group:"Vectors", name:"Cross product", code:"C2.6",
-    gen(){
-      let u, v, w;
-      do { u = rvec(-5,5); v = rvec(-5,5); w = cross(u,v); } while (!w.some(Boolean));
-      return {
-        task:"Find the cross product, then check it is perpendicular to both.",
-        expr:"<span class='vec'>u</span> = " + vec(u) + " × <span class='vec'>v</span> = " + vec(v),
-        answerHtml:"<span class='vec'>u</span> × <span class='vec'>v</span> = " + vec(w),
-        steps:[
-          "First: u₂v₃ " + M + " u₃v₂ = (" + neg(u[1]) + ")(" + neg(v[2]) + ") " + M + " (" + neg(u[2]) + ")(" + neg(v[1]) + ") = " + neg(w[0]),
-          "Second: u₃v₁ " + M + " u₁v₃ = (" + neg(u[2]) + ")(" + neg(v[0]) + ") " + M + " (" + neg(u[0]) + ")(" + neg(v[2]) + ") = " + neg(w[1]),
-          "Third: u₁v₂ " + M + " u₂v₁ = (" + neg(u[0]) + ")(" + neg(v[1]) + ") " + M + " (" + neg(u[1]) + ")(" + neg(v[0]) + ") = " + neg(w[2]),
-          "Check: w · u = " + neg(dot(w,u)) + " and w · v = " + neg(dot(w,v)) + ". Both zero, so it is perpendicular to both."
-        ]
-      };
-    }
-  },
-  {
-    id:"angle", group:"Vectors", name:"Angle between", code:"C2.4",
-    gen(){
-      let u, v, c;
-      do {
-        u = rvec(-5,5); v = rvec(-5,5);
-        c = dot(u,v) / (mag(u)*mag(v));
-      } while (Math.abs(c) > 0.995);
-      const deg = Math.acos(c) * 180 / Math.PI;
-      return {
-        task:"Find the angle between them, in degrees to one decimal place.",
-        expr:"<span class='vec'>u</span> = " + vec(u) + ", &nbsp;<span class='vec'>v</span> = " + vec(v),
-        input:"num", tol:0.15,
-        answer: Math.round(deg*10)/10,
-        answerHtml: neg((Math.round(deg*10)/10).toFixed(1)) + "°",
-        steps:[
-          "u · v = " + neg(dot(u,v)) + ", |u| = √" + dot(u,u) + " ≈ " + mag(u).toFixed(3) + ", |v| = √" + dot(v,v) + " ≈ " + mag(v).toFixed(3),
-          "cos θ = " + neg(dot(u,v)) + " / (" + mag(u).toFixed(3) + " × " + mag(v).toFixed(3) + ") ≈ " + neg(c.toFixed(4)),
-          "θ = cos⁻¹(" + neg(c.toFixed(4)) + ") ≈ " + (Math.round(deg*10)/10).toFixed(1) + "°"
-        ]
-      };
-    }
-  },
-  {
-    id:"line", group:"Vectors", name:"Line through two points", code:"C4.2",
-    gen(){
-      let P, Q;
-      do { P = rvec(-5,5); Q = rvec(-5,5); } while (P.join() === Q.join());
-      const d = sub(Q,P), nm = ["x","y","z"];
-      const par = nm.map((s,i) =>
-        d[i] === 0 ? s + " = " + neg(P[i])
-                   : s + " = " + neg(P[i]) + (d[i] < 0 ? " " + M + " " : " + ") + (Math.abs(d[i]) === 1 ? "" : Math.abs(d[i])) + "t"
-      ).join(", &nbsp;");
-      return {
-        task:"Write a vector equation and parametric equations for the line through these two points.",
-        expr:"P " + vec(P) + " &nbsp;and&nbsp; Q " + vec(Q),
-        answerHtml:"<span class='vec'>r</span> = " + vec(P) + " + t" + vec(d) + "<br>" + par,
-        steps:[
-          "Direction vector = Q " + M + " P = " + vec(d) + ".",
-          "Any point on the line plus a multiple of the direction gives the vector form.",
-          "Splitting into components gives the parametric equations."
-        ]
-      };
-    }
-  },
-  {
-    id:"plane", group:"Vectors", name:"Plane through three points", code:"C4.5",
-    gen(){
-      let P, Q, R, n;
-      do {
-        P = rvec(-5,5); Q = rvec(-5,5); R = rvec(-5,5);
-        n = cross(sub(Q,P), sub(R,P));
-      } while (!n.some(Boolean));
-      let g = n.reduce((a,c) => gcd(a,c), 0);
-      if (g > 1) n = n.map(c => c/g);
-      const lead = n.find(Boolean);
-      if (lead < 0) n = n.map(c => -c);
-      const d = -dot(n,P);
-      return {
-        task:"Find the scalar equation of the plane through these three points.",
-        expr:"(" + P.map(neg).join(", ") + "), &nbsp;(" + Q.map(neg).join(", ") + "), &nbsp;(" + R.map(neg).join(", ") + ")",
-        answerHtml: linForm(n,d),
-        steps:[
-          "Two vectors in the plane: Q " + M + " P = " + vec(sub(Q,P)) + " and R " + M + " P = " + vec(sub(R,P)) + ".",
-          "Their cross product is a normal to the plane: " + vec(n) + (g > 1 ? " (after dividing through by " + g + ")" : ""),
-          "Substitute P to find the constant: " + linForm(n,d),
-          "Check all three points satisfy it. They do."
-        ]
-      };
+    const P = rv(-4,4), d = rv(-3,3), t = pick([2,-1,3,-2]);
+    const on = P.map((x,i) => x + t*d[i]);
+    const off = j => { const w = on.slice(); w[j] += pick([1,-1]); return w; };
+    const cands = [
+      {v:d.slice(), why:"That is the direction vector itself. It is not usually a point on the line."},
+      {v:off(0), why:null}, {v:off(2), why:null}, {v:off(1), why:null}
+    ];
+    const onLine = w => isZero(cross(sub(w,P), d));
+    const wrong = cands.filter(o => !onLine(o.v)).map(o => ({html:vec(o.v), v:o.v,
+      why:o.why || "Close, but one coordinate misses. Try the value of t that fixes the other two, and check every component."}));
+    return { task:"Which point lies on this line?",
+      expr:"r = "+vec(P)+" + t"+vec(d),
+      correct:{html:vec(on), v:on}, onLine:{P, d},
+      wrong,
+      walk:["Every point on the line is P plus some multiple of the direction.",
+            "Try t = "+neg(t)+": "+vec(P)+" + "+neg(t)+vec(d)+" = "+m_(vec(on))+".",
+            "Every component has to work for the same t. That is the whole test."] };
+  }
+}
+];
+
+/* ============ Why it works ============ */
+const WHY = [
+  { q:"Why can a function have only one output for each input?",
+    right:"So that knowing the input tells you the output for certain. That certainty is what lets you graph it, combine it, and ask how fast it changes.",
+    wrong:[
+      ["Because two outputs would be impossible to draw.","A circle has two outputs for most inputs and is easy to draw. The issue is predictability, not drawing."],
+      ["Because mathematics does not allow two outputs.","It does. Those are called relations. Functions are a choice, made because they are useful."],
+      ["Because the vertical line test says so.","The vertical line test is a picture of the rule, not the reason for it."]],
+    explain:"<p class='prose'>Relations with two outputs are perfectly real: x = y² is one. What they lose is <strong>certainty</strong>. If an input of 4 could give 2 or −2, then “the value at 4” means nothing, and you cannot ask how fast it is changing. Requiring one output is the price of being able to say <strong>the</strong> answer.</p>" },
+  { q:"Why does y = (x − 3)² sit 3 units to the right of y = x²?",
+    right:"The function is being fed 3 less than x, so each output shows up 3 units later along the axis.",
+    wrong:[
+      ["Because a minus sign means move right.","That is the memorized rule, not the reason, and it misleads you on forms like (3 − x)²."],
+      ["Because it subtracts 3 from every y-value.","Subtracting from the output moves a graph down. Here the 3 is subtracted from the input."],
+      ["It does not. It moves 3 to the left.","Check a point: x² is 0 at x = 0, and (x − 3)² is 0 at x = 3. The zero moved right."]],
+    explain:"<p class='prose'>You are not moving the graph. You are changing what the function is fed. To get out what x² gave at 0, you now have to put in 3. Every feature arrives 3 units later.</p><p class='prose'>This is why a and c behave as expected in y = af(k(x − d)) + c, and k and d seem backwards: a and c act on the output, k and d act on the input.</p>" },
+  { q:"Why is there no derivative at a sharp corner?",
+    right:"Zooming in never makes a corner look like a straight line, so there is no single slope to measure.",
+    wrong:[
+      ["Because the function has no value at the corner.","The function has a value at the corner. It is the slope that fails."],
+      ["Because the slope there is infinite.","Infinite slope is a vertical tangent, a different situation. At a corner, the slopes from the left and right disagree."],
+      ["Because the slope there is zero.","Zero slope means a flat tangent. A corner has no tangent at all."]],
+    explain:"<p class='prose'>The derivative is the slope of the straight line a curve turns into when you zoom in far enough. A smooth curve flattens into a line. A corner stays a corner at every magnification, forever, so there is no line and no slope.</p>" },
+  { q:"Why is the derivative of a constant zero?",
+    right:"A constant never changes, and a derivative measures change.",
+    wrong:[
+      ["Because a constant has no x in it.","True, but that is a symptom, not the reason."],
+      ["Because the power rule gives zero.","That works mechanically but explains nothing."],
+      ["Because the graph of a constant goes through zero.","y = 7 never touches zero. Its graph is flat, and flat means slope zero."]],
+    explain:"<p class='prose'>The derivative answers one question: how fast is the output changing? A constant's output never changes, so the answer is 0. Its graph is a horizontal line, and a horizontal line has slope 0. The rule is the consequence, not the reason.</p>" },
+  { q:"What makes the number e special?",
+    right:"eˣ is the one exponential whose slope at every point equals its own height.",
+    wrong:[
+      ["It is the most precise irrational number.","There is no such thing. e is special for what it does, not how it is written."],
+      ["It is the base of the log key on a calculator.","The log key is base 10. The ln key is base e, and it is named after e, not the reason for it."],
+      ["It is the largest base an exponential can have.","Any positive base works. e is special because its growth rate matches its size exactly."]],
+    explain:"<p class='prose'>Every exponential aˣ has a derivative that is itself times a constant. For base 2 that constant is about 0.69. For base 3 it is about 1.10. Somewhere between, the constant is exactly 1, and the function is <strong>its own derivative</strong>. That base is e, about 2.718.</p>" },
+  { q:"Why is the derivative of sin x equal to cos x?",
+    right:"If you plot the slope of the sine curve at each point, you get 1, 0, −1, 0, 1: exactly the values of cosine.",
+    wrong:[
+      ["Because sine and cosine are the same curve, shifted.","They are shifts of each other, but that alone does not make one the derivative of the other."],
+      ["Because sin²x + cos²x = 1.","That identity is true, but it is not what makes the derivative work."],
+      ["It is a definition, so there is no reason.","It is a result you can check by reading slopes off the sine graph."]],
+    explain:"<p class='prose'>At x = 0 sine climbs most steeply: slope 1. At π/2 it peaks and is flat: slope 0. At π it falls most steeply: slope −1. At 3π/2 it is flat again. Those slopes, 1, 0, −1, 0, trace out the cosine curve.</p><p class='prose'>This only works in radians. In degrees an awkward factor of π/180 appears, which is the real reason radians exist.</p>" },
+  { q:"Why does log(ab) = log a + log b?",
+    right:"A logarithm is an exponent, and when you multiply powers of the same base you add the exponents.",
+    wrong:[
+      ["Because logs spread out over multiplication.","Spreading out would give log a · log b. The real reason is the exponent law."],
+      ["It only happens to work for base 10.","It works for every base, because every base obeys the exponent laws."],
+      ["Because logs turn addition into multiplication.","Backwards. Logs turn multiplication into addition."]],
+    explain:"<p class='prose'>If a = 10ᵐ and b = 10ⁿ, then ab = 10ᵐ⁺ⁿ. The exponent of the product is the sum of the exponents. Take logs of both sides: log(ab) = m + n = log a + log b. It is xᵐ · xⁿ = xᵐ⁺ⁿ read backwards.</p>" },
+  { q:"If the first derivative is speed, what is the second derivative?",
+    right:"Acceleration: how fast the speed itself is changing.",
+    wrong:[
+      ["Distance travelled.","Distance is the original function. Derivatives go from distance to speed to acceleration."],
+      ["Average speed.","Average speed is a rate over an interval, still a first-derivative idea."],
+      ["Speed squared.","The second derivative is the derivative of the derivative, not its square."]],
+    explain:"<p class='prose'>The first derivative says how fast position changes. The second says how fast that rate changes. On a graph, the first tells you if you are going up or down; the second tells you if you are curving up like a valley or down like a hill.</p>" },
+  { q:"Why does the chain rule multiply?",
+    right:"Rates compound: if y changes 3 times as fast as u, and u changes 5 times as fast as x, then y changes 15 times as fast as x.",
+    wrong:[
+      ["Because it is really the product rule.","Different rule. The product rule is for two functions multiplied; the chain rule is for one inside another."],
+      ["It actually adds the rates.","Test it with gears: one turning twice as fast driving one that turns three times as fast gives six times, not five."],
+      ["Because of the power rule.","The power rule is one place the chain rule gets used, not its reason."]],
+    explain:"<p class='prose'>Gears make it plain. A gear turning 2 times as fast drives one turning 3 times as fast: the last gear turns 6 times as fast as the first. Rates stacked inside each other multiply. The notation shows it too: (dy/du)(du/dx), where du cancels and leaves dy/dx.</p>" },
+  { q:"What does the dot product of two vectors tell you?",
+    right:"How much the two vectors point the same way. Zero means they are at right angles.",
+    wrong:[
+      ["The area between them.","That is the length of the cross product."],
+      ["The length of the two combined.","That is the length of u + v."],
+      ["A vector at right angles to both.","That is the cross product. The dot product is a single number."]],
+    explain:"<p class='prose'>u · v = |u||v| cos θ. Take out the lengths and what is left is cos θ, which measures alignment. Same direction: largest. Right angles: zero, which is why a zero dot product is the test for perpendicular. Opposite directions: negative.</p>" },
+  { q:"Why does the length of u × v equal the area of the parallelogram they make?",
+    right:"Its length is |u||v| sin θ, and that is exactly base times height.",
+    wrong:[
+      ["Because it multiplies all the components together.","It does not; the formula subtracts pairs of products."],
+      ["Because the cross product is at right angles to both.","True, but that explains its direction, not its length."],
+      ["Because it equals the dot product.","The dot product uses cos θ and measures alignment, not area."]],
+    explain:"<p class='prose'>Use u as the base of the parallelogram. The height is the part of v at right angles to u, which is |v| sin θ. Base times height is |u||v| sin θ, which is |u × v|.</p>" },
+  { q:"Three planes, no two of them parallel, share no common point. How?",
+    right:"They form a triangular prism: each pair meets in a line, but the three lines run parallel and never meet.",
+    wrong:[
+      ["It cannot happen; non-parallel planes always share a point.","The prism case proves otherwise. Picture the long box of a Toblerone bar."],
+      ["They all meet in one line.","Then every point on that line would be common to all three."],
+      ["They are all the same plane.","Then every point would be common, and they would be parallel as well."]],
+    explain:"<p class='prose'>Stand three sheets of cardboard up as the sides of a Toblerone box. Each pair touches along an edge, but the three edges are parallel and never meet. Nothing is parallel, yet no point is on all three. It is the case most people miss, and algebraically it shows up as a contradiction such as 0 = 5.</p>" }
+];
+
+/* ============ build a problem ============ */
+const keyOf = h => String(h).replace(/<[^>]+>/g,"").replace(/\s+/g,"");
+function build(step){
+  for (let tries = 0; tries < 60; tries++){
+    const p = step.gen();
+    const need = (step.nopts || 4) - 1;
+    const seen = new Set([keyOf(p.correct.html)]), w = [];
+    for (const o of p.wrong){ const k = keyOf(o.html); if (!seen.has(k)){ seen.add(k); w.push(o); } }
+    if (w.length >= need){
+      p.wrong = w.slice(0, need);
+      p.options = shuffle([Object.assign({ok:true}, p.correct)].concat(p.wrong.map(o => Object.assign({ok:false}, o))));
+      return p;
     }
   }
-];
-
-/* the why-questions, as explanation cards */
-const WHY = [
-  { q:"Why can a function not have two outputs for one input?",
-    a:"<p class='prose'>Nothing breaks mathematically. Relations with two outputs exist, and x = y² is one of them. What breaks is <strong>prediction</strong>.</p><p class='prose'>The entire use of a function is that knowing the input settles the output. If an input of 4 could give back 2 or " + M + "2, then “the value of f at 4” means nothing. You cannot draw it as a single curve, cannot feed it into another function, and cannot ask how fast it is changing. The restriction is not a law of nature. It is the price of being able to say <strong>the</strong> answer.</p>" },
-  { q:"Why does (x " + M + " 3) move a graph to the right rather than the left?",
-    a:"<p class='prose'>Because you are changing the input, not the graph.</p><p class='prose'>The new function hands the old one whatever it is given, minus 3. So to get out what the old function produced at 0, you now have to feed in 3. Every feature shows up three units further along.</p><p class='prose'>You are not sliding the curve. You are <strong>delaying what the machine is fed</strong>. That is why a and c behave as you expect, and k and d appear to run backwards: a and c act on the output, after the function has done its work.</p>" },
-  { q:"Why does a corner have no derivative?",
-    a:"<p class='prose'>The derivative is the slope of the line a curve becomes when you zoom in far enough.</p><p class='prose'>Zoom in on a smooth curve and it flattens into a line. Zoom in on a corner and it stays a corner, at every magnification, forever. There is no single line, so there is no single slope.</p><p class='prose'>Stated with limits: the secants coming from the left approach one slope and the secants from the right approach a different one. The two disagree, so the limit does not exist.</p>" },
-  { q:"Why is the derivative of a constant zero?",
-    a:"<p class='prose'>A constant function does not change. The derivative measures how fast the output changes as the input changes. The output never changes, so the rate is zero.</p><p class='prose'>Graphically: the graph is a horizontal line, and a horizontal line has slope zero. No rule required, and worth noticing that the rule is the consequence rather than the reason.</p>" },
-  { q:"Why is e special? What question is e the answer to?",
-    a:"<p class='prose'>Every exponential function a<sup>x</sup> has a derivative proportional to itself. Differentiate it and you get back k · a<sup>x</sup>, where k depends on which base you chose.</p><p class='prose'>For a = 2 that constant is about 0.69. For a = 3 it is about 1.10. Somewhere between 2 and 3 there is a base where the constant is exactly 1, and the function becomes <strong>its own derivative</strong>.</p><p class='prose'>That base is e, about 2.71828. So e is the answer to: which exponential grows at exactly the rate of its own size?</p>" },
-  { q:"Why does the derivative of sin x turn out to be cos x?",
-    a:"<p class='prose'>Read the slope off the sine graph at each point and plot those slopes.</p><p class='prose'>At x = 0, sine is climbing at its steepest, so the slope is 1. At π/2 it is at the peak, momentarily flat, slope 0. At π it is falling most steeply, slope " + M + "1. At 3π/2, flat again, 0.</p><p class='prose'>Plot 1, 0, " + M + "1, 0 above 0, π/2, π, 3π/2. That is the cosine curve.</p><p class='prose'>One catch worth knowing: this only works in <strong>radians</strong>. In degrees the derivative picks up an awkward factor of π/180, which is the real reason radians exist.</p>" },
-  { q:"Why does log(ab) = log a + log b?",
-    a:"<p class='prose'>A logarithm is an exponent. That one sentence is the whole answer.</p><p class='prose'>If a = 10<sup>m</sup> and b = 10<sup>n</sup>, then ab = 10<sup>m+n</sup>. The exponent of the product is the sum of the exponents. Take logs of both sides and you have log(ab) = m + n = log a + log b.</p><p class='prose'>It is the exponent law x<sup>m</sup> · x<sup>n</sup> = x<sup>m+n</sup> read backwards.</p>" },
-  { q:"What does the second derivative mean, if the first derivative is speed?",
-    a:"<p class='prose'><strong>Acceleration.</strong> The first derivative says how fast position is changing. The second says how fast <em>that</em> is changing.</p><p class='prose'>On a graph: the first derivative tells you whether you are going up or down. The second tells you whether you are curving upward like a valley or downward like a hill. Positive second derivative means the slope itself is increasing.</p>" },
-  { q:"Why does the chain rule multiply? What is each factor measuring?",
-    a:"<p class='prose'>Because rates compose by multiplying.</p><p class='prose'>If y changes three times as fast as u, and u changes five times as fast as x, then y changes fifteen times as fast as x. Gears make it obvious: a gear turning twice as fast driving one that turns three times as fast gives six times.</p><p class='prose'>The notation says it out loud. (dy/du)(du/dx): the du cancels and leaves dy/dx.</p>" },
-  { q:"Why does the dot product tell you about the angle between two vectors?",
-    a:"<p class='prose'>Because <strong>u · v = |u||v| cos θ</strong>. Divide out the two lengths and what is left is cos θ.</p><p class='prose'>What the dot product measures is how much of one vector points along the other. Same direction and cos θ = 1, so the product is as big as it can be. Perpendicular and cos θ = 0, so it vanishes, which is why a zero dot product is the test for a right angle. Opposite directions and it goes negative.</p>" },
-  { q:"Why is the cross product perpendicular to both vectors, and why does its length measure area?",
-    a:"<p class='prose'><strong>Perpendicular:</strong> it is built so that its dot product with each original vector is zero, and a zero dot product is exactly the condition for a right angle. Multiply it out and the six terms cancel in pairs. The practice problems above check this for you every time.</p><p class='prose'><strong>Area:</strong> |u × v| = |u||v| sin θ. Take u as the base of a parallelogram. Then |v| sin θ is its height, the part of v at right angles to u. Base times height is the area.</p>" },
-  { q:"Three planes, no common point. Give two genuinely different ways that can happen.",
-    a:"<p class='prose'><strong>One.</strong> All three parallel and distinct, like three shelves. No point sits on all of them.</p><p class='prose'><strong>Two, the triangular prism.</strong> No two planes are parallel. Each pair meets in a line, so there are three lines of intersection. But those three lines are parallel to one another and never meet, like the three long edges of a Toblerone box.</p><p class='prose'>The second is the one nearly everybody misses, because nothing is parallel and yet there is still no common point. Algebraically both cases produce a contradiction such as 0 = 5.</p>" }
-];
+  throw new Error("could not build " + step.id);
+}
+/* UI_START */
 
 /* ============ state ============ */
-const KEY = "chalk-paper-v1";
-let stats = {}, session = {done:0, right:0, streak:0}, mode = "mixed", cur = null, whyIx = 0;
+const KEY = "chalk-paper-v2";
+let S = { level:0, hist:{}, whyIx:0 };
+try { const r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && typeof r === "object") S = Object.assign(S, r); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+let mode = "path", cur = null, answered = false, showRule = false, sess = {done:0, right:0, streak:0};
 
-try { stats = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { stats = {}; }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {} }
-function rec(id, ok){
-  const s = stats[id] || (stats[id] = {a:0, c:0});
-  s.a++; if (ok) s.c++;
-  session.done++;
-  if (ok){ session.right++; session.streak++; } else session.streak = 0;
-  save(); paintTally(); paintProgress();
-}
+const last5 = id => (S.hist[id] || []).slice(-5);
+const mastered = id => { const h = last5(id); return h.length >= 4 && h.filter(Boolean).length >= 4; };
 
-/* ============ picking ============ */
-const ALL = TOPICS.concat([{id:"why", group:"Understanding", name:"The why questions", code:"reasons, not rules"}]);
-
-function weightOf(id){
-  const s = stats[id];
-  if (!s || !s.a) return 3;
-  return 1 + 3 * (1 - s.c / s.a);
-}
-function chooseTopic(){
-  if (mode !== "mixed") return ALL.find(t => t.id === mode);
-  const pool = TOPICS;
-  const ws = pool.map(t => weightOf(t.id));
-  let r = Math.random() * ws.reduce((a,b) => a+b, 0);
-  for (let i = 0; i < pool.length; i++){ r -= ws[i]; if (r <= 0) return pool[i]; }
-  return pool[pool.length-1];
-}
-
-function nextProblem(){
-  const t = chooseTopic();
-  if (t.id === "why"){
-    const card = WHY[whyIx % WHY.length];
-    whyIx++;
-    cur = {topic:t, task:"Answer it out loud, in words a ten-year-old would follow. Then reveal.",
-           expr:card.q, answerHtml:card.a, isProse:true};
-  } else {
-    cur = Object.assign({topic:t}, t.gen());
-  }
-  render();
-}
-
-/* ============ rendering ============ */
+/* ============ render ============ */
 const card = document.getElementById("card");
+const bar = document.getElementById("pathbar");
 
-function render(revealed, verdict){
-  const t = cur.topic;
-  let h = '<div class="ctop"><span class="ctopic">' + t.name + '</span>' +
-          '<span class="ccode">' + t.code + '</span></div>';
-  h += '<p class="task">' + cur.task + '</p>';
-  h += '<p class="expr">' + cur.expr + '</p>';
+function paintBar(){
+  if (mode !== "path"){ bar.innerHTML = ""; return; }
+  const st = STEPS[S.level], h = last5(st.id);
+  const dots = Array.from({length:5}, (_,i) => '<i class="dot'+(h[i] === true ? " y" : h[i] === false ? " n" : "")+'"></i>').join("");
+  const right = h.filter(Boolean).length;
+  let msg = mastered(st.id) ? "done" : (4 - Math.min(4,right)) + " more right to move on";
+  if (h.length < 4 && right >= h.length) msg = (4 - right) + " more right to move on";
+  bar.innerHTML =
+    '<div class="stepbar"><div class="stepname">Step '+(S.level+1)+' of '+STEPS.length+'<b>'+st.name+'</b></div>' +
+    '<div class="dots" aria-label="Your last five answers on this step">'+dots+'<span>'+msg+'</span></div></div>' +
+    '<details class="ladder"><summary>All steps, jump to any</summary><div class="steps-list">' +
+    STEPS.map((s,i) => '<button type="button" class="sbtn'+(i === S.level ? " cur" : "")+(mastered(s.id) ? " done" : "")+'" data-i="'+i+'"><span class="sn">'+(i+1)+'</span>'+s.name+'</button>').join("") +
+    '</div></details>';
+  bar.querySelectorAll(".sbtn").forEach(b => b.onclick = () => { S.level = Number(b.dataset.i); save(); next(); });
+}
 
-  if (!revealed){
-    if (cur.input === "num"){
-      h += '<div class="acts"><input type="text" id="ansIn" inputmode="text" autocomplete="off" ' +
-           'aria-label="Your answer" placeholder="answer">' +
-           '<button class="btn primary" id="check" type="button">Check</button>' +
-           '<button class="btn" id="giveup" type="button">Show it</button></div>';
-    } else {
-      h += '<p class="hint">Work it on paper first. The reveal is worthless if you read it before you have tried.</p>';
-      h += '<div class="acts"><button class="btn primary" id="reveal" type="button">Reveal the answer</button></div>';
+function ruleHtml(st){
+  return '<div class="rule"><p class="rt">The rule</p><p class="rr">'+st.rule.r+'</p>' +
+    '<div class="rx"><div class="tipb"><b>Memory tip</b>'+st.rule.tip+'</div>' +
+    '<div class="trapb"><b>Watch out</b>'+st.rule.trap+'</div></div></div>';
+}
+
+function next(){
+  answered = false; showRule = false;
+  if (mode === "path"){
+    cur = build(STEPS[S.level]); cur.step = STEPS[S.level];
+  } else {
+    const w = WHY[S.whyIx % WHY.length]; S.whyIx++; save();
+    cur = { step:{id:"why", name:"Why it works", code:"reasons, not rules"}, task:"Pick the best reason.",
+      expr:w.q, isWhy:true, explain:w.explain,
+      options:shuffle([{ok:true, html:w.right}].concat(w.wrong.map(x => ({ok:false, html:x[0], why:x[1]})))) };
+  }
+  paintBar(); render();
+}
+
+function render(pickedIx){
+  const st = cur.step;
+  const prose = cur.isWhy || cur.prose;
+  let h = '<div class="ctop"><span class="ctopic">'+st.name+'</span><span class="ccode">'+st.code+'</span></div>';
+  h += '<p class="task">'+cur.task+'</p>';
+  h += '<p class="expr'+(cur.isWhy ? " q" : "")+'">'+cur.expr+'</p>';
+  h += '<div class="opts">' + cur.options.map((o,i) => {
+    let cls = "opt" + (prose ? " prose" : "");
+    if (answered){ if (o.ok) cls += " right"; else if (i === pickedIx) cls += " wrong"; else cls += " faded"; }
+    return '<button type="button" class="'+cls+'" data-i="'+i+'"'+(answered ? " disabled" : "")+'>' +
+           '<span class="ok">'+(answered && o.ok ? "✓" : answered && i === pickedIx ? "✗" : String.fromCharCode(65+i))+'</span>' +
+           '<span class="ov">'+o.html+'</span></button>';
+  }).join("") + '</div>';
+
+  if (!answered){
+    if (!cur.isWhy){
+      h += '<div class="hintrow"><button type="button" class="link" id="hint">'+(showRule ? "Hide the rule" : "Remind me of the rule")+'</button></div>';
+      if (showRule) h += '<div style="margin-top:12px">'+ruleHtml(st)+'</div>';
     }
   } else {
-    h += '<div class="ans" aria-live="polite">';
-    if (verdict === "y") h += '<span class="verdict y">Correct</span>';
-    if (verdict === "n") h += '<span class="verdict n">Not this time</span>';
-    h += '<p class="alabel">' + (cur.isProse ? "The reason" : "Answer") + '</p>';
-    h += cur.isProse ? cur.answerHtml : '<p class="aval">' + cur.answerHtml + '</p>';
-    if (cur.steps){
-      h += '<div class="steps">' + cur.steps.map((s,i) =>
-        '<div class="sl' + (i === cur.steps.length-1 ? " last" : "") + '">' + s + '</div>').join("") + '</div>';
-    }
-    if (verdict === null){
-      h += '<p class="selfq">Did you get it?</p>';
-      h += '<div class="acts"><button class="btn good" id="got" type="button">I got it</button>' +
-           '<button class="btn miss" id="nope" type="button">I missed it</button></div>';
+    const chosen = cur.options[pickedIx], ok = chosen.ok;
+    h += '<div class="fb" aria-live="polite">';
+    h += ok ? '<span class="verdict y">Correct</span>' : '<span class="verdict n">Not quite</span>';
+    if (cur.advanced) h += '<div class="advance">Step '+(S.level)+' done. Next up: step '+(S.level+1)+', '+STEPS[S.level].name+'.</div>';
+    if (!ok) h += '<div class="mistake"><span class="lbl">What went wrong</span>'+(chosen.why || "")+'</div>';
+    if (cur.isWhy){
+      h += '<p class="h4">The reason</p>' + cur.explain;
     } else {
-      h += '<div class="acts"><button class="btn primary" id="next" type="button">Next problem</button></div>';
+      h += '<p class="h4">How to get it</p><div class="walk">' + cur.walk.map(s => '<div class="w">'+s+'</div>').join("") + '</div>';
+      h += ruleHtml(st);
     }
+    h += '<div class="acts"><button type="button" class="btn" id="nextBtn">Next question</button><span class="keys">or press Enter</span></div>';
     h += '</div>';
   }
   card.innerHTML = h;
 
-  const $ = id => document.getElementById(id);
-  if ($("reveal")) $("reveal").onclick = () => render(true, null);
-  if ($("giveup")) $("giveup").onclick = () => { rec(cur.topic.id, false); render(true, "n"); };
-  if ($("check")) $("check").onclick = doCheck;
-  if ($("ansIn")){
-    $("ansIn").focus();
-    $("ansIn").onkeydown = e => { if (e.key === "Enter") doCheck(); };
+  card.querySelectorAll(".opt").forEach(b => b.onclick = () => choose(Number(b.dataset.i)));
+  const hint = document.getElementById("hint");
+  if (hint) hint.onclick = () => { showRule = !showRule; render(); };
+  const nb = document.getElementById("nextBtn");
+  if (nb){ nb.onclick = next; nb.focus({preventScroll:true}); }
+}
+
+function choose(i){
+  if (answered) return;
+  answered = true;
+  const ok = cur.options[i].ok;
+  sess.done++; if (ok){ sess.right++; sess.streak++; } else sess.streak = 0;
+  paintTally();
+  cur.advanced = false;
+  if (!cur.isWhy){
+    const id = cur.step.id, before = mastered(id);
+    (S.hist[id] = S.hist[id] || []).push(ok);
+    if (S.hist[id].length > 20) S.hist[id] = S.hist[id].slice(-20);
+    if (!before && mastered(id) && S.level < STEPS.length - 1 && STEPS[S.level].id === id){
+      S.level++; cur.advanced = true;
+    }
+    save();
   }
-  if ($("got")) $("got").onclick = () => { rec(cur.topic.id, true); render(true, "y"); };
-  if ($("nope")) $("nope").onclick = () => { rec(cur.topic.id, false); render(true, "n"); };
-  if ($("next")) $("next").onclick = nextProblem;
+  render(i);
+  if (!cur.advanced) paintBar(); else paintBarKeepingStep();
 }
-
-function parseNum(s){
-  const t = String(s).trim().replace(/−/g, "-").replace(/\s/g, "");
-  if (!t) return NaN;
-  const m = t.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
-  if (m) return Number(m[1]) / Number(m[2]);
-  return Number(t);
-}
-function doCheck(){
-  const el = document.getElementById("ansIn");
-  if (!el) return;
-  const v = parseNum(el.value);
-  if (!isFinite(v)){ el.focus(); el.select(); return; }
-  const ok = Math.abs(v - cur.answer) <= (cur.tol || 1e-9);
-  rec(cur.topic.id, ok);
-  render(true, ok ? "y" : "n");
-}
-
-/* chips */
-function paintPickers(){
-  const host = document.getElementById("pickers");
-  const groups = ["Calculus","Vectors","Understanding"];
-  let h = '<div class="prow"><span class="plabel">Practice</span>' +
-          '<button class="chip wide" data-m="mixed" type="button" aria-pressed="' + (mode === "mixed") + '">Mixed, weighted to my weak spots</button></div>';
-  groups.forEach(g => {
-    h += '<div class="prow"><span class="plabel">' + g + '</span>' +
-      ALL.filter(t => t.group === g).map(t =>
-        '<button class="chip" data-m="' + t.id + '" type="button" aria-pressed="' + (mode === t.id) + '">' + t.name + '</button>'
-      ).join("") + '</div>';
-  });
-  host.innerHTML = h;
-  host.querySelectorAll(".chip").forEach(b => b.onclick = () => {
-    mode = b.dataset.m; paintPickers(); nextProblem();
-  });
+/* show the finished step's dots until Next is pressed */
+function paintBarKeepingStep(){
+  const prev = S.level; S.level = prev - 1; paintBar(); S.level = prev;
 }
 
 function paintTally(){
-  document.getElementById("tDone").textContent = session.done;
-  document.getElementById("tRight").textContent = session.right;
-  document.getElementById("tStreak").textContent = session.streak;
+  document.getElementById("tDone").textContent = sess.done;
+  document.getElementById("tRight").textContent = sess.right;
+  document.getElementById("tStreak").textContent = sess.streak;
 }
 
-function paintProgress(){
-  const host = document.getElementById("plist");
-  host.innerHTML = ALL.map(t => {
-    const s = stats[t.id] || {a:0, c:0};
-    const pct = s.a ? Math.round(100 * s.c / s.a) : 0;
-    const weak = s.a >= 3 && pct < 60;
-    return '<div class="prow2"><span class="pn">' + t.name + '</span>' +
-      '<span class="bar"><i class="' + (weak ? "weak" : "") + '" style="width:' + (s.a ? pct : 0) + '%"></i></span>' +
-      '<span class="pnum">' + (s.a ? pct + "%" : "—") + '</span></div>';
-  }).join("");
+function setMode(m){
+  mode = m;
+  document.getElementById("mPath").setAttribute("aria-pressed", String(m === "path"));
+  document.getElementById("mWhy").setAttribute("aria-pressed", String(m === "why"));
+  next();
 }
+document.getElementById("mPath").onclick = () => setMode("path");
+document.getElementById("mWhy").onclick = () => setMode("why");
+document.getElementById("reset").onclick = () => { S = {level:0, hist:{}, whyIx:0}; save(); sess = {done:0,right:0,streak:0}; paintTally(); next(); };
 
-document.getElementById("reset").onclick = () => {
-  stats = {}; session = {done:0, right:0, streak:0}; save(); paintTally(); paintProgress();
-};
+document.addEventListener("keydown", e => {
+  if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if (!answered){
+    const k = e.key.toUpperCase(), idx = "ABCD".indexOf(k) >= 0 ? "ABCD".indexOf(k) : "1234".indexOf(e.key);
+    if (idx >= 0 && idx < cur.options.length){ e.preventDefault(); choose(idx); }
+  } else if (e.key === "Enter" && document.activeElement && document.activeElement.id !== "nextBtn"){
+    e.preventDefault(); next();
+  }
+});
 
-paintPickers(); paintTally(); paintProgress(); nextProblem();
+paintTally(); next();
 </script>
