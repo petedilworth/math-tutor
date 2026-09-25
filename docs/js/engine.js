@@ -33,8 +33,9 @@ CP.state = () => S;
 function load() {
   try { const r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && r.v === 1) S = Object.assign(fresh(), r); } catch (e) {}
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (CP.afterSave) CP.afterSave(); }
 CP.save = save;
+CP.replaceState = function (next) { S = Object.assign(fresh(), next); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 CP.reset = () => { S = fresh(); save(); };
 load();
 

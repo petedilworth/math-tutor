@@ -212,32 +212,110 @@ function renderProgress() {
     h += '<section class="card"><p class="kicker">What to work on</p>' + (weak ? '<p class="small">Weakest step: <strong>' + esc(weak.name) + '</strong> at ' + Math.round(weak.acc * 100) + '%.</p>' : "") +
          (mis.length ? '<p class="h4" style="margin-top:10px">Mistakes you keep making</p><div class="list">' + mis.slice(0, 5).map(m => '<div class="li"><span class="k">' + esc(CP.stepById(m.step).name) + ': chose <span class="m" style="font-size:.95em">' + m.chosen + '</span></span><span class="v">' + m.n + '×</span></div>').join("") + '</div>' : "") + '</section>';
   }
-  h += '<button class="btn ghost block" type="button" id="share">Share a read-only link to this page</button><p class="note" style="text-align:center">Sharing and syncing between devices arrive with profiles, in the next phase.</p></div>';
+  const canShare = CP.sync.signedIn() && CP.sync.profile && CP.sync.profile.shareOn;
+  h += '<button class="btn ghost block" type="button" id="share">' + (canShare ? "Copy my read-only progress link" : "Share a read-only link to this page") + '</button>' +
+       (canShare ? "" : '<p class="note" style="text-align:center">' + (CP.sync.enabled ? "Sign in on the Me screen and switch sharing on." : "Sharing needs the shared record; see the setup guide.") + '</p>') + '</div>';
   view.innerHTML = h;
   view.querySelectorAll(".st").forEach(b => b.onclick = () => { location.hash = "#practice/" + b.dataset.s; });
-  $("#share").onclick = () => alert("Not yet. Profiles and sharing are the next phase.");
+  $("#share").onclick = () => { if (!canShare) { location.hash = "#me"; return; } navigator.clipboard.writeText(CP.sync.shareUrl()).then(() => { $("#share").textContent = "Copied"; }).catch(() => { $("#share").textContent = CP.sync.shareUrl(); }); };
 }
 
 /* ---------- Household ---------- */
+function summarize(state) {
+  const steps = state.steps || {}, days = state.days || {}, frozen = state.frozen || {};
+  const mastered = Object.values(steps).filter(x => x && x.mastered).length;
+  /* current step: first never-mastered in MCV4U order */
+  const cur = CP.trackSteps("mcv4u").find(st => !(steps[st.id] && steps[st.id].mastered)) || CP.trackSteps("mcv4u").slice(-1)[0];
+  /* streak from days + frozen */
+  const D = 86400000, dn = iso => Math.floor(Date.parse(iso + "T00:00:00Z") / D), fromN = n => new Date(n * D).toISOString().slice(0, 10);
+  const covered = iso => ((days[iso] || {}).q > 0) || !!frozen[iso];
+  let n = 0, c = dn(CP.today()); if (!covered(CP.today())) c--; while (n < 4000 && covered(fromN(c))) { n++; c--; }
+  /* this week's questions */
+  let week = 0; for (let i = 0; i < 7; i++) week += ((days[fromN(dn(CP.today()) - i)] || {}).q || 0);
+  let weak = null; for (const id in steps) { const x = steps[id]; if (!x || x.attempts < 3) continue; const acc = x.correct / x.attempts; if (!weak || acc < weak.acc) weak = { acc, name: CP.stepById(id).name }; }
+  return { mastered, cur, streak: n, freezes: state.freezes || 0, week, weak, points: state.points || 0 };
+}
 function renderHousehold() {
-  view.innerHTML = '<h1 style="font-size:24px">Household</h1><div class="stack"><section class="card"><p class="kicker">Coming with profiles</p>' +
-    '<p class="prose" style="color:var(--ink)">This is where a small group, joined by an invite code, sees each other’s step, streak and weakest topic. A table, not a leaderboard. It needs progress to live somewhere shared, which is the next phase.</p>' +
-    '<p class="small">Until then, everything you do here stays on this phone.</p></section></div>';
+  if (!CP.sync.enabled) {
+    view.innerHTML = '<h1 style="font-size:24px">Household</h1><div class="stack"><section class="card"><p class="kicker">Needs the shared record</p><p class="prose" style="color:var(--ink)">A small group, joined by an invite code, sees each other’s step, streak and weakest topic. A table, not a leaderboard. It switches on once the site is connected to its database; see the setup guide in the repository.</p></section></div>';
+    return;
+  }
+  if (!CP.sync.signedIn()) {
+    view.innerHTML = '<h1 style="font-size:24px">Household</h1><div class="stack"><section class="card"><p class="kicker">Sign in first</p><p class="prose" style="color:var(--ink)">Households need a profile so the others can see you. Sign in on the <a href="#me">Me</a> screen with a name and a PIN.</p></section></div>';
+    return;
+  }
+  view.innerHTML = '<h1 style="font-size:24px">Household</h1><p class="small">Loading…</p>';
+  CP.sync.household().then(r => {
+    let h = '<h1 style="font-size:24px">Household</h1><div class="stack">';
+    if (!r.household) {
+      h += '<section class="card"><p class="kicker">Not in a household yet</p><p class="small">Make one and share its code, or join with a code someone gave you. Nothing is searchable; the code is the only way in.</p>' +
+           '<div class="field" style="margin-top:12px"><label for="hn">Make a household</label><input type="text" id="hn" placeholder="e.g. The Thursday crew"></div><div class="acts"><button class="btn" id="hcreate" type="button">Create</button></div>' +
+           '<div class="field" style="margin-top:16px"><label for="hc">Join with a code</label><input type="text" id="hc" placeholder="ABC-123" autocapitalize="characters"></div><div class="acts"><button class="btn ghost" id="hjoin" type="button">Join</button></div><p class="note" id="herr"></p></section></div>';
+      view.innerHTML = h;
+      $("#hcreate").onclick = async () => { try { await CP.sync.householdCreate($("#hn").value.trim() || "Household"); renderHousehold(); } catch (e) { $("#herr").textContent = CP.sync.errorText(e); } };
+      $("#hjoin").onclick = async () => { try { await CP.sync.householdJoin($("#hc").value.trim()); renderHousehold(); } catch (e) { $("#herr").textContent = CP.sync.errorText(e); } };
+      return;
+    }
+    const rows = r.members.map(m => Object.assign({ name: m.name, me: m.me }, summarize(m.state || {})));
+    const tot = rows.reduce((a, x) => ({ week: a.week + x.week, mastered: a.mastered + x.mastered }), { week: 0, mastered: 0 });
+    h += '<div class="row" style="margin-bottom:4px"><p class="kicker" style="margin:0">' + esc(r.household.name) + '</p><span class="mono">invite code ' + esc(r.household.code) + '</span></div>' +
+         '<p class="kicker muted" style="padding:6px 2px 0">This week · no leaderboard, just a table</p>';
+    for (const x of rows) {
+      h += '<section class="card" style="display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:4px 12px;align-items:center">' +
+           '<span style="grid-row:span 2;width:38px;height:38px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:600">' + esc(x.name.slice(0, 1).toUpperCase()) + '</span>' +
+           '<span style="font-size:15px;font-weight:600">' + esc(x.name) + (x.me ? ' <span style="font-size:11px;font-weight:400;color:var(--ink-3)">you</span>' : '') + '</span>' +
+           '<span class="mono" style="text-align:right;color:var(--ink-2)">streak ' + x.streak + ' · ❄ ' + x.freezes + '</span>' +
+           '<span class="small">Step ' + x.cur.order + ', ' + esc(x.cur.name.toLowerCase()) + ' · ' + x.week + ' questions this week</span>' +
+           '<span class="mono" style="text-align:right;color:var(--miss)">' + (x.weak ? 'weakest: ' + esc(x.weak.name.toLowerCase()) : '') + '</span></section>';
+    }
+    h += '<section class="card"><p class="kicker">Household this week</p><div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))">' +
+         '<div><span class="tile v" style="font-family:var(--serif);font-size:24px;font-weight:600;display:block">' + tot.week + '</span><span class="small">questions</span></div>' +
+         '<div><span style="font-family:var(--serif);font-size:24px;font-weight:600;display:block">' + rows.length + '</span><span class="small">people</span></div>' +
+         '<div><span style="font-family:var(--serif);font-size:24px;font-weight:600;display:block">' + tot.mastered + '</span><span class="small">steps mastered</span></div></div></section>' +
+         '<div class="acts"><button class="btn ghost" id="hleave" type="button">Leave this household</button></div></div>';
+    view.innerHTML = h;
+    $("#hleave").onclick = async () => { if (!$("#hleave").dataset.armed) { $("#hleave").dataset.armed = "1"; $("#hleave").textContent = "Tap again to leave"; return; } await CP.sync.householdLeave(); renderHousehold(); };
+  }).catch(e => { view.innerHTML = '<h1 style="font-size:24px">Household</h1><p class="small">' + esc(CP.sync.errorText(e)) + '</p>'; });
 }
 
 /* ---------- Me ---------- */
+function accountCard() {
+  if (!CP.sync.enabled) return '<section class="card"><p class="kicker muted">This device only</p><p class="small">The site is not connected to its shared record yet, so there is no sign-in. Everything is saved on this phone. The setup guide in the repository connects it.</p></section>';
+  if (CP.sync.signedIn()) {
+    const st = { ok: "Synced", offline: "Saved here, will sync when there is signal", auth: "PIN no longer matches: sign out and in again", off: "" }[CP.sync.status] || "";
+    const pr = CP.sync.profile || {};
+    return '<section class="card"><div class="row"><p class="kicker">Signed in as ' + esc(CP.sync.auth.name) + '</p><span class="mono">' + esc(st) + '</span></div>' +
+      '<label class="check" style="margin-top:6px"><input type="checkbox" id="shareOn"' + (pr.shareOn ? " checked" : "") + '> Share a read-only progress page</label>' +
+      (pr.shareOn && CP.sync.shareUrl() ? '<p class="small" style="margin-top:8px;word-break:break-all">Your link: <a href="' + esc(CP.sync.shareUrl()) + '" target="_blank" rel="noopener">' + esc(CP.sync.shareUrl()) + '</a></p><div class="acts"><button class="btn ghost" id="copyShare" type="button">Copy link</button></div>' : '') +
+      '<div class="field" style="margin-top:14px"><label for="npin">Change PIN</label><input type="text" id="npin" inputmode="numeric" maxlength="8" placeholder="new PIN"></div><div class="acts"><button class="btn ghost" id="chpin" type="button">Change</button><button class="btn ghost" id="signout" type="button">Sign out</button></div><p class="note" id="aerr"></p></section>';
+  }
+  return '<section class="card"><p class="kicker">Sign in</p><p class="small">A name and a PIN. Add the invite code the first time to make your profile. Then your progress follows you to any device.</p>' +
+    '<div class="field" style="margin-top:10px"><label for="sn">Name</label><input type="text" id="sn" autocomplete="username" placeholder="Pete"></div>' +
+    '<div class="field"><label for="sp">PIN</label><input type="text" id="sp" inputmode="numeric" maxlength="8" autocomplete="current-password" placeholder="4 digits"></div>' +
+    '<div class="field"><label for="si">Invite code, first time only</label><input type="text" id="si" placeholder="from whoever invited you"></div>' +
+    '<div class="acts"><button class="btn" id="signin" type="button">Sign in</button></div><p class="note" id="aerr"></p></section>';
+}
+function wireAccount() {
+  const err = m => { const e = $("#aerr"); if (e) e.textContent = m; };
+  const si = $("#signin"); if (si) si.onclick = async () => { si.disabled = true; err("Signing in…"); try { await CP.sync.signIn($("#sn").value, $("#sp").value, $("#si").value); renderMe(); } catch (e) { err(CP.sync.errorText(e)); si.disabled = false; } };
+  const so = $("#signout"); if (so) so.onclick = () => { CP.sync.signOut(); renderMe(); };
+  const sh = $("#shareOn"); if (sh) sh.onchange = async () => { await CP.sync.setShare(sh.checked); renderMe(); };
+  const cp = $("#copyShare"); if (cp) cp.onclick = () => { navigator.clipboard.writeText(CP.sync.shareUrl()).then(() => { cp.textContent = "Copied"; }).catch(() => { cp.textContent = "Long-press the link to copy it"; }); };
+  const ch = $("#chpin"); if (ch) ch.onclick = async () => { try { await CP.sync.changePin($("#npin").value); err("PIN changed."); } catch (e) { err(CP.sync.errorText(e)); } };
+}
 function renderMe() {
   const p = S().profile;
-  view.innerHTML = '<h1 style="font-size:24px">Me</h1><div class="stack"><section class="card">' +
+  view.innerHTML = '<h1 style="font-size:24px">Me</h1><div class="stack">' + accountCard() + '<section class="card">' +
     '<div class="field"><label for="nm">Your name</label><input type="text" id="nm" value="' + esc(p.name) + '" placeholder="So the welcome-back knows who you are" autocomplete="given-name"></div>' +
     '<div class="field"><label>Daily lesson size</label><div class="chips">' + [3, 5, 8].map(n => '<button type="button" class="chip" data-n="' + n + '" aria-pressed="' + (p.size === n) + '">' + n + ' questions</button>').join("") + '</div></div>' +
     '<div class="field"><label>Tracks</label><div class="chips">' + CP.TRACKS.map(t => '<button type="button" class="chip" aria-pressed="' + p.tracks.includes(t.id) + '"' + (t.available ? "" : " disabled") + '>' + esc(t.name) + (t.available ? "" : " · coming") + '</button>').join("") + '</div></div></section>' +
-    '<section class="card"><p class="kicker">The morning email</p><p class="small">Not sending yet: it is the phase after profiles. Leave your address now and it starts the day that switches on.</p>' +
+    '<section class="card"><p class="kicker">The morning email</p><p class="small">' + (CP.sync.signedIn() ? "One email each morning with the day\u2019s rule, the real-life number and a link. It starts once the sending job is switched on." : "Sign in first, so the morning job knows whose lesson to send.") + '</p>' +
     '<div class="field" style="margin-top:10px"><label for="em">Email</label><input type="email" id="em" value="' + esc(p.email) + '" placeholder="you@example.com" autocomplete="email"></div>' +
     '<label class="check"><input type="checkbox" id="opt"' + (p.emailOptIn ? " checked" : "") + '> Send me the lesson each morning</label></section>' +
     '<section class="card"><p class="kicker">On your phone</p><p class="small">Open this page in Safari or Chrome, use the share or menu button, and choose <strong>Add to Home Screen</strong>. It then opens full-screen like an app and works without signal.</p></section>' +
-    '<section class="card"><p class="kicker muted">Data</p><p class="small">Everything is saved on this device the moment you tap. Nothing leaves it yet.</p><div class="acts"><button class="btn ghost" id="reset" type="button">Start over</button></div></section></div>' +
+    '<section class="card"><p class="kicker muted">Data</p><p class="small">Everything is saved on this device the moment you tap' + (CP.sync.signedIn() ? ", then synced to your profile a moment later." : ".") + '</p><div class="acts"><button class="btn ghost" id="reset" type="button">Start over</button></div></section></div>' +
     '<footer>Chalk and Paper · built to the Ontario MCV4U expectations</footer>';
+  wireAccount();
   $("#nm").onchange = e => { p.name = e.target.value.trim(); CP.save(); };
   $("#em").onchange = e => { p.email = e.target.value.trim(); CP.save(); };
   $("#opt").onchange = e => { p.emailOptIn = e.target.checked; CP.save(); };
@@ -264,7 +342,8 @@ window.addEventListener("hashchange", route);
 
 /* ---------- boot ---------- */
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-loadLive().then(() => { CP.settleFreezes(); route(); });
+loadLive().then(() => { CP.settleFreezes(); route(); if (CP.sync.signedIn()) CP.sync.pull().then(() => { CP.settleFreezes(); route(); }); });
+CP.sync.onChange = () => { if ((location.hash || "#today") === "#me") paintTally(); };
 document.addEventListener("keydown", e => {
   if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
   const opts = Array.from(view.querySelectorAll(".opt:not(:disabled)"));

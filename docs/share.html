@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chalk and Paper</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>.wrap{padding-bottom:40px}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead"><span class="brand">Chalk and Paper</span><span class="tally">read-only</span></header>
+  <main id="view"><p class="small">Loading…</p></main>
+</div>
+<script src="js/config.js"></script>
+<script src="js/content.js"></script>
+<script src="js/generators.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/sync.js"></script>
+<script>
+(function () {
+  const view = document.getElementById("view");
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const token = new URLSearchParams(location.search).get("t");
+  if (!CP.sync.enabled || !token) { view.innerHTML = '<p class="small">Nothing to show.</p>'; return; }
+  CP.sync.rpc("cp_share", { p_token: token }).then(r => {
+    /* load the shared record into the engine, read-only, so the same progress code renders it */
+    CP.replaceState(Object.assign({ v: 1 }, r.state, { profile: { name: r.name, tracks: ["mcv4u"], size: 5 } }));
+    const steps = CP.trackSteps("mcv4u"), cur = CP.currentStep("mcv4u"), st = CP.streak(), lv = CP.level();
+    const mastered = steps.filter(s => CP.mastered(s.id)).length, b = CP.bests(), weak = CP.weakest(), mis = CP.mistakes(), cal = CP.calendar(8);
+    const q = n => n === 0 ? "" : n < 4 ? "q1" : n < 8 ? "q2" : "q3";
+    const S = CP.state();
+    let h = '<h1 style="font-size:24px">' + esc(r.name) + '</h1><p class="lede" style="font-size:15px">Shared progress. Updated as they practise.</p><div class="stack">';
+    h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days</span></div><div class="tile"><span class="k">Level ' + lv.n + '</span><span class="v">' + S.points.toLocaleString("en-CA") + '</span><span class="s">points</span></div><div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + '</span></div></div>';
+    h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + '</span></div><div class="map">' + steps.map(s => { const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : ""; return '<div class="st"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.name.split(",")[0].split(" and ")[0]) + '</span></div>'; }).join("") + '</div></section>';
+    h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + '" title="' + d.date + '"></span>').join("") + '</div></section>';
+    /* the tutor view: per step accuracy and the mistakes they keep making */
+    const rows = steps.map(s => ({ s, x: S.steps[s.id] })).filter(o => o.x && o.x.attempts > 0);
+    h += '<section class="card"><p class="kicker">Accuracy by step</p><div class="list">' + rows.map(o => '<div class="li"><span class="k">' + esc(o.s.name) + '</span><span class="v">' + Math.round(100 * o.x.correct / o.x.attempts) + '% · ' + o.x.attempts + '</span></div>').join("") + (rows.length ? "" : '<p class="small">Nothing attempted yet.</p>') + '</div></section>';
+    if (mis.length) h += '<section class="card"><p class="kicker">Mistakes they keep making</p><p class="small" style="margin-bottom:8px">The wrong options chosen most often. Each is a specific misconception, and the name of the thing to teach next.</p><div class="list">' + mis.map(m => '<div class="li"><span class="k">' + esc(CP.stepById(m.step).name) + ': chose <span class="m" style="font-size:.95em">' + m.chosen + '</span></span><span class="v">' + m.n + '×</span></div>').join("") + '</div></section>';
+    if (weak) h += '<p class="small">Weakest step: <strong>' + esc(weak.name) + '</strong> at ' + Math.round(weak.acc * 100) + '%.</p>';
+    h += '</div>';
+    view.innerHTML = h;
+  }).catch(e => { view.innerHTML = '<p class="small">' + esc(CP.sync.errorText(e)) + '</p>'; });
+})();
+</script>
+</body>
+</html>

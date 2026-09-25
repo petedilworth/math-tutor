@@ -1,6 +1,6 @@
 # Chalk and Paper – the site
 
-A daily maths lesson, built to the Ontario MCV4U expectations. Phase 1: single device, no accounts.
+A daily maths lesson, built to the Ontario MCV4U expectations. Setup for each phase is in `SETUP.md`.
 
 ## Turn it on
 
@@ -17,6 +17,9 @@ On a phone, open that address, use the browser's share or menu button, and choos
 | `js/generators.js` | The code that invents fresh problems, three difficulty tiers per step. Verified by `tools/verify.js`. |
 | `js/engine.js` | Saving, spaced review, the daily lesson, the safety net, streaks, freezes, points |
 | `js/app.js` | The screens |
+| `js/config.js` | The two Supabase values that connect the site to its shared record |
+| `js/sync.js` | Sign-in, push and pull, merging two devices' records, households, sharing |
+| `share.html` | The read-only progress page a share link opens |
 | `sw.js`, `manifest.webmanifest`, `icon.svg` | Offline support and the home-screen install |
 | `data/live.json` | The real numbers, written each morning by the workflow in `.github/workflows/daily-data.yml` |
 
@@ -26,6 +29,8 @@ On a phone, open that address, use the browser's share or menu button, and choos
 
 `node tools/fetch-live.js` fetches the live numbers by hand.
 
+`DRY_RUN=1 node tools/send-daily.js` renders the morning email to `data/email-preview.html` without sending.
+
 ## Not yet
 
-Profiles, sync between devices, sharing and households (phase 2, needs a free Supabase account). The morning email (phase 3, needs a Gmail app password in the repository's secrets). The Advanced Functions and Grade 11 tracks.
+The Advanced Functions and Grade 11 tracks. Lockout after repeated wrong PINs.
