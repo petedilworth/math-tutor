@@ -16,7 +16,7 @@ A daily maths lesson that arrives by email, opens on a phone in one tap, takes t
 | 4 | Sign-in | Name and a 4-digit PIN. No email, no password |
 | 5 | Sharing | Private by default; each person can turn on a read-only progress link |
 | 6 | Tutor view | The shared page includes actual mistakes: which wrong option, how often |
-| 7 | Scale | 5 to 10 people, friends and family. Not searchable. Household groups so Sebastian can compete with his parents and explain what they get wrong |
+| 7 | Scale | 5 to 10 people, friends and family. Not searchable. Household groups so Sebastian and his parents can see each other's progress |
 | 8 | Progress that motivates | All of: mastery map, personal bests, points and levels, calendar of days practised |
 | 9 | Streaks | Yes, with freeze days earned by practising |
 | 10 | Reminders | One daily lesson by email: a short briefing, a link, the same briefing on the site, a few questions, then optional extra practice |
@@ -61,28 +61,47 @@ Sebastian's parents may not remember their maths, and a person who gets four que
 
 The tracks below Calculus and Vectors matter most for this. A parent whose exponents are gone needs Grade 11 first, and the app should route them there rather than let them fail Grade 12 in public.
 
-## Make it practical
+## Make it practical, with real numbers
 
-Every lesson ends with a short "in real life" section: two or three sentences connecting the day's rule to something outside a classroom. At least once a week, and more often when it fits, the connection is to finance and investing. The mathematics of money is unusually well matched to this course, and these are not stretches:
+Every lesson ends with an "in real life" section, and it is not a sentence of analogy. It is a short worked calculation with real data, followed by one question on that data. It counts as one of the lesson's questions, so the practical part is answered, not just read.
 
-| Step | The real-life connection |
-|---|---|
-| Exponent laws | Compounding. (1.05)³ · (1.05)² is five years of growth at 5%, which is why the exponents add. |
-| Fraction and negative exponents | Discounting. A dollar in three years is worth 1.05⁻³ today. A negative exponent is the finance word "present value". |
-| Slope and rate of change | Return. The slope of a portfolio's value over time is its rate of return. Average rate of change over a year is the annual return. |
-| Power rule | Marginal cost. If cost is C(q) = 0.02q², the derivative 0.04q is the cost of one more unit at scale q. |
-| Tangent at a point | Duration. A bond's price against interest rates is a curve; the slope of the tangent at today's rate is its duration, the number every bond desk watches. |
-| Product rule | Revenue is price times quantity, and both move. The product rule says how revenue changes when a price cut raises volume. |
-| Chain rule | A Canadian holding US stocks. Your return in dollars depends on the stock's return and the exchange rate, and the chain rule multiplies them. |
-| eˣ and ln | Continuous compounding, and log returns. Professionals add log returns over time because ln turns multiplication into addition. |
-| Maximums and minimums | Optimization. The order size that minimizes total cost, the price that maximizes profit. Every "optimal" in a finance article is a derivative set to zero. |
-| Second derivative | Convexity. How a bond's duration itself changes as rates move. Option traders call the same idea gamma. |
-| Vector basics | A portfolio is a vector: (shares of A, shares of B, shares of C). Rebalancing is vector subtraction. |
-| Dot product | The single cleanest example in the course. Portfolio return is exactly the dot product of the weights vector and the returns vector. |
-| Cross product and planes | Constraints. "Spend exactly $10,000 across three funds" is a plane in three-space; the feasible portfolios are its intersection with other planes. |
-| Lines in space | A glide path: a retirement portfolio moving from one allocation to another over time is a line through allocation space. |
+The shape, every time:
 
-Not every lesson is finance. Others draw on driving (speed, acceleration, stopping distance), cooking (scaling, rates), sport (projectiles, angles), and weather (rates of change, periodic functions). The content file keeps two or three connections per step and the daily lesson picks one, ensuring finance appears at least weekly.
+1. **A live number**, with its source and date, marked "live". Fetched fresh each morning by the same job that sends the email.
+2. **A setup** in two sentences, in first person: you bought, you hold, you owe.
+3. **The calculation**, three or four lines, in a monospaced block, with the answer.
+4. **Why this is today's rule**, in one paragraph that names the rule and shows where it acted.
+5. **Try it**: the same situation with one number changed, four options, wrong options being the usual mistakes (adding rates instead of multiplying, ignoring the currency, using the wrong direction).
+
+Finance and investing at least once a week, and more often when the rule fits. Free sources with no key required:
+
+- **Bank of Canada Valet API**: USD/CAD and every other exchange rate, the policy rate, bond yields, and CPI. Enough for most of the finance connections below.
+- **Open-Meteo**: temperature, wind, sunrise and sunset, for rate-of-change and periodic-function days.
+- Anything else stays a fixed worked example with the date stated. No source, no fake "live" tag.
+
+The worked example for the chain rule, as drawn on the screens:
+
+> USD/CAD 1.3500, Bank of Canada, yesterday's close. A year ago you bought a US stock at US$100 when a US dollar cost C$1.40. It is now US$110, and a US dollar costs C$1.35. Stock: 110 ÷ 100 = 1.100, up 10%. Currency: 1.35 ÷ 1.40 = 0.964, down 3.6%. Together: 1.100 × 0.964 = 1.061, up 6.1%. C$140 became C$148.50. Rates stacked inside each other multiply; that multiply is the chain rule. Try it: if the US dollar had risen to C$1.45 instead? Answer 13.9%; the trap is 13.6%, which is what you get by adding.
+
+The connection per step, each of which becomes a calculation of this shape:
+
+| Step | Live number | The calculation |
+|---|---|---|
+| Exponent laws | Policy rate | (1 + r)³ · (1 + r)² is five years of growth, so the exponents add |
+| Fraction and negative exponents | 5-year bond yield | What a dollar due in three years is worth today: (1 + y)⁻³ |
+| Slope and rate of change | USD/CAD, 30 days apart | The average daily rate of change of the currency |
+| Power rule | Fixed example | Marginal cost from C(q) = 0.02q² |
+| Tangent at a point | 10-year bond yield | Bond price against yield, and the slope at today's yield: duration |
+| Product rule | Fixed example | Revenue is price times volume when a price cut raises volume |
+| Chain rule | USD/CAD | The example above |
+| eˣ and ln | Policy rate | Continuous compounding, and why log returns add |
+| Maximums and minimums | Fixed example | The order size that minimizes total cost |
+| Vector basics | Three exchange rates | A portfolio as a vector; rebalancing as subtraction |
+| Dot product | Three exchange rates | Portfolio return as weights · returns |
+| Cross product and planes | Fixed example | "Spend exactly $10,000 across three funds" as a plane |
+| Lines in space | Fixed example | A retirement glide path as a line through allocation space |
+
+Days that are not finance use Open-Meteo: today's temperature curve for sinusoidal functions, the rate the temperature is changing at noon for the derivative, sunrise drift across the year for average rate of change.
 
 ## Architecture, free tiers only
 
@@ -125,7 +144,7 @@ Every answer is written to the phone's storage before the screen even updates. A
 - **Points and levels:** points per correct answer, weighted by step difficulty, bonus for a review answered correctly, none deducted for mistakes.
 - **Calendar:** one square per day, darker for more questions. Never shows a red square for a missed day.
 - **Streak with freezes:** one freeze earned per five days practised, up to three banked.
-- **Household:** members see each other's step, streak and weakest topic. When one member got right what another got wrong this week, the app suggests "ask them to explain it". Logging an explanation earns the explainer points. No leaderboard.
+- **Household:** members see each other's step, streak, questions this week and weakest topic, as a table rather than a ranking. A small household total (questions, days practised, steps mastered this week) sits below it. Nothing nudges anyone to do anything about anyone else's results. An earlier "explain it to them" mechanic was considered and dropped.
 
 ## Content model
 
