@@ -40,6 +40,50 @@ The most likely failure is a busy week, not boredom or difficulty. So the design
 - The daily email keeps arriving, unchanged in tone, whether the last lesson was yesterday or three weeks ago.
 - A break longer than a week quietly reduces the daily size to the minimum until three days have been completed.
 
+## Missed lessons stay open
+
+A lesson is dated, not disposable. If the email is missed, the lesson still sits on the site, and it keeps sitting there until it is done. But an unbounded pile of undone lessons is exactly the guilt that answer 20 warns about, so:
+
+- The newest lesson is always at the top and is the one the site opens on. Older open lessons sit below it under "waiting", with no count and no red badge.
+- After fourteen days an undone lesson stops being a to-do. Its questions fold quietly into the review pool, so nothing is lost, and the list never grows past two weeks.
+- Doing an old lesson counts fully: points, calendar square for today, streak.
+
+## The parents' safety net
+
+Sebastian's parents may not remember their maths, and a person who gets four questions wrong in a row on their first evening will not come back. So every step has a floor under it.
+
+- **Every step names its prerequisite.** Chain rule rests on power rule; power rule rests on exponent laws; vectors rest on nothing but arithmetic. This is data, not code.
+- **Show me one first.** The first question on any new step is worked in front of you, not asked. Then the next three questions are the easiest version of that step, and the rule card stays open above them.
+- **Two wrong in a row backs you up.** The app says "let's take a step back", opens the prerequisite step's rule card, gives three easy questions there, and then returns you. It does this without comment on the score.
+- **A hint before answering, always.** The "remind me of the rule" link is on every question, and using it costs nothing.
+- **Explanations are the product, not a consolation.** A wrong answer shows what went wrong, the walk-through, and the rule card. That is more teaching than a right answer gets, deliberately.
+- **Difficulty is per person, not per step.** Someone still shaky on a step keeps getting the easy versions until they are not. Someone fluent gets the harder versions. Two people on the same step see different questions.
+
+The tracks below Calculus and Vectors matter most for this. A parent whose exponents are gone needs Grade 11 first, and the app should route them there rather than let them fail Grade 12 in public.
+
+## Make it practical
+
+Every lesson ends with a short "in real life" section: two or three sentences connecting the day's rule to something outside a classroom. At least once a week, and more often when it fits, the connection is to finance and investing. The mathematics of money is unusually well matched to this course, and these are not stretches:
+
+| Step | The real-life connection |
+|---|---|
+| Exponent laws | Compounding. (1.05)³ · (1.05)² is five years of growth at 5%, which is why the exponents add. |
+| Fraction and negative exponents | Discounting. A dollar in three years is worth 1.05⁻³ today. A negative exponent is the finance word "present value". |
+| Slope and rate of change | Return. The slope of a portfolio's value over time is its rate of return. Average rate of change over a year is the annual return. |
+| Power rule | Marginal cost. If cost is C(q) = 0.02q², the derivative 0.04q is the cost of one more unit at scale q. |
+| Tangent at a point | Duration. A bond's price against interest rates is a curve; the slope of the tangent at today's rate is its duration, the number every bond desk watches. |
+| Product rule | Revenue is price times quantity, and both move. The product rule says how revenue changes when a price cut raises volume. |
+| Chain rule | A Canadian holding US stocks. Your return in dollars depends on the stock's return and the exchange rate, and the chain rule multiplies them. |
+| eˣ and ln | Continuous compounding, and log returns. Professionals add log returns over time because ln turns multiplication into addition. |
+| Maximums and minimums | Optimization. The order size that minimizes total cost, the price that maximizes profit. Every "optimal" in a finance article is a derivative set to zero. |
+| Second derivative | Convexity. How a bond's duration itself changes as rates move. Option traders call the same idea gamma. |
+| Vector basics | A portfolio is a vector: (shares of A, shares of B, shares of C). Rebalancing is vector subtraction. |
+| Dot product | The single cleanest example in the course. Portfolio return is exactly the dot product of the weights vector and the returns vector. |
+| Cross product and planes | Constraints. "Spend exactly $10,000 across three funds" is a plane in three-space; the feasible portfolios are its intersection with other planes. |
+| Lines in space | A glide path: a retirement portfolio moving from one allocation to another over time is a line through allocation space. |
+
+Not every lesson is finance. Others draw on driving (speed, acceleration, stopping distance), cooking (scaling, rates), sport (projectiles, angles), and weather (rates of change, periodic functions). The content file keeps two or three connections per step and the daily lesson picks one, ensuring finance appears at least weekly.
+
 ## Architecture, free tiers only
 
 Three parts, one new account.
@@ -85,7 +129,7 @@ Every answer is written to the phone's storage before the screen even updates. A
 
 ## Content model
 
-Each track is a data file listing its steps in order. A step has: name, curriculum code, a generator for fresh problems, and the prose for its rule card (rule, memory tip, trap). Generators are code; the prose is a separate content file.
+Each track is a data file listing its steps in order. A step has: name, curriculum code, its prerequisite step, a generator for fresh problems at three difficulty levels, and the prose for its rule card (rule, memory tip, trap) and its real-life connections. Generators are code; the prose is a separate content file.
 
 Tracks at launch:
 
@@ -97,7 +141,7 @@ A person can subscribe to any combination. The daily lesson draws from all their
 
 ## Build order
 
-**Phase 1, no accounts needed.** The site in this repository: installable, offline, all gamification, spaced review, multiple tracks, the daily lesson shown on the site. Single-device only until phase 2. The owner turns on GitHub Pages in the repository settings, which takes under a minute.
+**Phase 1, no accounts needed.** The site in this repository: installable, offline, all gamification, spaced review, multiple tracks, the daily lesson shown on the site with its practical section, missed lessons kept open, the safety net (worked first example, easy versions, step-back to the prerequisite). Single-device only until phase 2. The owner turns on GitHub Pages in the repository settings, which takes under a minute.
 
 **Phase 2, needs a Supabase account.** Profiles, PIN, sync across devices, share links, households.
 
