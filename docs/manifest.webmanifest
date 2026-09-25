@@ -1,0 +1,14 @@
+{
+  "name": "Chalk and Paper",
+  "short_name": "Chalk",
+  "description": "A daily maths lesson: calculus and vectors, two to five minutes, with real numbers.",
+  "start_url": "./#today",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F4F1",
+  "theme_color": "#0B6E68",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

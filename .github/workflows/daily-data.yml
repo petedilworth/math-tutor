@@ -1,0 +1,30 @@
+name: Daily live data
+
+# Fetches the real numbers the lesson uses (Bank of Canada, Open-Meteo) and commits docs/data/live.json.
+# Scheduled workflows only run on the repository's default branch. Until this branch is the default,
+# run it by hand from the Actions tab (workflow_dispatch) or the site shows "fixed example".
+
+on:
+  schedule:
+    - cron: "30 10 * * *"   # 10:30 UTC, 6:30 am Toronto in summer, 5:30 in winter
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node tools/fetch-live.js
+      - name: Commit if changed
+        run: |
+          git config user.name "chalk-and-paper-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/live.json
+          git diff --cached --quiet || git commit -m "Daily live data $(date -u +%F)"
+          git push
