@@ -6,6 +6,7 @@
 -- one person cannot alter another's record from a browser. PINs are stored as bcrypt hashes.
 -- This is friends-and-family security: it stops casual snooping, not a determined person who knows a PIN.
 
+-- On Supabase, pgcrypto lives in the "extensions" schema; every function below searches it too.
 create extension if not exists pgcrypto;
 
 create table if not exists cp_settings (
@@ -60,7 +61,7 @@ create or replace function cp__norm(p_name text) returns text language sql immut
 $$;
 
 create or replace function cp__auth(p_name text, p_pin text) returns cp_profiles
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles;
 begin
   select * into pr from cp_profiles where name = cp__norm(p_name);
@@ -71,7 +72,7 @@ begin
 end $$;
 
 create or replace function cp__profile_json(pr cp_profiles) returns json
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, extensions as $$
   select json_build_object(
     'name', pr.name, 'shareToken', pr.share_token, 'shareOn', pr.share_on,
     'household', (select json_build_object('name', h.name, 'code', h.code) from cp_households h where h.id = pr.household_id),
@@ -80,7 +81,7 @@ $$;
 
 -- ---------- sign in, or create with the invite code ----------
 create or replace function cp_signin(p_name text, p_pin text, p_invite text default null)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles; st jsonb;
 begin
   if length(trim(p_name)) < 2 or length(p_pin) < 4 then raise exception 'BAD_INPUT'; end if;
@@ -102,7 +103,7 @@ end $$;
 
 -- ---------- pull the record ----------
 create or replace function cp_pull(p_name text, p_pin text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles; st jsonb; ts timestamptz;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -112,7 +113,7 @@ end $$;
 
 -- ---------- push the record and settings ----------
 create or replace function cp_push(p_name text, p_pin text, p_state jsonb, p_settings jsonb default '{}'::jsonb)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -132,7 +133,7 @@ end $$;
 
 -- ---------- change PIN ----------
 create or replace function cp_change_pin(p_name text, p_pin text, p_new_pin text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -143,7 +144,7 @@ end $$;
 
 -- ---------- households ----------
 create or replace function cp_household_create(p_name text, p_pin text, p_hname text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles; h cp_households; c text;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -154,7 +155,7 @@ begin
 end $$;
 
 create or replace function cp_household_join(p_name text, p_pin text, p_code text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles; h cp_households;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -165,7 +166,7 @@ begin
 end $$;
 
 create or replace function cp_household_leave(p_name text, p_pin text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -176,7 +177,7 @@ end $$;
 -- Members' summaries. The browser computes the table from the trimmed state (steps, days, points, freezes),
 -- never from answers, so household members do not see each other's individual answers.
 create or replace function cp_household(p_name text, p_pin text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles;
 begin
   pr := cp__auth(p_name, p_pin);
@@ -194,7 +195,7 @@ end $$;
 -- ---------- read-only share link ----------
 -- Returns the full record (answers included, since the tutor view wants mistakes) if sharing is on.
 create or replace function cp_share(p_token text)
-returns json language plpgsql security definer set search_path = public as $$
+returns json language plpgsql security definer set search_path = public, extensions as $$
 declare pr cp_profiles; st jsonb;
 begin
   select * into pr from cp_profiles where share_token = p_token and share_on;
