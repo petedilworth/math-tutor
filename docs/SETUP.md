@@ -21,7 +21,7 @@ This gives everyone a profile, makes progress follow you between devices, and tu
    update cp_settings set value = 'YOUR-CODE-HERE' where key = 'invite_code';
    ```
    This is what a new person types once to make a profile. Change it any time.
-4. Left sidebar → **Project Settings → API**. Copy two things: the **Project URL** and the **anon public** key.
+4. Left sidebar → **Project Settings → API** (on newer projects, **Data API** for the URL and **API Keys** for the key). Copy two things: the **Project URL**, which ends in `.supabase.co` (if what you see ends in `/rest/v1`, that also works), and the key labelled **anon public** or **Publishable**. Either kind of key works. Not the one labelled service_role or Secret.
 5. Open `docs/js/config.js` in this repository (on GitHub, click the file, then the pencil) and paste them in:
    ```js
    supabaseUrl: "https://xxxx.supabase.co",

@@ -11,14 +11,22 @@ CP.sync = { enabled: !!(CFG.supabaseUrl && CFG.supabaseAnonKey), auth: null, pro
 try { CP.sync.auth = JSON.parse(localStorage.getItem(AUTH_KEY) || "null"); } catch (e) {}
 const saveAuth = () => { try { if (CP.sync.auth) localStorage.setItem(AUTH_KEY, JSON.stringify(CP.sync.auth)); else localStorage.removeItem(AUTH_KEY); } catch (e) {} };
 
+/* The base URL is the project URL. People often paste the REST URL, which ends in /rest/v1; accept that too. */
+const BASE = String(CFG.supabaseUrl || "").trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+const KEY = String(CFG.supabaseAnonKey || "").trim();
+/* Old-style anon keys are JWTs and go in both headers. New publishable keys go in apikey only. */
+const HEADERS = Object.assign({ "content-type": "application/json", "apikey": KEY }, KEY.startsWith("eyJ") ? { "authorization": "Bearer " + KEY } : {});
 async function rpc(fn, args) {
-  const r = await fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/rest/v1/rpc/" + fn, {
-    method: "POST", headers: { "content-type": "application/json", "apikey": CFG.supabaseAnonKey, "authorization": "Bearer " + CFG.supabaseAnonKey },
-    body: JSON.stringify(args)
-  });
+  let r;
+  try { r = await fetch(BASE + "/rest/v1/rpc/" + fn, { method: "POST", headers: HEADERS, body: JSON.stringify(args) }); }
+  catch (e) { throw new Error("NETWORK"); }
   const text = await r.text();
   let j = null; try { j = JSON.parse(text); } catch (e) {}
-  if (!r.ok) { const msg = (j && (j.message || j.hint)) || text || ("HTTP " + r.status); const code = /NO_PROFILE|BAD_PIN|BAD_INVITE|BAD_INPUT|NO_HOUSEHOLD|NO_SHARE|TOO_BIG/.exec(msg); throw new Error(code ? code[0] : msg); }
+  if (!r.ok) {
+    const msg = (j && (j.message || j.hint || j.error)) || text || "";
+    const code = /NO_PROFILE|BAD_PIN|BAD_INVITE|BAD_INPUT|NO_HOUSEHOLD|NO_SHARE|TOO_BIG/.exec(msg);
+    throw new Error(code ? code[0] : "SERVER " + r.status + (msg ? ": " + msg.slice(0, 160) : ""));
+  }
   return j;
 }
 CP.sync.rpc = rpc;
@@ -29,8 +37,9 @@ CP.sync.errorText = e => ({
   BAD_INPUT: "Name needs two letters and the PIN four digits.",
   NO_HOUSEHOLD: "No household with that code.",
   NO_SHARE: "That link is not being shared any more.",
-  TOO_BIG: "The record is too large to save."
-}[e.message] || "Could not reach the server. Your progress is safe on this device and will sync later.");
+  TOO_BIG: "The record is too large to save.",
+  NETWORK: "No connection to the server. Your progress is safe on this device and will sync when there is signal."
+}[e.message] || (String(e.message).startsWith("SERVER") ? "The server refused the request (" + e.message.slice(7) + "). Your progress is safe on this device." : "Something went wrong (" + e.message + "). Your progress is safe on this device."));
 
 /* ---------- merge two records: keep everything either side did ---------- */
 CP.sync.merge = function (a, b) {
@@ -94,7 +103,7 @@ CP.sync.push = async function (now) {
     const r = await rpc("cp_push", { p_name: CP.sync.auth.name, p_pin: CP.sync.auth.pin, p_state: CP.state(),
       p_settings: { email: p.email || null, emailOptIn: !!p.emailOptIn, lessonSize: p.size, tracks: p.tracks, shareOn: CP.sync.profile ? !!CP.sync.profile.shareOn : false } });
     CP.sync.profile = r.profile; CP.sync.dirty = false; CP.sync.lastPush = Date.now(); CP.sync.status = "ok";
-  } catch (e) { CP.sync.status = e.message === "BAD_PIN" || e.message === "NO_PROFILE" ? "auth" : "offline"; }
+  } catch (e) { CP.sync.status = e.message === "BAD_PIN" || e.message === "NO_PROFILE" ? "auth" : "offline"; CP.sync.lastError = e.message; }
   if (CP.sync.onChange) CP.sync.onChange();
 };
 CP.sync.pull = async function () {

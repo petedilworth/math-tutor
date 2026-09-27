@@ -1,6 +1,6 @@
 /* Chalk and Paper – offline support.
    The app shell is cached so the site opens without signal. Live data is fetched fresh when it can be. */
-const CACHE = "chalk-paper-v2";
+const CACHE = "chalk-paper-v3";
 const SHELL = ["./", "index.html", "app.css", "js/config.js", "js/content.js", "js/generators.js", "js/engine.js", "js/sync.js", "js/app.js", "share.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
@@ -18,9 +18,14 @@ self.addEventListener("fetch", e => {
     e.respondWith(fetch(e.request).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; }).catch(() => caches.match(e.request)));
     return;
   }
-  /* fonts and everything else: cache first, then network, and keep what we fetch */
-  e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(r => {
-    if (r && (r.status === 200 || r.type === "opaque")) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
+  /* fonts: cache first, they never change */
+  if (url.origin !== location.origin) {
+    e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(r => { if (r && (r.status === 200 || r.type === "opaque")) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); } return r; })));
+    return;
+  }
+  /* the app's own files: network first so a change reaches every device on the next open; the cached copy only when offline */
+  e.respondWith(fetch(e.request).then(r => {
+    if (r && r.status === 200) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
     return r;
-  }).catch(() => hit)));
+  }).catch(() => caches.match(e.request).then(hit => hit || caches.match("index.html"))));
 });
