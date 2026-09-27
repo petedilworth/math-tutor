@@ -44,8 +44,11 @@ create table if not exists cp_progress (
   updated_at timestamptz not null default now()
 );
 
--- Nobody reaches the tables from the browser.
+-- Nobody reaches the tables from the browser. The service role (used only by the morning email job,
+-- from the repository's secrets) keeps full access whatever the project's default-privilege setting is.
 revoke all on cp_settings, cp_households, cp_profiles, cp_progress from anon, authenticated;
+grant all on cp_settings, cp_households, cp_profiles, cp_progress to service_role;
+grant usage on schema public to anon, service_role;
 alter table cp_settings enable row level security;
 alter table cp_households enable row level security;
 alter table cp_profiles enable row level security;

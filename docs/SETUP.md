@@ -14,7 +14,7 @@ At this point the app works fully on one device. Sign-in, households and sharing
 
 This gives everyone a profile, makes progress follow you between devices, and turns on households and the read-only share link.
 
-1. Go to supabase.com, sign up (free), and create a project. Any name, any region near you. Wait for it to finish setting up.
+1. Go to supabase.com, sign up (free), and create a project. Any name, any region near you. Under Security when creating it: **Enable Data API** on, **Automatically expose new tables** off, **Enable automatic RLS** on. (If the project already exists, the same three are under Project Settings → Data API.) Wait for it to finish setting up.
 2. Left sidebar → **SQL Editor** → New query. Paste the whole of `supabase/schema.sql` from this repository and click Run. It should say "Success".
 3. Still in the SQL editor, set your invite code:
    ```sql
