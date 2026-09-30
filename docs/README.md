@@ -14,7 +14,10 @@ On a phone, open that address, use the browser's share or menu button, and choos
 |---|---|
 | `index.html`, `app.css` | The page and its look |
 | `js/content.js` | Everything a person reads: tracks, steps, rule cards, the real-life calculations, the why-questions. The file to reword. |
-| `js/generators.js` | The code that invents fresh problems, three difficulty tiers per step. Verified by `tools/verify.js`. |
+| `js/generators.js` | The code that invents fresh problems, the forward problems at tiers 1 to 3 (Easy, Medium, Hard) for the first 14 steps. Verified by `tools/verify.js`. |
+| `js/content-more.js` | Ten more MCV4U steps (first principles through distance to a plane), the five tier names, and the full 24-step order. |
+| `js/generators-more.js` | Forward problems for those ten steps. |
+| `js/generators-modes.js` | Expert and Master: spot the error and work backwards for all 24 steps, and the dispatcher that mixes them in. |
 | `js/engine.js` | Saving, spaced review, the daily lesson, the safety net, streaks, freezes, points |
 | `js/app.js` | The screens |
 | `js/config.js` | The two Supabase values that connect the site to its shared record |
@@ -25,7 +28,7 @@ On a phone, open that address, use the browser's share or menu button, and choos
 
 ## Checks
 
-`node tools/verify.js` builds every problem at every tier thousands of times and checks that the marked answer is right, that no wrong option is secretly also right, and that every wrong option explains the mistake. It also runs every real-life calculation against three sets of data. Run it after any change to `generators.js` or the practical builders in `content.js`.
+`node tools/verify.js` builds every problem at every tier thousands of times and checks that the marked answer is right, that no wrong option is secretly also right, and that every wrong option explains the mistake. It also runs every real-life calculation against three sets of data. For spot the error it checks that exactly one line is false and the rest follow from the lines above; for work backwards, that the condition holds for the right option only. Run it after any change to a generator or a practical builder.
 
 `node tools/fetch-live.js` fetches the live numbers by hand.
 

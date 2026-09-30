@@ -1,6 +1,6 @@
 /* Chalk and Paper – problem generators
    Each step's gen(tier) invents a fresh multiple-choice problem.
-   tier is 0 (easy), 1 (medium) or 2 (hard). Every wrong option names the mistake behind it.
+   tier is 0 (easy), 1 (medium) or 2 (hard). Tiers 3 and 4 (expert, master) are dispatched in generators-modes.js. Every wrong option names the mistake behind it.
    These formulas are verified numerically by the test in tools/verify.js. */
 
 window.CP = window.CP || {};
@@ -541,4 +541,6 @@ CP.freeze = function (p, stepId, tier) {
 };
 
 CP.gutil = { shuffle, pick, ri };
+/* helpers shared with generators-more.js and generators-modes.js */
+CP.h = { M, neg, ri, nz, pick, shuffle, gcd, sup, xp, poly, evalT, grp, frac, vec, dot, cross, sub, add, isZero, to3, parallel, rv, sgnTerm, m_, keyOf };
 })();

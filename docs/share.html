@@ -17,9 +17,13 @@
   <header class="masthead"><span class="brand">Chalk and Paper</span><span class="tally">read-only</span></header>
   <main id="view"><p class="small">Loading…</p></main>
 </div>
+<script>window.CP = { readOnly: true }; /* never write the shared record into this device's own progress */</script>
 <script src="js/config.js"></script>
 <script src="js/content.js"></script>
+<script src="js/content-more.js"></script>
 <script src="js/generators.js"></script>
+<script src="js/generators-more.js"></script>
+<script src="js/generators-modes.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/sync.js"></script>
 <script>
@@ -37,12 +41,14 @@
     const S = CP.state();
     let h = '<h1 style="font-size:24px">' + esc(r.name) + '</h1><p class="lede" style="font-size:15px">Shared progress. Updated as they practise.</p><div class="stack">';
     h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days</span></div><div class="tile"><span class="k">Level ' + lv.n + '</span><span class="v">' + S.points.toLocaleString("en-CA") + '</span><span class="s">points</span></div><div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + '</span></div></div>';
-    h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + '</span></div><div class="map">' + steps.map(s => { const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : ""; return '<div class="st"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.name.split(",")[0].split(" and ")[0]) + '</span></div>'; }).join("") + '</div></section>';
+    h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + ' · ' + CP.TIERS[CP.stepState(cur.id).tier] + '</span></div><div class="map">' + steps.map(s => { const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : ""; return '<div class="st"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></div>'; }).join("") + '</div></section>';
     h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + '" title="' + d.date + '"></span>').join("") + '</div></section>';
     /* the tutor view: per step accuracy and the mistakes they keep making */
     const rows = steps.map(s => ({ s, x: S.steps[s.id] })).filter(o => o.x && o.x.attempts > 0);
-    h += '<section class="card"><p class="kicker">Accuracy by step</p><div class="list">' + rows.map(o => '<div class="li"><span class="k">' + esc(o.s.name) + '</span><span class="v">' + Math.round(100 * o.x.correct / o.x.attempts) + '% · ' + o.x.attempts + '</span></div>').join("") + (rows.length ? "" : '<p class="small">Nothing attempted yet.</p>') + '</div></section>';
+    h += '<section class="card"><p class="kicker">Accuracy by step, and tier reached</p><div class="list">' + rows.map(o => '<div class="li"><span class="k">' + esc(o.s.name) + ' <span style="color:var(--ink-3)">· ' + CP.TIERS[CP.stepState(o.s.id).tier] + '</span></span><span class="v">' + Math.round(100 * o.x.correct / o.x.attempts) + '% · ' + o.x.attempts + '</span></div>').join("") + (rows.length ? "" : '<p class="small">Nothing attempted yet.</p>') + '</div></section>';
     if (mis.length) h += '<section class="card"><p class="kicker">Mistakes they keep making</p><p class="small" style="margin-bottom:8px">The wrong options chosen most often. Each is a specific misconception, and the name of the thing to teach next.</p><div class="list">' + mis.map(m => '<div class="li"><span class="k">' + esc(CP.stepById(m.step).name) + ': chose <span class="m" style="font-size:.95em">' + m.chosen + '</span></span><span class="v">' + m.n + '×</span></div>').join("") + '</div></section>';
+    const tests = (S.tests || []).slice(-6).reverse();
+    if (tests.length) h += '<section class="card"><p class="kicker">Recent tests</p><div class="list">' + tests.map(t => '<div class="li"><span class="k">' + new Date(t.id).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + ' · ' + esc(CP.testLabel(t.scope, t.stepId)) + '</span><span class="v">' + t.right + '/' + t.n + '</span></div>').join("") + '</div></section>';
     if (weak) h += '<p class="small">Weakest step: <strong>' + esc(weak.name) + '</strong> at ' + Math.round(weak.acc * 100) + '%.</p>';
     h += '</div>';
     view.innerHTML = h;

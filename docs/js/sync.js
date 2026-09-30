@@ -54,7 +54,19 @@ CP.sync.merge = function (a, b) {
   for (const d in (b.days || {})) { const x = out.days[d] || { q: 0, right: 0 }; out.days[d] = { q: Math.max(x.q, b.days[d].q), right: Math.max(x.right, b.days[d].right) }; }
   /* steps: per step, the side with more attempts wins; mastered sticks */
   out.steps = out.steps || {};
-  for (const id in (b.steps || {})) { const x = out.steps[id], y = b.steps[id]; if (!x || (y.attempts || 0) > (x.attempts || 0)) out.steps[id] = y; if (x && y.mastered) out.steps[id].mastered = true; }
+  for (const id in (b.steps || {})) {
+    const x = out.steps[id], y = b.steps[id]; if (!x || (y.attempts || 0) > (x.attempts || 0)) out.steps[id] = y;
+    if (x && y.mastered) out.steps[id].mastered = true;
+    if (x && y) { out.steps[id].bestTier = Math.max(x.bestTier || 0, y.bestTier || 0); out.steps[id].tierReached = Object.assign({}, y.tierReached || {}, x.tierReached || {}); }
+  }
+  /* tier history and finished tests: keep both sides' */
+  const tl = new Map(); for (const x of (a.tierLog || []).concat(b.tierLog || [])) tl.set(x.t + "|" + x.step, x);
+  out.tierLog = Array.from(tl.values()).sort((x, y) => x.t - y.t).slice(-50);
+  const tm = new Map(); for (const x of (a.tests || []).concat(b.tests || [])) tm.set(x.id, x);
+  out.tests = Array.from(tm.values()).sort((x, y) => x.id - y.id).slice(-60);
+  out.testBests = Object.assign({}, a.testBests || {});
+  for (const k in (b.testBests || {})) { const x = out.testBests[k], y = b.testBests[k]; if (!x || y.pct > x.pct || (y.pct === x.pct && y.ms < x.ms)) out.testBests[k] = y; }
+  /* a test in progress, and the last result screen, stay with the device they happened on */
   /* lessons: per date, the one with more answers */
   out.lessons = out.lessons || {};
   for (const d in (b.lessons || {})) { const x = out.lessons[d], y = b.lessons[d]; if (!x || (y.answers || []).length > (x.answers || []).length) out.lessons[d] = y; }

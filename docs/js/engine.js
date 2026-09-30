@@ -15,7 +15,7 @@ function fresh() {
   return {
     v: 1,
     profile: { name: "", tracks: ["mcv4u"], size: 5, email: "", emailOptIn: false, created: today() },
-    steps: {},        /* id -> { box, due, tier, hist:[bool], seenDemo:bool, bestMs, attempts, correct } */
+    steps: {},        /* id -> { box, due, tier, hist:[bool], seenDemo, bestMs, attempts, correct, mastered, tierRun:[bool], bestTier, tierStats:[{a,c}]x5, tierReached:{tier:date} } */
     lessons: {},      /* date -> lesson */
     days: {},         /* date -> { q:n, right:n } */
     answers: [],      /* { t, step, kind, ok, chosen, ms } capped at 2000 */
@@ -24,18 +24,26 @@ function fresh() {
     run: 0, bestRun: 0,
     lastActive: null,
     frozen: {},
-    easeUntil: null   /* date until which lessons are shortened after a break */
+    easeUntil: null,  /* date until which lessons are shortened after a break */
+    tierLog: [],      /* { t, step, tier, dir } newest last, capped at 50 */
+    tests: [],        /* finished tests: { id, scope, stepId, n, right, ms, date, best, bonus } */
+    testBests: {},    /* scope key -> { pct, right, n, ms, date } */
+    activeTest: null, /* the test in progress, saved on every tap */
+    lastTest: null    /* the last finished test with its questions, for the review screen */
   };
 }
 let S = fresh();
 CP.state = () => S;
 
+/* The read-only share page sets CP.readOnly so a shared record never touches this device's own saved progress. */
+const RO = () => !!CP.readOnly;
 function load() {
+  if (RO()) return;
   try { const r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && r.v === 1) S = Object.assign(fresh(), r); } catch (e) {}
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (CP.afterSave) CP.afterSave(); }
+function save() { if (RO()) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (CP.afterSave) CP.afterSave(); }
 CP.save = save;
-CP.replaceState = function (next) { S = Object.assign(fresh(), next); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+CP.replaceState = function (next) { S = Object.assign(fresh(), next); if (RO()) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 CP.reset = () => { S = fresh(); save(); };
 load();
 
@@ -43,8 +51,30 @@ load();
 const INTERVALS = [0, 1, 3, 7, 14, 30, 60]; /* days until next review, by box */
 CP.MASTER_BOX = 3;
 function stepState(id) {
-  return S.steps[id] || (S.steps[id] = { box: 0, due: null, tier: 0, hist: [], seenDemo: false, bestMs: null, attempts: 0, correct: 0, mastered: false });
+  const s = S.steps[id] || (S.steps[id] = { box: 0, due: null, tier: 0, hist: [], seenDemo: false, bestMs: null, attempts: 0, correct: 0, mastered: false });
+  /* records from before five tiers: keep the tier, start its run fresh */
+  if (!s.tierRun) { s.tierRun = []; s.bestTier = s.tier || 0; s.tierStats = [0, 1, 2, 3, 4].map(() => ({ a: 0, c: 0 })); s.tierReached = {}; }
+  return s;
 }
+CP.TOP_TIER = 4;
+/* Answers at the step's current tier count toward moving: 4 of the last 5 right moves up, 2 wrong in a row moves down.
+   Tests record accuracy but never move a tier; a test should measure, not change, what it measures. */
+const TIER_MOVES = { skill: 1, practice: 1, review: 1 };
+function moveTier(id, ss, dir) {
+  ss.tier += dir; ss.tierRun = [];
+  if (ss.tier > ss.bestTier) ss.bestTier = ss.tier;
+  if (dir > 0 && !ss.tierReached[ss.tier]) ss.tierReached[ss.tier] = today();
+  S.tierLog = (S.tierLog || []).concat([{ t: Date.now(), step: id, tier: ss.tier, dir }]).slice(-50);
+  return dir > 0 ? { tierUp: ss.tier, step: id } : { tierDown: ss.tier, step: id };
+}
+/* where a step stands on its tier ladder, for the progress bar */
+CP.tierProgress = function (id) {
+  const ss = stepState(id), run = ss.tierRun.slice(-5);
+  let need = null;
+  if (ss.tier < CP.TOP_TIER) for (let k = 0; k <= 5; k++) { const r = ss.tierRun.concat(Array(k).fill(true)).slice(-5); if (r.length >= 5 && r.filter(Boolean).length >= 4) { need = k; break; } }
+  const st = ss.tierStats[ss.tier];
+  return { tier: ss.tier, best: ss.bestTier, run, right: run.filter(Boolean).length, need, acc: st.a ? st.c / st.a : null, answered: st.a, reached: ss.tierReached };
+};
 CP.stepState = stepState;
 CP.mastered = id => !!stepState(id).mastered;
 CP.due = id => { const s = stepState(id); return !!s.mastered && !!s.due && s.due <= today(); };
@@ -64,7 +94,9 @@ function bumpDay(ok) {
   const d = S.days[today()] || (S.days[today()] = { q: 0, right: 0 });
   d.q++; if (ok) d.right++;
 }
-CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms }) {
+CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms, tier }) {
+  let ev = null;
+  const tr = typeof tier === "number" ? tier : 0;
   const t = today();
   S.answers.push({ t: Date.now(), step: stepId, kind, ok, chosen, ms: ms || null });
   if (S.answers.length > 2000) S.answers = S.answers.slice(-2000);
@@ -73,7 +105,7 @@ CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms }) {
   /* points: never deducted */
   const st = stepId ? CP.stepById(stepId) : null;
   if (ok) {
-    S.points += kind === "why" ? 15 : kind === "practical" ? 15 : kind === "review" ? 15 : 10 * (st ? st.weight : 1);
+    S.points += kind === "why" || kind === "practical" ? 15 : kind === "review" ? 15 + 5 * tr : 10 * (st ? st.weight : 1) + 5 * tr;
     S.run++; if (S.run > S.bestRun) S.bestRun = S.run;
   } else S.run = 0;
   if (stepId && kind !== "why") {
@@ -89,18 +121,21 @@ CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms }) {
       } else if (kind === "review") {
         ss.box = Math.min(ss.box + 1, INTERVALS.length - 1); ss.due = isoFromDayNum(dayNum(t) + INTERVALS[ss.box]);
       }
-      /* difficulty rises after 4 of the last 5 right at this tier */
-      const l5 = ss.hist.slice(-5);
-      if (l5.length >= 5 && l5.filter(Boolean).length >= 4 && ss.tier < 2) { ss.tier++; ss.hist = []; }
-    } else {
-      if (ss.mastered) { ss.box = Math.max(1, ss.box - 1); ss.due = isoFromDayNum(dayNum(t) + 1); }
-      /* two wrong in a row drops the tier */
-      const l2 = ss.hist.slice(-2);
-      if (l2.length === 2 && !l2[0] && !l2[1] && ss.tier > 0) { ss.tier--; }
+    } else if (ss.mastered) { ss.box = Math.max(1, ss.box - 1); ss.due = isoFromDayNum(dayNum(t) + 1); }
+    /* tier ladder: stats at every tier; movement only from answers at the current tier */
+    if (typeof tier === "number" && tier >= 0 && tier <= CP.TOP_TIER) {
+      const ts = ss.tierStats[tier]; ts.a++; if (ok) ts.c++;
+      if (TIER_MOVES[kind] && tier === ss.tier) {
+        ss.tierRun.push(ok); if (ss.tierRun.length > 10) ss.tierRun = ss.tierRun.slice(-10);
+        const r5 = ss.tierRun.slice(-5), r2 = ss.tierRun.slice(-2);
+        if (r5.length >= 5 && r5.filter(Boolean).length >= 4 && ss.tier < CP.TOP_TIER) ev = moveTier(stepId, ss, 1);
+        else if (r2.length === 2 && !r2[0] && !r2[1] && ss.tier > 0) ev = moveTier(stepId, ss, -1);
+      }
     }
   }
   freezesEarned();
   save();
+  return ev;
 };
 
 /* ---------- streak and freezes ---------- */
@@ -191,11 +226,11 @@ CP.answerLesson = function (lesson, itemIx, chosenIx, ms) {
   if (it.kind === "demo") { lesson.ix = itemIx + 1; stepState(it.step).seenDemo = true; save(); return { demo: true }; }
   const ok = !!it.options[chosenIx].ok;
   lesson.answers.push({ i: itemIx, chosen: chosenIx, ok, t: Date.now() });
-  CP.recordAnswer({ stepId: it.step, kind: it.kind, ok, chosen: it.options[chosenIx].html, ms });
+  const ev = CP.recordAnswer({ stepId: it.step, kind: it.kind, ok, chosen: it.options[chosenIx].html, ms, tier: it.tier });
   lesson.ix = itemIx + 1;
   if (lesson.ix >= lesson.items.length) lesson.done = true;
   save();
-  return { ok };
+  return { ok, ev };
 };
 /* two wrong in a row on the lesson's main step? offer a step back */
 CP.shouldStepBack = function (lesson) {
@@ -220,6 +255,52 @@ CP.practiceProblem = function (stepId) {
   const p = CP.build(stepId, ss.tier);
   return Object.assign(CP.freeze(p, stepId, ss.tier), { kind: "practice" });
 };
+
+/* ---------- test mode ---------- */
+/* No hints, no feedback until the end, no step-backs. Each step is asked at its current tier. Saved on every tap. */
+CP.TEST_SIZES = [5, 8, 12];
+CP.TEST_CAP_MS = 600000; /* a question left open longer than 10 minutes counts as 10 minutes */
+CP.testSteps = function (scope, stepId) {
+  const trackId = S.profile.tracks[0] || "mcv4u", all = trackSteps(trackId);
+  if (scope === "step") return [CP.stepById(stepId) || CP.currentStep(trackId)];
+  if (scope === "mastered") { const m = all.filter(s => CP.mastered(s.id)); return m.length ? m : null; }
+  return all;
+};
+CP.testLabel = (scope, stepId) => scope === "step" ? (CP.stepById(stepId) || CP.currentStep(S.profile.tracks[0] || "mcv4u")).name : scope === "mastered" ? "Everything mastered" : "Whole course";
+const testKey = (scope, stepId, n) => (scope === "step" ? "step:" + stepId : scope) + ":" + n;
+CP.testBest = (scope, stepId, n) => (S.testBests || {})[testKey(scope, stepId, n)] || null;
+CP.startTest = function (scope, n, stepId) {
+  const steps = CP.testSteps(scope, stepId);
+  if (!steps) return null;
+  const order = []; while (order.length < n) order.push(...CP.gutil.shuffle(steps.slice()));
+  const items = order.slice(0, n).map(st => { const tier = stepState(st.id).tier; return Object.assign(CP.freeze(CP.build(st.id, tier), st.id, tier), { kind: "test", noHint: true }); });
+  S.activeTest = { id: Date.now(), scope, stepId: scope === "step" ? steps[0].id : null, items, answers: [], started: Date.now() };
+  save();
+  return S.activeTest;
+};
+CP.answerTest = function (chosenIx, ms) {
+  const T = S.activeTest; if (!T) return null;
+  const i = T.answers.length, it = T.items[i]; if (!it) return null;
+  const ok = !!it.options[chosenIx].ok, t = Math.max(0, Math.min(ms || 0, CP.TEST_CAP_MS));
+  T.answers.push({ i, chosen: chosenIx, ok, ms: t });
+  CP.recordAnswer({ stepId: it.step, kind: "test", ok, chosen: it.options[chosenIx].html, ms: t, tier: it.tier });
+  return { ok, done: T.answers.length >= T.items.length };
+};
+CP.finishTest = function () {
+  const T = S.activeTest; if (!T || T.answers.length < T.items.length) return null;
+  const n = T.items.length, right = T.answers.filter(a => a.ok).length, ms = T.answers.reduce((s, a) => s + a.ms, 0), pct = right / n;
+  const key = testKey(T.scope, T.stepId, n), prev = S.testBests[key];
+  const best = !prev || pct > prev.pct || (pct === prev.pct && ms < prev.ms);
+  if (best) S.testBests[key] = { pct, right, n, ms, date: today() };
+  const bonus = right === n ? 25 : 0; S.points += bonus;
+  const rec = { id: T.id, scope: T.scope, stepId: T.stepId, n, right, ms, date: today(), best, first: !prev, bonus };
+  S.tests = (S.tests || []).concat([rec]).slice(-60);
+  S.lastTest = { rec, items: T.items, answers: T.answers };
+  S.activeTest = null;
+  save();
+  return rec;
+};
+CP.abandonTest = () => { S.activeTest = null; save(); };
 
 /* ---------- progress views ---------- */
 CP.calendar = function (weeks = 8) {

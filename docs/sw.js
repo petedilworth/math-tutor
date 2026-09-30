@@ -1,7 +1,7 @@
 /* Chalk and Paper – offline support.
    The app shell is cached so the site opens without signal. Live data is fetched fresh when it can be. */
-const CACHE = "chalk-paper-v3";
-const SHELL = ["./", "index.html", "app.css", "js/config.js", "js/content.js", "js/generators.js", "js/engine.js", "js/sync.js", "js/app.js", "share.html", "manifest.webmanifest", "icon.svg"];
+const CACHE = "chalk-paper-v4";
+const SHELL = ["./", "index.html", "app.css", "js/config.js", "js/content.js", "js/content-more.js", "js/generators.js", "js/generators-more.js", "js/generators-modes.js", "js/engine.js", "js/sync.js", "js/app.js", "share.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

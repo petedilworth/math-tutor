@@ -32,16 +32,42 @@ function ruleHtml(step) {
     '<div class="rx"><div class="tipb"><b>Memory tip</b>' + step.rule.tip + '</div><div class="trapb"><b>Watch out</b>' + step.rule.trap + '</div></div></div>';
 }
 function optionsHtml(item, answeredIx) {
-  const prose = item.prose;
+  const prose = item.prose, spot = item.mode === "spot";
   return '<div class="opts' + (prose ? " one" : "") + '">' + item.options.map((o, i) => {
-    let cls = "opt" + (prose ? " prose" : "");
+    let cls = "opt" + (prose ? " prose" : "") + (spot ? " line" : "");
     const done = answeredIx !== undefined && answeredIx !== null;
     if (done) cls += o.ok ? " right" : i === answeredIx ? " wrong" : " faded";
-    const mark = done && o.ok ? "✓" : done && i === answeredIx ? "✗" : String.fromCharCode(65 + i);
+    const mark = done && o.ok ? "✓" : done && i === answeredIx ? "✗" : spot ? String(i + 1) : String.fromCharCode(65 + i);
     return '<button type="button" class="' + cls + '" data-i="' + i + '"' + (done ? " disabled" : "") + '><span class="ok">' + mark + '</span><span class="ov">' + o.html + '</span></button>';
   }).join("") + '</div>';
 }
-function walkHtml(walk) { return '<p class="h4">How to get it</p><div class="walk">' + walk.map(s => '<div class="w">' + s + '</div>').join("") + '</div>'; }
+function walkHtml(walk, title) { return '<p class="h4">' + (title || "How to get it") + '</p><div class="walk">' + walk.map(s => '<div class="w">' + s + '</div>').join("") + '</div>'; }
+
+/* ---------- tiers ---------- */
+const tierName = t => CP.TIERS[t] || "";
+const modeLabel = it => it.mode === "spot" ? " · spot the error" : it.mode === "rev" ? " · work backwards" : "";
+function tierBar(stepId, withNames) {
+  const tp = CP.tierProgress(stepId), top = CP.TIERS.length - 1;
+  const pips = CP.TIERS.map((n, i) => '<i class="' + (i < tp.tier ? "done" : i === tp.tier ? "cur" : i <= tp.best ? "best" : "") + '" title="' + n + '"></i>').join("");
+  const runTxt = tp.run.length ? tp.right + " of the last " + tp.run.length + " right" : "No answers at this tier yet";
+  const msg = tp.tier === top ? runTxt + ". This is the top tier." : runTxt + " · " + tp.need + " more right in a row moves you up to " + tierName(tp.tier + 1) + ".";
+  return '<div class="tierbar">' + (withNames ? '<div class="tnames">' + CP.TIERS.map(n => '<span>' + n + '</span>').join("") + '</div>' : "") +
+    '<div class="tpips">' + pips + '</div><div class="tlab"><b>' + tierName(tp.tier) + '</b> · ' + msg + (tp.best > tp.tier ? " Best reached: " + tierName(tp.best) + "." : "") + '</div></div>';
+}
+function eventBanner(ev) {
+  if (!ev) return "";
+  const st = CP.stepById(ev.step);
+  if (ev.tierUp !== undefined) return '<div class="banner up"><b>Up to ' + tierName(ev.tierUp) + '</b> on ' + esc(st.name.toLowerCase()) + '. ' + CP.TIER_NOTE[ev.tierUp] + '</div>';
+  return '<div class="banner down"><b>Back to ' + tierName(ev.tierDown) + '</b> on ' + esc(st.name.toLowerCase()) + ' for now. Two misses in a row. Four of the next five right climbs back up.</div>';
+}
+/* what went wrong, and for spot the error, where the mistake really was */
+function explainHtml(it, chosenIx) {
+  const chosen = it.options[chosenIx];
+  let h = chosen && !chosen.ok ? '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + '</div>' : "";
+  if (it.mode === "spot") { const b = it.options.findIndex(o => o.ok); h += '<div class="fixbox"><span class="lbl">The mistake is in line ' + (b + 1) + '</span>' + it.spotWhy + '<br>It should read: <span class="m">' + it.fix + '</span></div>'; }
+  return h;
+}
+const walkTitle = it => it.mode === "spot" ? "The working, corrected" : it.mode === "rev" ? "How to work backwards" : "How to get it";
 
 /* ---------- Today ---------- */
 function renderToday(dateOverride) {
@@ -61,7 +87,7 @@ function renderToday(dateOverride) {
        '<span class="mono">' + prog.total + ' questions' + (shortened ? " · eased" : "") + '</span></div>' +
        '<h2>' + step.name + '</h2><p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
        '<div class="rule" style="margin-top:12px;padding:0;border:0;background:none"><div class="rx"><div class="tipb" style="background:var(--tip-soft);padding:9px 10px;border-radius:2px"><b>Memory tip</b>' + step.rule.tip + '</div>' +
-       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div></section>';
+       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + '</section>';
   /* dots */
   const qItems = lesson.items.map((it, i) => ({ it, i })).filter(x => x.it.kind !== "demo");
   h += '<div class="dots">' + qItems.map(({ it, i }) => {
@@ -75,7 +101,7 @@ function renderToday(dateOverride) {
     const right = lesson.answers.filter(a => a.ok).length;
     h += '<section class="card lift"><p class="kicker">Done</p><h2>' + right + ' of ' + lesson.answers.length + ' right</h2>' +
          '<p class="prose" style="margin-top:8px">' + (right === lesson.answers.length ? "Clean sweep. Tomorrow's lesson is already waiting for the morning." : "Every miss moved that step's next look closer. That is all a miss does here.") + '</p>' +
-         '<div class="acts"><a class="btn" href="#practice">Keep practising ' + esc(step.name.toLowerCase()) + '</a><a class="btn ghost" href="#progress">See progress</a></div></section>';
+         '<div class="acts"><a class="btn" href="#practice">Keep practising ' + esc(step.name.toLowerCase()) + '</a><a class="btn ghost" href="#test">Take a test</a><a class="btn ghost" href="#progress">See progress</a></div></section>';
   } else {
     h += '<section class="card lift" id="qcard"></section>';
   }
@@ -93,13 +119,13 @@ function renderToday(dateOverride) {
   if (!lesson.done) renderItem(lesson);
 }
 
-function renderItem(lesson, answeredIx, stepBackOffer) {
+function renderItem(lesson, answeredIx, stepBackOffer, ev) {
   const card = $("#qcard"); if (!card) return;
   const it = lesson.items[lesson.ix];
   if (!it) { renderToday(lesson.date === CP.today() ? undefined : lesson.date); return; }
   const step = it.step ? CP.stepById(it.step) : null;
   const kindLabel = { demo: "Worked example", skill: step ? step.name : "", review: "Review · " + (step ? step.name : ""), stepback: "A step back · " + (step ? step.name : ""), why: "Why it works", practical: "In real life" }[it.kind];
-  const tierLabel = it.kind === "skill" || it.kind === "review" ? [" · easy", " · medium", " · hard"][it.tier] : "";
+  const tierLabel = (it.kind === "skill" || it.kind === "review" || it.kind === "stepback") && it.tier !== undefined ? " · " + tierName(it.tier).toLowerCase() + modeLabel(it) : "";
   let h = '<div class="row"><p class="kicker">' + kindLabel + tierLabel + '</p><span class="mono">' + (step ? step.code : "reasons, not rules") + '</span></div>';
 
   if (it.kind === "demo") {
@@ -119,15 +145,17 @@ function renderItem(lesson, answeredIx, stepBackOffer) {
          '<div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:4px"><p class="task">Try it. ' + it.task + '</p>' + optionsHtml(it, answeredIx) + '</div>';
   } else {
     h += '<p class="task">' + it.task + '</p><p class="expr' + (it.kind === "why" ? " q" : "") + '">' + it.expr + '</p>' + optionsHtml(it, answeredIx);
-    if (answeredIx == null && step) h += '<div style="margin-top:12px"><button class="link" id="hint" type="button">Remind me of the rule</button><div id="hintbox"></div></div>';
+    if (answeredIx == null && step && !it.noHint) h += '<div style="margin-top:12px"><button class="link" id="hint" type="button">Remind me of the rule</button><div id="hintbox"></div></div>';
+    else if (answeredIx == null && it.noHint) h += '<p class="note" style="margin-top:12px">Master tier: no rule reminder.</p>';
   }
 
   if (answeredIx != null) {
     const chosen = it.options[answeredIx], ok = chosen.ok;
-    h += '<div class="fb"><span class="verdict ' + (ok ? "y" : "n") + '">' + (ok ? "Correct" : "Not quite") + '</span>';
-    if (!ok) h += '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + '</div>';
+    h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (ok ? "y" : "n") + '">' + (ok ? "Correct" : "Not quite") + '</span>';
+    if (it.kind === "why" || it.kind === "practical") { if (!ok) h += '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + '</div>'; }
+    else h += explainHtml(it, answeredIx);
     if (it.kind === "why") h += '<p class="h4">The reason</p><p class="prose">' + it.explain + '</p>';
-    else if (it.kind !== "practical") h += walkHtml(it.walk) + ruleHtml(step);
+    else if (it.kind !== "practical") h += walkHtml(it.walk, walkTitle(it)) + ruleHtml(step);
     if (stepBackOffer) {
       h += '<div class="card tip" style="margin-top:14px"><p class="kicker tipc">Take a step back?</p><p class="prose" style="color:var(--ink)">That is two in a row. ' + esc(step.name) + ' leans on ' + esc(stepBackOffer.name.toLowerCase()) + '. Three easy ones there take about a minute, then you come straight back.</p>' +
            '<div class="acts"><button class="btn" id="stepback" type="button">Yes, three easy ones</button><button class="btn ghost" id="next" type="button">Keep going</button></div></div>';
@@ -142,11 +170,11 @@ function renderItem(lesson, answeredIx, stepBackOffer) {
     if (answeredIx != null) return;
     const i = Number(b.dataset.i), ms = Date.now() - started;
     const before = lesson.ix;
-    CP.answerLesson(lesson, before, i, ms);
+    const res = CP.answerLesson(lesson, before, i, ms);
     lesson.ix = before; /* stay on this item to show feedback; advance on Next */
     const offer = it.kind === "skill" ? CP.shouldStepBack(lesson) : null;
     paintTally();
-    renderItem(lesson, i, offer);
+    renderItem(lesson, i, offer, res && res.ev);
   });
   const hint = $("#hint"); if (hint) hint.onclick = () => { $("#hintbox").innerHTML = ruleHtml(step); hint.hidden = true; };
   const nx = $("#next"); if (nx) nx.onclick = () => { lesson.ix++; CP.save(); renderToday(lesson.date === CP.today() ? undefined : lesson.date); };
@@ -172,18 +200,18 @@ function renderWelcome(gap) {
 /* ---------- Free practice ---------- */
 function renderPractice(stepId) {
   const step = CP.stepById(stepId) || CP.currentStep(S().profile.tracks[0]);
-  let item = CP.practiceProblem(step.id), answered = null;
+  let item = CP.practiceProblem(step.id), answered = null, ev = null;
   const draw = () => {
-    const ss = CP.stepState(step.id);
-    let h = '<div class="stack"><section class="card lift"><div class="row"><p class="kicker">Practice · ' + esc(step.name) + [" · easy", " · medium", " · hard"][item.tier] + '</p><span class="mono">' + step.code + '</span></div>' +
+    CP.currentPractice = item; /* the item on screen, for tests and debugging */
+    let h = '<div class="stack"><section class="card lift"><div class="row"><p class="kicker">Practice · ' + esc(step.name) + ' · ' + tierName(item.tier).toLowerCase() + modeLabel(item) + '</p><span class="mono">' + step.code + '</span></div>' +
       '<p class="task">' + item.task + '</p><p class="expr">' + item.expr + '</p>' + optionsHtml(item, answered);
-    if (answered == null) h += '<div style="margin-top:12px"><button class="link" id="hint" type="button">Remind me of the rule</button><div id="hintbox"></div></div>';
-    else { const c = item.options[answered]; h += '<div class="fb"><span class="verdict ' + (c.ok ? "y" : "n") + '">' + (c.ok ? "Correct" : "Not quite") + '</span>' + (c.ok ? "" : '<div class="mistake"><span class="lbl">What went wrong</span>' + c.why + '</div>') + walkHtml(item.walk) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Another</button><a class="btn ghost" href="#today">Back to today</a></div></div>'; }
-    h += '</section><p class="small">Last five on this step: ' + (ss.hist.slice(-5).map(b => b ? "✓" : "✗").join(" ") || "none yet") + ' · get four of five right and the difficulty rises.</p></div>';
+    if (answered == null) h += item.noHint ? '<p class="note" style="margin-top:12px">Master tier: no rule reminder.</p>' : '<div style="margin-top:12px"><button class="link" id="hint" type="button">Remind me of the rule</button><div id="hintbox"></div></div>';
+    else { const c = item.options[answered]; h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (c.ok ? "y" : "n") + '">' + (c.ok ? "Correct" : "Not quite") + '</span>' + explainHtml(item, answered) + walkHtml(item.walk, walkTitle(item)) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Another</button><a class="btn ghost" href="#today">Back to today</a></div></div>'; }
+    h += '</section><section class="card"><p class="kicker">Tier on this step</p>' + tierBar(step.id, true) + '</section></div>';
     view.innerHTML = h; started = Date.now();
-    view.querySelectorAll(".opt").forEach(b => b.onclick = () => { if (answered != null) return; answered = Number(b.dataset.i); CP.recordAnswer({ stepId: step.id, kind: "practice", ok: !!item.options[answered].ok, chosen: item.options[answered].html, ms: Date.now() - started }); paintTally(); draw(); });
+    view.querySelectorAll(".opt").forEach(b => b.onclick = () => { if (answered != null) return; answered = Number(b.dataset.i); ev = CP.recordAnswer({ stepId: step.id, kind: "practice", ok: !!item.options[answered].ok, chosen: item.options[answered].html, ms: Date.now() - started, tier: item.tier }); paintTally(); draw(); });
     const hint = $("#hint"); if (hint) hint.onclick = () => { $("#hintbox").innerHTML = ruleHtml(step); hint.hidden = true; };
-    const nx = $("#next"); if (nx) nx.onclick = () => { item = CP.practiceProblem(step.id); answered = null; draw(); };
+    const nx = $("#next"); if (nx) nx.onclick = () => { item = CP.practiceProblem(step.id); answered = null; ev = null; draw(); };
   };
   draw();
 }
@@ -200,8 +228,9 @@ function renderProgress() {
        '<div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + ' steps</span></div></div>';
   h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">MCV4U</span></div><div class="map">' + steps.map(s => {
     const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
-    return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.name.replace(/,.*$/, "").replace("Fraction and negative exponents", "Fraction exp.").replace("Slope and rate of change", "Slope").replace("Power rule", "Power rule").replace("Slope of a tangent at a point", "Tangent").replace("Sine, cosine and eˣ", "sin, cos, eˣ").replace("Maximums and minimums", "Max and min").replace("Dot product and right angles", "Dot product").replace("Lines in space", "Lines")) + '</span></button>';
+    return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';
   }).join("") + '</div><div class="legend"><span><i style="background:var(--accent)"></i>mastered</span><span><i style="background:var(--accent-soft);border:1.5px dashed var(--accent)"></i>due for review</span><span><i style="background:var(--surface);border:1.5px solid var(--accent)"></i>working on</span></div><p class="note" style="margin-top:8px">Tap a step to practise it.</p></section>';
+  h += tiersCard(steps, cur);
   h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks · ' + practised + ' days</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + (d.today ? " today" : "") + '" title="' + d.date + ": " + d.q + '"></span>').join("") + '</div><p class="note" style="margin-top:8px">Darker means more questions. No red squares, ever.</p></section>';
   h += '<section class="card"><p class="kicker">Personal bests</p><div class="list">' +
        '<div class="li"><span class="k">Longest run of right answers</span><span class="v">' + b.bestRun + '</span></div>' +
@@ -220,6 +249,85 @@ function renderProgress() {
   $("#share").onclick = () => { if (!canShare) { location.hash = "#me"; return; } navigator.clipboard.writeText(CP.sync.shareUrl()).then(() => { $("#share").textContent = "Copied"; }).catch(() => { $("#share").textContent = CP.sync.shareUrl(); }); };
 }
 
+function tiersCard(steps, cur) {
+  const seen = steps.filter(s => { const x = S().steps[s.id]; return x && x.attempts > 0; });
+  if (!seen.length) return "";
+  const rows = seen.map(s => {
+    const tp = CP.tierProgress(s.id);
+    const pips = CP.TIERS.map((n, i) => '<i class="' + (i < tp.tier ? "done" : i === tp.tier ? "cur" : "") + '"></i>').join("");
+    return '<button type="button" class="trow st" data-s="' + s.id + '" style="background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">' +
+      '<span class="nm2">' + esc(s.short) + '<small>' + tierName(tp.tier) + (tp.best > tp.tier ? " · best " + tierName(tp.best) : "") + '</small></span>' +
+      '<span class="tp">' + pips + '</span><span class="ac">' + (tp.answered ? Math.round(tp.acc * 100) + "% of " + tp.answered : "new") + '</span></button>';
+  }).join("");
+  const log = (S().tierLog || []).slice(-5).reverse();
+  return '<section class="card"><div class="row"><p class="kicker">Tiers</p><span class="mono">' + CP.TIERS.join(" · ").toLowerCase() + '</span></div>' +
+    '<p class="note" style="margin:-2px 0 8px">The number on the right is your accuracy at the current tier. Four of five right moves a step up; two misses in a row moves it down. Tap a step to practise it.</p>' + rows +
+    (log.length ? '<p class="h4" style="margin-top:12px">Recent changes</p><div class="list">' + log.map(e => '<div class="li"><span class="k">' + esc((CP.stepById(e.step) || {}).short || e.step) + ' ' + (e.dir > 0 ? "up to" : "down to") + ' ' + tierName(e.tier) + '</span><span class="v">' + new Date(e.t).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + '</span></div>').join("") + '</div>' : "") + '</section>';
+}
+
+/* ---------- Test ---------- */
+let testTimer = null, testScope = null, testLen = null, testStarted = null;
+const clockTxt = ms => { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+function renderTest(arg) {
+  const T = S().activeTest;
+  if (arg === "result" && S().lastTest) return renderTestResult();
+  if (T) return renderTestQuestion();
+  const cur = CP.currentStep(S().profile.tracks[0]), hasMastered = !!CP.testSteps("mastered");
+  if (testScope === null) { const last = (S().tests || []).slice(-1)[0]; testScope = last ? last.scope : "step"; testLen = last ? last.n : 8; } /* start from the last test's choices */
+  if (testScope === "mastered" && !hasMastered) testScope = "step";
+  const best = CP.testBest(testScope, cur.id, testLen);
+  const scopes = [["step", "This step: " + cur.short], ["mastered", "Everything I’ve mastered"], ["course", "Whole course"]];
+  let h = '<h1 style="font-size:24px">Test</h1><div class="stack"><section class="card lift"><p class="kicker">A test, on your own terms</p>' +
+    '<p class="small">No hints and no answers until the end. Each step comes at its current tier. The clock is for you, not a limit. Close the app mid-test and it waits.</p>' +
+    '<div class="field" style="margin-top:12px"><label>What to cover</label><div class="chips">' + scopes.map(([k, n]) => '<button type="button" class="chip" data-scope="' + k + '" aria-pressed="' + (testScope === k) + '"' + (k === "mastered" && !hasMastered ? " disabled" : "") + '>' + esc(n) + (k === "mastered" && !hasMastered ? " · none yet" : "") + '</button>').join("") + '</div>' +
+    (testScope === "course" ? '<p class="note" style="margin-top:6px">Includes steps you have not reached yet, at the easy tier.</p>' : "") + '</div>' +
+    '<div class="field"><label>How many questions</label><div class="chips">' + CP.TEST_SIZES.map(n => '<button type="button" class="chip" data-len="' + n + '" aria-pressed="' + (testLen === n) + '">' + n + '</button>').join("") + '</div></div>' +
+    '<p class="small">' + (best ? "Your best here: " + best.right + " of " + best.n + " in " + clockTxt(best.ms) + "." : "No test like this yet. The first one sets your best.") + (" A perfect score earns 25 bonus points.") + '</p>' +
+    '<div class="acts"><button class="btn" id="tstart" type="button">Start the test</button></div></section>';
+  const hist = (S().tests || []).slice(-8).reverse();
+  if (hist.length) h += '<section class="card"><p class="kicker">Recent tests</p><div class="list">' + hist.map(t => '<div class="li"><span class="k">' + new Date(t.id).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + ' · ' + esc(CP.testLabel(t.scope, t.stepId)) + (t.best ? '<span class="tagb">best</span>' : "") + '</span><span class="v">' + t.right + '/' + t.n + ' · ' + clockTxt(t.ms) + '</span></div>').join("") + '</div>' +
+    (S().lastTest ? '<div class="acts"><a class="btn ghost" href="#test/result">Review the last test</a></div>' : "") + '</section>';
+  h += '</div>';
+  view.innerHTML = h;
+  view.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { testScope = b.dataset.scope; renderTest(); });
+  view.querySelectorAll("[data-len]").forEach(b => b.onclick = () => { testLen = Number(b.dataset.len); renderTest(); });
+  $("#tstart").onclick = () => { if (CP.startTest(testScope, testLen, cur.id)) renderTest(); };
+}
+function renderTestQuestion() {
+  const T = S().activeTest, i = T.answers.length, it = T.items[i];
+  const step = CP.stepById(it.step), done = T.answers.reduce((s, a) => s + a.ms, 0);
+  testStarted = Date.now();
+  let h = '<div class="stack"><section class="card lift"><div class="row"><p class="kicker">Test · ' + esc(CP.testLabel(T.scope, T.stepId)) + ' · ' + (i + 1) + ' of ' + T.items.length + '</p><span class="clock" id="clock">' + clockTxt(done) + '</span></div>' +
+    '<div class="dots">' + T.items.map((x, k) => '<i class="' + (k < i ? "y" : k === i ? "cur" : "") + '"></i>').join("") + '</div>' +
+    '<p class="small" style="margin:6px 0 0">' + esc(step.name) + ' · ' + tierName(it.tier).toLowerCase() + modeLabel(it) + '</p>' +
+    '<p class="task">' + it.task + '</p><p class="expr">' + it.expr + '</p>' + optionsHtml(it, null) + '</section>' +
+    '<p class="small" style="text-align:center"><button class="link" id="tquit" type="button">Stop this test</button></p></div>';
+  view.innerHTML = h;
+  clearInterval(testTimer);
+  testTimer = setInterval(() => { const c = $("#clock"); if (!c) { clearInterval(testTimer); return; } c.textContent = clockTxt(done + Math.min(Date.now() - testStarted, CP.TEST_CAP_MS)); }, 1000);
+  view.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const r = CP.answerTest(Number(b.dataset.i), Date.now() - testStarted);
+    paintTally();
+    if (r && r.done) { clearInterval(testTimer); CP.finishTest(); if (location.hash === "#test/result") route(); else location.hash = "#test/result"; }
+    else renderTestQuestion();
+  });
+  $("#tquit").onclick = () => { const q = $("#tquit"); if (!q.dataset.armed) { q.dataset.armed = "1"; q.textContent = "Tap again to stop. Answers so far still count toward your practice."; return; } clearInterval(testTimer); CP.abandonTest(); renderTest(); };
+}
+function renderTestResult() {
+  const L = S().lastTest, r = L.rec, best = CP.testBest(r.scope, r.stepId, r.n);
+  const msg = r.right === r.n ? "Perfect. 25 bonus points." : r.best && !r.first ? "A new best for this test." : r.first ? "Your first test like this. It is the one to beat." : "Your best here is " + best.right + " of " + best.n + " in " + clockTxt(best.ms) + ".";
+  let h = '<h1 style="font-size:24px">Test result</h1><div class="stack"><section class="card lift"><p class="kicker">' + esc(CP.testLabel(r.scope, r.stepId)) + ' · ' + r.n + ' questions</p>' +
+    '<div class="row" style="align-items:flex-end"><span class="score">' + r.right + ' of ' + r.n + '</span><span class="clock">' + clockTxt(r.ms) + '</span></div>' +
+    '<p class="prose" style="margin-top:8px">' + msg + '</p><div class="acts"><a class="btn" href="#test">Take another</a><a class="btn ghost" href="#today">Back to today</a></div></section>' +
+    '<section class="card"><p class="kicker">Question by question</p><p class="note" style="margin:-2px 0 6px">Tap one to see the working.</p>' +
+    L.items.map((it, k) => {
+      const a = L.answers[k], st = CP.stepById(it.step);
+      return '<details class="rq"><summary><span class="mk ' + (a.ok ? "y" : "n") + '">' + (a.ok ? "✓" : "✗") + '</span><span>' + (k + 1) + '. ' + esc(st.short) + ' · ' + tierName(it.tier).toLowerCase() + modeLabel(it) + ' <span class="mono" style="color:var(--ink-3)">' + clockTxt(a.ms) + '</span></span></summary>' +
+        '<div class="body"><p class="task">' + it.task + '</p><p class="expr">' + it.expr + '</p>' + optionsHtml(it, a.chosen) + '<div class="fb">' + explainHtml(it, a.chosen) + walkHtml(it.walk, walkTitle(it)) + '</div></div></details>';
+    }).join("") + '</section></div>';
+  view.innerHTML = h;
+}
+
 /* ---------- Household ---------- */
 function summarize(state) {
   const steps = state.steps || {}, days = state.days || {}, frozen = state.frozen || {};
@@ -233,7 +341,7 @@ function summarize(state) {
   /* this week's questions */
   let week = 0; for (let i = 0; i < 7; i++) week += ((days[fromN(dn(CP.today()) - i)] || {}).q || 0);
   let weak = null; for (const id in steps) { const x = steps[id]; if (!x || x.attempts < 3) continue; const acc = x.correct / x.attempts; if (!weak || acc < weak.acc) weak = { acc, name: CP.stepById(id).name }; }
-  return { mastered, cur, streak: n, freezes: state.freezes || 0, week, weak, points: state.points || 0 };
+  return { mastered, cur, tier: (steps[cur.id] && steps[cur.id].tier) || 0, streak: n, freezes: state.freezes || 0, week, weak, points: state.points || 0 };
 }
 function renderHousehold() {
   if (!CP.sync.enabled) {
@@ -265,7 +373,7 @@ function renderHousehold() {
            '<span style="grid-row:span 2;width:38px;height:38px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;font-weight:600">' + esc(x.name.slice(0, 1).toUpperCase()) + '</span>' +
            '<span style="font-size:15px;font-weight:600">' + esc(x.name) + (x.me ? ' <span style="font-size:11px;font-weight:400;color:var(--ink-3)">you</span>' : '') + '</span>' +
            '<span class="mono" style="text-align:right;color:var(--ink-2)">streak ' + x.streak + ' · ❄ ' + x.freezes + '</span>' +
-           '<span class="small">Step ' + x.cur.order + ', ' + esc(x.cur.name.toLowerCase()) + ' · ' + x.week + ' questions this week</span>' +
+           '<span class="small">Step ' + x.cur.order + ', ' + esc(x.cur.name.toLowerCase()) + ' · ' + tierName(x.tier) + ' · ' + x.week + ' questions this week</span>' +
            '<span class="mono" style="text-align:right;color:var(--miss)">' + (x.weak ? 'weakest: ' + esc(x.weak.name.toLowerCase()) : '') + '</span></section>';
     }
     h += '<section class="card"><p class="kicker">Household this week</p><div class="tiles" style="grid-template-columns:repeat(3,minmax(0,1fr))">' +
@@ -328,11 +436,13 @@ function route() {
   const hash = location.hash.replace(/^#/, "") || "today";
   const [name, arg] = hash.split("/");
   document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.v === (name === "lesson" || name === "practice" ? "today" : name)));
+  clearInterval(testTimer);
   paintTally();
   if (name === "today") renderToday();
   else if (name === "lesson") renderToday(arg);
   else if (name === "practice") renderPractice(arg);
   else if (name === "progress") renderProgress();
+  else if (name === "test") renderTest(arg);
   else if (name === "household") renderHousehold();
   else if (name === "me") renderMe();
   else renderToday();
