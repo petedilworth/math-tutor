@@ -114,7 +114,8 @@ for (const st of CP.STEPS) {
   /* real situations: every scenario, fresh numbers each time */
   const pool = CP.CTX[st.id] || [];
   if (pool.length < 2) bad(st.id + " needs at least 2 real-life scenarios, has " + pool.length);
-  if (!pool.some(f => { try { const p = f(); return p && p.k === "Finance"; } catch (e) { return false; } }) && !["crossp"].includes(st.id)) bad(st.id + " has no finance scenario");
+  /* a scenario may reject its random numbers and return null, so sample each a few times */
+  if (!pool.some(f => { for (let i = 0; i < 20; i++) { try { const p = f(); if (p) return p.k === "Finance"; } catch (e) { return false; } } return false; })) bad(st.id + " has no finance scenario");
   for (const fn of pool) for (let i = 0; i < Math.ceil(N / 3); i++) {
     const tag = st.id + "/ctx:" + fn.name; let p;
     try { p = CP.buildCtx(st.id, fn.name); } catch (e) { bad(tag + " build: " + e.message); break; }
