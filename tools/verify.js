@@ -9,7 +9,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, isFinite, Infinity };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP; /* browser: window is the global object */
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "generators.js", "generators-more.js", "generators-modes.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "notes.js", "generators.js", "generators-more.js", "generators-context.js", "generators-modes.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 const N = Number(process.env.VERIFY_N || 1000);
 
@@ -26,7 +26,7 @@ const parallel = (a, b) => isZero(cross(to3(a), to3(b)));
 const keyOf = h => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, "");
 const same = CP.h.same;
 
-let fails = 0, total = 0, spotN = 0, revN = 0;
+let fails = 0, total = 0, spotN = 0, revN = 0, ctxN = 0;
 const seenKinds = {};
 const bad = m => { const k = m.split(" ").slice(0, 3).join(" "); seenKinds[k] = (seenKinds[k] || 0) + 1; if (seenKinds[k] <= 2 && fails < 60) console.log("FAIL", m); fails++; };
 
@@ -51,7 +51,7 @@ function checkForward(p, tag) {
   const c = p.options.find(o => o.ok), W = p.options.filter(o => !o.ok);
   if (p.src && c.f) { for (const x of xs) if (!close(c.f(x), numd(p.src, x), 1e-3)) { bad(tag + " derivative wrong @" + x + " " + c.html); break; } }
   for (const w of W) { if (w.f && c.f && xs.every(x => close(w.f(x), c.f(x), 1e-9))) bad(tag + " distractor equals correct: " + w.html); }
-  if (p.truthN !== undefined && Math.abs(c.n - p.truthN) > 1e-6) bad(tag + " numeric wrong " + c.n + " vs " + p.truthN);
+  if (p.truthN !== undefined && Math.abs(c.n - p.truthN) > 1e-6 * Math.max(1, Math.abs(p.truthN))) bad(tag + " numeric wrong " + c.n + " vs " + p.truthN);
   for (const w of W) { if (typeof w.n === "number" && typeof c.n === "number" && !isNaN(w.n) && Math.abs(w.n - c.n) < 1e-12) bad(tag + " numeric distractor equals correct"); }
   if (p.truthV && c.v.join() !== p.truthV.join()) bad(tag + " vector wrong " + c.v + " vs " + p.truthV);
   for (const w of W) { if (w.v && c.v && w.v.join() === c.v.join()) bad(tag + " vector distractor equals correct"); }
@@ -104,12 +104,33 @@ function checkForward(p, tag) {
 for (const st of CP.STEPS) {
   for (const tier of [0, 1, 2]) {
     for (let i = 0; i < N; i++) {
-      let p; try { p = CP.build(st.id, tier); } catch (e) { bad(st.id + "/" + tier + " build: " + e.message); break; }
+      let p; try { p = CP.buildFwd(st.id, tier); } catch (e) { bad(st.id + "/" + tier + " build: " + e.message); break; }
       total++;
       checkForward(p, st.id + "/" + tier);
       const fz = CP.freeze(p, st.id, tier); if (JSON.stringify(fz).length < 50 || fz.mode !== "fwd") bad(st.id + "/" + tier + " freeze broken");
     }
   }
+
+  /* real situations: every scenario, fresh numbers each time */
+  const pool = CP.CTX[st.id] || [];
+  if (pool.length < 2) bad(st.id + " needs at least 2 real-life scenarios, has " + pool.length);
+  if (!pool.some(f => { try { const p = f(); return p && p.k === "Finance"; } catch (e) { return false; } }) && !["crossp"].includes(st.id)) bad(st.id + " has no finance scenario");
+  for (const fn of pool) for (let i = 0; i < Math.ceil(N / 3); i++) {
+    const tag = st.id + "/ctx:" + fn.name; let p;
+    try { p = CP.buildCtx(st.id, fn.name); } catch (e) { bad(tag + " build: " + e.message); break; }
+    total++; ctxN++;
+    if (p.sid === undefined || !p.k) bad(tag + " missing label");
+    checkForward(p, tag);
+    if (/NaN|undefined|Infinity/.test(p.task + p.expr + p.options.map(o => o.html + (o.ok ? "" : o.why)).join() + p.walk.join())) bad(tag + " junk in text: " + p.task);
+    if (p.truthN === undefined && !p.truthV) bad(tag + " has no independent check");
+    const fz = CP.freeze(p, st.id, 2); if (fz.mode !== "ctx" || !fz.ctx) bad(tag + " freeze");
+  }
+  /* where this shows up */
+  const notes = CP.NOTES[st.id] || [];
+  if (notes.length < 8) bad(st.id + " needs 8 notes, has " + notes.length);
+  const fin = notes.filter(n => n.k === "Finance").length;
+  if (fin < 3 || notes.length - fin < 3) bad(st.id + " notes should mix finance and other life: " + fin + " of " + notes.length);
+  if (notes.some(n => !n.k || !n.t || !n.x) || new Set(notes.map(n => n.t)).size !== notes.length) bad(st.id + " notes incomplete or repeated");
 
   /* spot the error */
   for (let i = 0; i < Math.ceil(N * 0.8); i++) {
@@ -141,7 +162,7 @@ for (const st of CP.STEPS) {
   }
 
   /* the dispatcher at Expert and Master */
-  for (const tier of [3, 4]) for (let i = 0; i < 40; i++) {
+  for (const tier of [2, 3, 4]) for (let i = 0; i < 40; i++) {
     let p; try { p = CP.build(st.id, tier); } catch (e) { bad(st.id + "/" + tier + " dispatch: " + e.message); break; }
     const fz = CP.freeze(p, st.id, tier);
     if (fz.tier !== tier || fz.options.filter(o => o.ok).length !== 1 || !!fz.noHint !== (tier === 4)) bad(st.id + "/" + tier + " dispatch freeze");
@@ -184,5 +205,5 @@ chk("lineplane t=10, t=12", ret(10) === 420 && ret(12) === 406);
 chk("dist 4 m and 6 m", (2 * 3 + 6 + 2 * 15 - 30) / 3 === 4 && (2 * 3 + 6 + 2 * 18 - 30) / 3 === 6 && (30 - 6 - 6) / 2 === 9);
 for (const w of CP.WHY) { if (w.wrong.length !== 3) bad("why count"); const k = [w.right, ...w.wrong.map(x => x[0])]; if (new Set(k).size !== 4) bad("why dup"); if (w.wrong.some(x => !x[1])) bad("why missing reason"); }
 
-console.log(fails === 0 ? "ALL CHECKS PASSED: " + total + " problems across " + CP.STEPS.length + " steps (" + (total - spotN - revN) + " forward at 3 tiers, " + spotN + " spot the error, " + revN + " work backwards), " + CP.STEPS.length + " real-life calculations x 3 data sets, " + CP.WHY.length + " why-questions" : fails + " FAILURES");
+console.log(fails === 0 ? "ALL CHECKS PASSED: " + total + " problems across " + CP.STEPS.length + " steps (" + (total - spotN - revN - ctxN) + " forward at 3 tiers, " + ctxN + " real situations, " + spotN + " spot the error, " + revN + " work backwards), " + CP.STEPS.length + " real-life calculations x 3 data sets, " + CP.WHY.length + " why-questions, " + Object.values(CP.NOTES).reduce((a, x) => a + x.length, 0) + " real-life notes" : fails + " FAILURES");
 process.exit(fails ? 1 : 0);

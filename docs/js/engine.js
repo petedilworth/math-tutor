@@ -29,7 +29,8 @@ function fresh() {
     tests: [],        /* finished tests: { id, scope, stepId, n, right, ms, date, best, bonus } */
     testBests: {},    /* scope key -> { pct, right, n, ms, date } */
     activeTest: null, /* the test in progress, saved on every tap */
-    lastTest: null    /* the last finished test with its questions, for the review screen */
+    lastTest: null,   /* the last finished test with its questions, for the review screen */
+    noteIx: {}        /* step -> next "where this shows up" note to show */
   };
 }
 let S = fresh();
@@ -89,6 +90,17 @@ CP.currentStep = function (trackId) {
   return steps[steps.length - 1];
 };
 
+/* ---------- where this shows up ---------- */
+/* Each question carries the index of one real-life note for its step. The index rotates, so notes rarely repeat back to back. */
+CP.nextNote = function (stepId) {
+  const pool = (CP.NOTES || {})[stepId]; if (!pool || !pool.length) return null;
+  S.noteIx = S.noteIx || {};
+  const i = (S.noteIx[stepId] || 0) % pool.length; S.noteIx[stepId] = i + 1;
+  return i;
+};
+CP.noteFor = (stepId, ix) => stepId && ix != null ? ((CP.NOTES || {})[stepId] || [])[ix] || null : null;
+const withNote = it => { if (it.step && it.kind !== "practical" && it.kind !== "why") it.noteIx = CP.nextNote(it.step); return it; };
+
 /* ---------- recording an answer ---------- */
 function bumpDay(ok) {
   const d = S.days[today()] || (S.days[today()] = { q: 0, right: 0 });
@@ -105,7 +117,7 @@ CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms, tier }) {
   /* points: never deducted */
   const st = stepId ? CP.stepById(stepId) : null;
   if (ok) {
-    S.points += kind === "why" || kind === "practical" ? 15 : kind === "review" ? 15 + 5 * tr : 10 * (st ? st.weight : 1) + 5 * tr;
+    S.points += kind === "why" || kind === "practical" || kind === "scenario" ? 15 : kind === "review" ? 15 + 5 * tr : 10 * (st ? st.weight : 1) + 5 * tr;
     S.run++; if (S.run > S.bestRun) S.bestRun = S.run;
   } else S.run = 0;
   if (stepId && kind !== "why") {
@@ -186,6 +198,8 @@ CP.makeLesson = function (date) {
   const ss = stepState(step.id);
   const n = lessonSize();
   const items = [];
+  const onStep = Object.values(S.lessons).filter(l => l.stepId === step.id).length;
+  const lessonNote = CP.nextNote(step.id);
   /* worked example first time on a step */
   if (!ss.seenDemo) { const p = CP.build(step.id, 0); items.push(Object.assign(CP.freeze(p, step.id, 0), { kind: "demo" })); }
   for (let i = 0; i < n; i++) { const p = CP.build(step.id, ss.tier); items.push(Object.assign(CP.freeze(p, step.id, ss.tier), { kind: "skill" })); }
@@ -197,13 +211,20 @@ CP.makeLesson = function (date) {
   const w = CP.WHY[whyIx];
   items.push({ kind: "why", step: null, task: "Pick the best reason.", expr: w.q, prose: true, explain: w.explain,
     options: CP.gutil.shuffle([{ html: w.right, ok: true, why: "" }].concat(w.wrong.map(x => ({ html: x[0], ok: false, why: x[1] })))) });
-  /* the real-life calculation, with a question */
-  const L = Object.assign({}, CP.LIVE_FALLBACK, CP.liveData || {});
-  const pr = step.practical.build(L);
-  items.push({ kind: "practical", step: step.id, live: !!(CP.liveData && step.practical.live), source: pr.source, setup: pr.setup, lines: pr.lines,
-    answer: pr.answer, why: pr.why, task: pr.q, expr: "", prose: true,
-    options: CP.gutil.shuffle(pr.options.map(o => ({ html: o.html, ok: !!o.ok, why: o.why || "" }))) });
-  const lesson = { date, stepId: step.id, stepName: step.name, items, ix: 0, answers: [], done: false, created: Date.now() };
+  /* the real-life slot: the step's worked calculation on its first lesson and every third after; otherwise a fresh real situation */
+  if (onStep % 3 === 0 || !CP.buildCtx || !(CP.CTX || {})[step.id]) {
+    const L = Object.assign({}, CP.LIVE_FALLBACK, CP.liveData || {});
+    const pr = step.practical.build(L);
+    items.push({ kind: "practical", step: step.id, live: !!(CP.liveData && step.practical.live), source: pr.source, setup: pr.setup, lines: pr.lines,
+      answer: pr.answer, why: pr.why, task: pr.q, expr: "", prose: true,
+      options: CP.gutil.shuffle(pr.options.map(o => ({ html: o.html, ok: !!o.ok, why: o.why || "" }))) });
+  } else {
+    const sc = Object.assign(CP.freeze(CP.buildCtx(step.id), step.id, 2), { kind: "scenario" });
+    delete sc.tier; /* a real situation is not a tier question: it never moves the tier */
+    items.push(sc);
+  }
+  items.forEach(withNote);
+  const lesson = { date, stepId: step.id, stepName: step.name, items, ix: 0, answers: [], done: false, created: Date.now(), noteIx: lessonNote };
   S.lessons[date] = lesson;
   save();
   return lesson;
@@ -243,7 +264,7 @@ CP.shouldStepBack = function (lesson) {
 /* three easy questions on the prerequisite, inserted after the current item */
 CP.insertStepBack = function (lesson, prereqStep) {
   const ins = [];
-  for (let i = 0; i < 3; i++) { const p = CP.build(prereqStep.id, 0); ins.push(Object.assign(CP.freeze(p, prereqStep.id, 0), { kind: "stepback" })); }
+  for (let i = 0; i < 3; i++) { const p = CP.build(prereqStep.id, 0); ins.push(withNote(Object.assign(CP.freeze(p, prereqStep.id, 0), { kind: "stepback" }))); }
   lesson.items.splice(lesson.ix, 0, ...ins);
   lesson.steppedBack = true;
   save();
@@ -253,7 +274,9 @@ CP.insertStepBack = function (lesson, prereqStep) {
 CP.practiceProblem = function (stepId) {
   const ss = stepState(stepId);
   const p = CP.build(stepId, ss.tier);
-  return Object.assign(CP.freeze(p, stepId, ss.tier), { kind: "practice" });
+  const it = withNote(Object.assign(CP.freeze(p, stepId, ss.tier), { kind: "practice" }));
+  save();
+  return it;
 };
 
 /* ---------- test mode ---------- */
@@ -273,7 +296,7 @@ CP.startTest = function (scope, n, stepId) {
   const steps = CP.testSteps(scope, stepId);
   if (!steps) return null;
   const order = []; while (order.length < n) order.push(...CP.gutil.shuffle(steps.slice()));
-  const items = order.slice(0, n).map(st => { const tier = stepState(st.id).tier; return Object.assign(CP.freeze(CP.build(st.id, tier), st.id, tier), { kind: "test", noHint: true }); });
+  const items = order.slice(0, n).map(st => { const tier = stepState(st.id).tier; return withNote(Object.assign(CP.freeze(CP.build(st.id, tier), st.id, tier), { kind: "test", noHint: true })); });
   S.activeTest = { id: Date.now(), scope, stepId: scope === "step" ? steps[0].id : null, items, answers: [], started: Date.now() };
   save();
   return S.activeTest;

@@ -14,7 +14,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, Date, JSON, localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} } };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP;
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "generators.js", "generators-more.js", "generators-modes.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "notes.js", "generators.js", "generators-more.js", "generators-context.js", "generators-modes.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 let live = {}; try { live = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "docs", "data", "live.json"), "utf8")); } catch (e) {}
 const liveFresh = live.asOf && (Date.now() - Date.parse(live.asOf)) / 86400000 <= 4;
@@ -37,7 +37,7 @@ function lessonFor(profile) {
   const streak = CP.streak();
   const due = CP.trackSteps("mcv4u").filter(s => s.id !== step.id && CP.due(s.id)).length;
   const open = CP.openLessons().length;
-  return { step, pr, streak, due, open, tier: CP.TIERS[CP.stepState(step.id).tier], size: profile.lesson_size || 5, live: liveFresh && !!step.practical.live };
+  return { step, pr, streak, due, open, tier: CP.TIERS[CP.stepState(step.id).tier], note: (function () { const pool = CP.NOTES[step.id] || []; return pool.length ? pool[Object.keys(CP.state().lessons || {}).length % pool.length] : null; })(), size: profile.lesson_size || 5, live: liveFresh && !!step.practical.live };
 }
 
 function html(name, l) {
@@ -51,6 +51,7 @@ function html(name, l) {
     '<p style="font-family:Georgia,serif;font-size:21px;font-weight:600;margin:0 0 6px">' + esc(l.step.name) + ' <span style="font-family:monospace;font-size:11px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#51575F">· ' + esc(l.tier) + '</span></p>' +
     '<p style="font-family:Georgia,serif;font-size:16px;line-height:1.5;margin:0 0 10px">' + l.step.rule.r + '</p>' +
     '<p style="font-size:13.5px;line-height:1.5;color:#51575F;margin:0"><span style="font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B4E0E">Memory tip</span> &nbsp;' + l.step.rule.tip + '</p></div>' +
+    (l.note ? '<div style="background:#F4ECD6;border-left:3px solid #6B4E0E;padding:12px 14px;margin:0 0 18px;font-size:14px;line-height:1.55"><span style="display:block;font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B4E0E;margin-bottom:4px">Why you’d care · ' + esc(l.note.k) + '</span><b>' + l.note.t + '.</b> ' + l.note.x + '</div>' : '') +
     '<p style="font-family:monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#0B6E68;margin:0 0 6px">In real life · ' + esc(l.pr.source) + (l.live ? "" : " (fixed example)") + '</p>' +
     '<p style="font-size:14px;line-height:1.6;margin:0 0 10px">' + l.pr.setup + '</p>' +
     '<table style="border-collapse:collapse;font-family:monospace;font-size:12.5px;background:#F4F4F1;padding:10px;margin:0 0 10px"><tbody>' + lines + '</tbody></table>' +

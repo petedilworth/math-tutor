@@ -211,3 +211,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-si
 .rq .mk.y{color:var(--good)}.rq .mk.n{color:var(--miss)}
 .rq .body{padding:10px 0 4px}
 .tagb{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:2px;background:var(--accent-soft);color:var(--accent);margin-left:6px}
+/* where this shows up */
+.rl{margin:0 0 14px;padding:12px 14px;border-left:3px solid var(--tip);background:var(--tip-soft);font-size:14.5px;line-height:1.55;border-radius:0 2px 2px 0}
+.card > .rl{margin:14px 0 0}
+.rl .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tip);margin-bottom:4px}
+.rl b{font-weight:600}

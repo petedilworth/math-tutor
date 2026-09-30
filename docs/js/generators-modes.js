@@ -780,19 +780,23 @@ CP.buildFwd = fwdBuild;
 CP.buildMode = function (stepId, mode, tier) {
   if (mode === "spot") return buildSpot(stepId, tier);
   if (mode === "rev") return buildRev(stepId, tier);
+  if (mode === "ctx") return CP.buildCtx(stepId);
   return fwdBuild(stepId, Math.min(tier, 2));
 };
-/* Expert: 40% spot, 40% backwards, 20% hard forward. Master: 45 / 45 / 10. */
+/* Hard: about a third of questions are set in a real situation.
+   Expert: 40% spot, 40% backwards, 20% real situations or hard. Master: 45 / 45 / 10. */
 CP.build = function (stepId, tier) {
-  if (tier <= 2) return fwdBuild(stepId, tier);
+  if (tier < 2) return fwdBuild(stepId, tier);
+  if (tier === 2) return Math.random() < 0.35 ? CP.buildCtx(stepId) : fwdBuild(stepId, 2);
   const r = Math.random(), cut = tier === 3 ? [0.4, 0.8] : [0.45, 0.9];
-  return CP.buildMode(stepId, r < cut[0] ? "spot" : r < cut[1] ? "rev" : "fwd", tier);
+  return CP.buildMode(stepId, r < cut[0] ? "spot" : r < cut[1] ? "rev" : Math.random() < 0.7 ? "ctx" : "fwd", tier);
 };
 CP.freeze = function (p, stepId, tier) {
   const f = fwdFreeze(p, stepId, tier);
   f.mode = p.mode || "fwd";
   if (tier >= 4) f.noHint = true;
   if (p.mode === "spot") { f.spotWhy = p.why; f.fix = p.fix; f.prose = true; }
+  if (p.mode === "ctx") { f.ctx = p.k; f.sid = p.sid; }
   return f;
 };
 })();

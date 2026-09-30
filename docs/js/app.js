@@ -45,7 +45,12 @@ function walkHtml(walk, title) { return '<p class="h4">' + (title || "How to get
 
 /* ---------- tiers ---------- */
 const tierName = t => CP.TIERS[t] || "";
-const modeLabel = it => it.mode === "spot" ? " · spot the error" : it.mode === "rev" ? " · work backwards" : "";
+const modeLabel = it => it.mode === "spot" ? " · spot the error" : it.mode === "rev" ? " · work backwards" : it.mode === "ctx" ? " · real life" : "";
+/* one real place this idea shows up; rotates per question */
+function noteHtml(stepId, ix, lead) {
+  const n = CP.noteFor(stepId, ix); if (!n) return "";
+  return '<div class="rl"><span class="lbl">' + (lead || "Where this shows up") + ' · ' + esc(n.k) + '</span><b>' + n.t + '.</b> ' + n.x + '</div>';
+}
 function tierBar(stepId, withNames) {
   const tp = CP.tierProgress(stepId), top = CP.TIERS.length - 1;
   const pips = CP.TIERS.map((n, i) => '<i class="' + (i < tp.tier ? "done" : i === tp.tier ? "cur" : i <= tp.best ? "best" : "") + '" title="' + n + '"></i>').join("");
@@ -87,7 +92,7 @@ function renderToday(dateOverride) {
        '<span class="mono">' + prog.total + ' questions' + (shortened ? " · eased" : "") + '</span></div>' +
        '<h2>' + step.name + '</h2><p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
        '<div class="rule" style="margin-top:12px;padding:0;border:0;background:none"><div class="rx"><div class="tipb" style="background:var(--tip-soft);padding:9px 10px;border-radius:2px"><b>Memory tip</b>' + step.rule.tip + '</div>' +
-       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + '</section>';
+       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care") + '</section>';
   /* dots */
   const qItems = lesson.items.map((it, i) => ({ it, i })).filter(x => x.it.kind !== "demo");
   h += '<div class="dots">' + qItems.map(({ it, i }) => {
@@ -124,14 +129,14 @@ function renderItem(lesson, answeredIx, stepBackOffer, ev) {
   const it = lesson.items[lesson.ix];
   if (!it) { renderToday(lesson.date === CP.today() ? undefined : lesson.date); return; }
   const step = it.step ? CP.stepById(it.step) : null;
-  const kindLabel = { demo: "Worked example", skill: step ? step.name : "", review: "Review · " + (step ? step.name : ""), stepback: "A step back · " + (step ? step.name : ""), why: "Why it works", practical: "In real life" }[it.kind];
+  const kindLabel = { demo: "Worked example", skill: step ? step.name : "", review: "Review · " + (step ? step.name : ""), stepback: "A step back · " + (step ? step.name : ""), why: "Why it works", practical: "In real life", scenario: "In real life · " + (it.ctx || "") + " · " + (step ? step.short : "") }[it.kind];
   const tierLabel = (it.kind === "skill" || it.kind === "review" || it.kind === "stepback") && it.tier !== undefined ? " · " + tierName(it.tier).toLowerCase() + modeLabel(it) : "";
   let h = '<div class="row"><p class="kicker">' + kindLabel + tierLabel + '</p><span class="mono">' + (step ? step.code : "reasons, not rules") + '</span></div>';
 
   if (it.kind === "demo") {
     const c = it.options.findIndex(o => o.ok);
     h += '<p class="task">First one on this step is done for you. Read it, then the next ones are yours.</p><p class="expr">' + it.expr + '</p>' + optionsHtml(it, c) +
-         '<div class="fb">' + walkHtml(it.walk) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Got it, my turn</button></div></div>';
+         '<div class="fb">' + walkHtml(it.walk) + noteHtml(it.step, it.noteIx) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Got it, my turn</button></div></div>';
     card.innerHTML = h; $("#next").onclick = () => { CP.answerLesson(lesson, lesson.ix, 0); renderToday(lesson.date === CP.today() ? undefined : lesson.date); };
     return;
   }
@@ -153,7 +158,7 @@ function renderItem(lesson, answeredIx, stepBackOffer, ev) {
     const chosen = it.options[answeredIx], ok = chosen.ok;
     h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (ok ? "y" : "n") + '">' + (ok ? "Correct" : "Not quite") + '</span>';
     if (it.kind === "why" || it.kind === "practical") { if (!ok) h += '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + '</div>'; }
-    else h += explainHtml(it, answeredIx);
+    else h += explainHtml(it, answeredIx) + noteHtml(it.step, it.noteIx);
     if (it.kind === "why") h += '<p class="h4">The reason</p><p class="prose">' + it.explain + '</p>';
     else if (it.kind !== "practical") h += walkHtml(it.walk, walkTitle(it)) + ruleHtml(step);
     if (stepBackOffer) {
@@ -206,7 +211,7 @@ function renderPractice(stepId) {
     let h = '<div class="stack"><section class="card lift"><div class="row"><p class="kicker">Practice · ' + esc(step.name) + ' · ' + tierName(item.tier).toLowerCase() + modeLabel(item) + '</p><span class="mono">' + step.code + '</span></div>' +
       '<p class="task">' + item.task + '</p><p class="expr">' + item.expr + '</p>' + optionsHtml(item, answered);
     if (answered == null) h += item.noHint ? '<p class="note" style="margin-top:12px">Master tier: no rule reminder.</p>' : '<div style="margin-top:12px"><button class="link" id="hint" type="button">Remind me of the rule</button><div id="hintbox"></div></div>';
-    else { const c = item.options[answered]; h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (c.ok ? "y" : "n") + '">' + (c.ok ? "Correct" : "Not quite") + '</span>' + explainHtml(item, answered) + walkHtml(item.walk, walkTitle(item)) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Another</button><a class="btn ghost" href="#today">Back to today</a></div></div>'; }
+    else { const c = item.options[answered]; h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (c.ok ? "y" : "n") + '">' + (c.ok ? "Correct" : "Not quite") + '</span>' + explainHtml(item, answered) + noteHtml(item.step, item.noteIx) + walkHtml(item.walk, walkTitle(item)) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Another</button><a class="btn ghost" href="#today">Back to today</a></div></div>'; }
     h += '</section><section class="card"><p class="kicker">Tier on this step</p>' + tierBar(step.id, true) + '</section></div>';
     view.innerHTML = h; started = Date.now();
     view.querySelectorAll(".opt").forEach(b => b.onclick = () => { if (answered != null) return; answered = Number(b.dataset.i); ev = CP.recordAnswer({ stepId: step.id, kind: "practice", ok: !!item.options[answered].ok, chosen: item.options[answered].html, ms: Date.now() - started, tier: item.tier }); paintTally(); draw(); });
@@ -323,7 +328,7 @@ function renderTestResult() {
     L.items.map((it, k) => {
       const a = L.answers[k], st = CP.stepById(it.step);
       return '<details class="rq"><summary><span class="mk ' + (a.ok ? "y" : "n") + '">' + (a.ok ? "✓" : "✗") + '</span><span>' + (k + 1) + '. ' + esc(st.short) + ' · ' + tierName(it.tier).toLowerCase() + modeLabel(it) + ' <span class="mono" style="color:var(--ink-3)">' + clockTxt(a.ms) + '</span></span></summary>' +
-        '<div class="body"><p class="task">' + it.task + '</p><p class="expr">' + it.expr + '</p>' + optionsHtml(it, a.chosen) + '<div class="fb">' + explainHtml(it, a.chosen) + walkHtml(it.walk, walkTitle(it)) + '</div></div></details>';
+        '<div class="body"><p class="task">' + it.task + '</p><p class="expr">' + it.expr + '</p>' + optionsHtml(it, a.chosen) + '<div class="fb">' + explainHtml(it, a.chosen) + noteHtml(it.step, it.noteIx) + walkHtml(it.walk, walkTitle(it)) + '</div></div></details>';
     }).join("") + '</section></div>';
   view.innerHTML = h;
 }

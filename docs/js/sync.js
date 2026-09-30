@@ -67,6 +67,7 @@ CP.sync.merge = function (a, b) {
   out.testBests = Object.assign({}, a.testBests || {});
   for (const k in (b.testBests || {})) { const x = out.testBests[k], y = b.testBests[k]; if (!x || y.pct > x.pct || (y.pct === x.pct && y.ms < x.ms)) out.testBests[k] = y; }
   /* a test in progress, and the last result screen, stay with the device they happened on */
+  out.noteIx = Object.assign({}, b.noteIx || {}, a.noteIx || {});
   /* lessons: per date, the one with more answers */
   out.lessons = out.lessons || {};
   for (const d in (b.lessons || {})) { const x = out.lessons[d], y = b.lessons[d]; if (!x || (y.answers || []).length > (x.answers || []).length) out.lessons[d] = y; }
