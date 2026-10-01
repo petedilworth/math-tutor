@@ -9,7 +9,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, isFinite, Infinity };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP; /* browser: window is the global object */
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "coverage.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 const N = Number(process.env.VERIFY_N || 1000);
 
@@ -42,6 +42,10 @@ CP.STEPS.forEach((s, i) => {
   if (!CP.SPOT[s.id] || !CP.REV[s.id]) bad("missing spot/reverse generator " + s.id);
 });
 if (!CP.TIERS || CP.TIERS.length !== 5) bad("tiers");
+/* curriculum map: 51 expectations, each tied to real steps, and every step serving at least one */
+if (CP.coverage.EX.length !== 51) bad("curriculum map needs 51 expectations");
+for (const e of CP.coverage.EX) for (const sid of e[4]) if (!CP.stepById(sid)) bad("curriculum map names a missing step " + sid + " in " + e[0]);
+for (const st of CP.STEPS) if (["exp", "frac"].indexOf(st.id) < 0 && !CP.coverage.EX.some(e => e[4].includes(st.id))) bad("step serves no expectation: " + st.id);
 
 /* ---------- forward problems ---------- */
 function checkForward(p, tag) {

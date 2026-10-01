@@ -32,6 +32,7 @@
 <script src="js/generators-full.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/sync.js"></script>
+<script src="js/coverage.js"></script>
 <script>
 (function () {
   const view = document.getElementById("view");
@@ -48,6 +49,7 @@
     let h = '<h1 style="font-size:24px">' + esc(r.name) + '</h1><p class="lede" style="font-size:15px">Shared progress. Updated as they practise.</p><div class="stack">';
     h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days</span></div><div class="tile"><span class="k">Level ' + lv.n + '</span><span class="v">' + S.points.toLocaleString("en-CA") + '</span><span class="s">points</span></div><div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + '</span></div></div>';
     h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + ' · ' + CP.TIERS[CP.stepState(cur.id).tier] + '</span></div><div class="map">' + steps.map(s => { const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : ""; return '<div class="st"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></div>'; }).join("") + '</div></section>';
+    h += '<section class="card" id="cov"></section>';
     h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + '" title="' + d.date + '"></span>').join("") + '</div></section>';
     /* the tutor view: per step accuracy and the mistakes they keep making */
     const rows = steps.map(s => ({ s, x: S.steps[s.id] })).filter(o => o.x && o.x.attempts > 0);
@@ -58,6 +60,7 @@
     if (weak) h += '<p class="small">Weakest step: <strong>' + esc(weak.name) + '</strong> at ' + Math.round(weak.acc * 100) + '%.</p>';
     h += '</div>';
     view.innerHTML = h;
+    if (CP.coverage) CP.coverage.compact(document.getElementById("cov"));
     if (CP.graph) CP.graph.hydrate(view);
   }).catch(e => { view.innerHTML = '<p class="small">' + esc(CP.sync.errorText(e)) + '</p>'; });
 })();

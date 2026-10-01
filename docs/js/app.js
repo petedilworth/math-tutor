@@ -198,7 +198,7 @@ function unitLine(step) {
 /* ---------- Units ---------- */
 function renderUnits() {
   const focus = S().profile.focus, cur = CP.currentStep(S().profile.tracks[0]);
-  let h = '<h1 style="font-size:24px">Units</h1><p class="lede" style="font-size:15px">Work through the course in order, or jump to the unit your class is on. Mastered steps stay mastered, and reviews keep coming from every unit. <a href="coverage.html">See how the units cover the curriculum.</a></p><div class="stack">';
+  let h = '<h1 style="font-size:24px">Units</h1><p class="lede" style="font-size:15px">Work through the course in order, or jump to the unit your class is on. Mastered steps stay mastered, and reviews keep coming from every unit. <a href="coverage.html">See your progress against the curriculum.</a></p><div class="stack">';
   h += '<section class="card' + (focus ? "" : " lift") + '"><div class="row"><p class="kicker">Course order</p>' + (focus ? "" : '<span class="mono">current</span>') + '</div><p class="small">The first step you haven’t mastered, from the start of the course.</p>' +
        (focus ? '<div class="acts"><button class="btn ghost" type="button" data-u="">Go back to course order</button></div>' : "") + '</section>';
   CP.UNITS.forEach((u, i) => {
@@ -256,7 +256,7 @@ function renderProgress() {
   h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days · ' + st.freezesBanked + ' freeze' + (st.freezesBanked === 1 ? "" : "s") + ' ❄</span></div>' +
        '<div class="tile"><span class="k">Level ' + lv.n + ' · ' + esc(lv.title) + '</span><span class="v">' + S().points.toLocaleString("en-CA") + '</span><span class="s">points · ' + lv.toNext + ' to next</span></div>' +
        '<div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + ' steps</span></div></div>';
-  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div><p class="small" style="margin:-2px 0 10px">How these steps line up with the Ontario curriculum: <a href="coverage.html">the coverage map</a>.</p>' + CP.UNITS.map((u, i) =>
+  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div><p class="small" style="margin:-2px 0 10px">Your progress against all 51 Ontario expectations: <a href="coverage.html">the curriculum map</a>.</p>' + CP.UNITS.map((u, i) =>
     '<p class="ulab">' + (i + 1) + ' · ' + esc(u.name) + (S().profile.focus === u.id ? ' <span class="tagb">working on</span>' : "") + '</p><div class="map">' + u.steps.map(id => CP.stepById(id)).map(s => {
       const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
       return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';

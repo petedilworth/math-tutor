@@ -3,231 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MCV4U Coverage Map · Chalk and Paper</title>
-<meta name="description" content="All 51 Ontario MCV4U specific expectations, and what Chalk and Paper covers.">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Curriculum Map · Chalk and Paper</title>
+<meta name="description" content="Your progress against all 51 Ontario MCV4U specific expectations.">
 <meta name="theme-color" content="#0B6E68">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>
-/* Layout: one reading column; a 51-cell strip as the at-a-glance map, then strands as lists of expectations with a status pill each. */
-:root {
-  --bg: #F4F4F1; --surface: #FFFFFF; --ink: #16191D; --ink-2: #51575F; --ink-3: #868C93; --line: #DBDBD4;
-  --accent: #0B6E68; --accent-soft: #DCEDEA;
-  --part: #9A6A10; --part-soft: #F4EAD2;
-  --miss: #A5400C; --miss-soft: #F6E4D8;
-  --serif: "Newsreader", Georgia, "Times New Roman", serif;
-  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #121419; --surface: #1A1D22; --ink: #E8E9EA; --ink-2: #A9AEB4; --ink-3: #7B8188; --line: #2C3138;
-  --accent: #4FC7BC; --accent-soft: #15302D; --part: #DDB45E; --part-soft: #2E2612; --miss: #F0894A; --miss-soft: #33200F; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #121419; --surface: #1A1D22; --ink: #E8E9EA; --ink-2: #A9AEB4; --ink-3: #7B8188; --line: #2C3138;
-  --accent: #4FC7BC; --accent-soft: #15302D; --part: #DDB45E; --part-soft: #2E2612; --miss: #F0894A; --miss-soft: #33200F; color-scheme: dark }
-* { box-sizing: border-box }
-body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 28px 64px }
-.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px }
-h1, h2 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -.01em }
-h1 { font-size: clamp(28px, 6vw, 38px); line-height: 1.1 }
-h2 { font-size: 22px; line-height: 1.2 }
-.eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px }
-.lede { color: var(--ink-2); max-width: 62ch; margin: 10px 0 0 }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 18px }
-/* totals */
-.totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
-.tot { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 3px; border: 1px solid var(--line); background: var(--surface) }
-.tot .n { font-family: var(--serif); font-size: 34px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums }
-.tot .k { font-size: 13px; color: var(--ink-2) }
-.tot.c .n { color: var(--accent) } .tot.p .n { color: var(--part) } .tot.m .n { color: var(--miss) }
-/* the strip */
-.strip { display: flex; flex-direction: column; gap: 10px; margin-top: 16px }
-.srow { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center }
-.srow .lab { font-family: var(--mono); font-size: 12px; color: var(--ink-3) }
-.cells { display: flex; flex-wrap: wrap; gap: 4px }
-.cell { width: 26px; height: 26px; border-radius: 2px; border: 0; padding: 0; cursor: pointer; font-family: var(--mono); font-size: 8.5px; color: var(--bg); display: flex; align-items: center; justify-content: center; text-decoration: none }
-.cell.c { background: var(--accent) } .cell.p { background: var(--part) } .cell.m { background: var(--miss) }
-.cell:focus-visible, .chip:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
-.gap { width: 6px }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--ink-2); margin-top: 12px }
-.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px }
-/* filter */
-.chips { display: flex; flex-wrap: wrap; gap: 8px }
-.chip { font: inherit; font-size: 13.5px; padding: 7px 12px; min-height: 36px; border-radius: 2px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer }
-.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink) }
-/* strands */
-.strand { display: flex; flex-direction: column; gap: 14px }
-.shead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap }
-.shead .sum { font-family: var(--mono); font-size: 12px; color: var(--ink-3) }
-.group { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: 6px 0 -6px }
-.ex { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 14px; padding: 12px 0; border-top: 1px solid var(--line) }
-.ex .code { font-family: var(--mono); font-size: 13px; font-weight: 500; padding-top: 2px; font-variant-numeric: tabular-nums }
-.ex .body { min-width: 0; display: flex; flex-direction: column; gap: 4px }
-.ex .what { font-weight: 500 }
-.ex .note { color: var(--ink-2); font-size: 14px }
-.pill { align-self: flex-start; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px }
-.pill.c { background: var(--accent-soft); color: var(--accent) } .pill.p { background: var(--part-soft); color: var(--part) } .pill.m { background: var(--miss-soft); color: var(--miss) }
-.ex.flash { animation: flash 1.4s ease-out }
-@keyframes flash { from { background: var(--accent-soft) } to { background: transparent } }
-@media (prefers-reduced-motion: reduce) { .ex.flash { animation: none } }
-/* next */
-ol.next { margin: 12px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px }
-ol.next li { padding-left: 4px }
-ol.next b { font-weight: 600 }
-.small { font-size: 13px; color: var(--ink-3) }
-@media (max-width: 480px) { .tot .n { font-size: 28px } .ex { grid-template-columns: 44px minmax(0, 1fr) } }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>.wrap{padding-bottom:48px}</style>
 </head>
 <body>
-
 <div class="wrap">
-  <header>
-    <p class="eyebrow"><a href="./#progress" style="color:inherit">← Back to Chalk and Paper</a> · Grade 12 Calculus and Vectors</p>
-    <h1>What the app covers, expectation by expectation</h1>
-    <p class="lede">All 51 specific expectations in the Ontario MCV4U curriculum, checked against the app's 36 steps, its spot-the-error and work-backwards questions, and its real-life scenarios. Tap a square to jump to it.</p>
-  </header>
-
-  <section aria-label="Totals">
-    <div class="totals" id="totals"></div>
-    <div class="panel" style="margin-top:12px">
-      <div class="strip" id="strip"></div>
-      <div class="legend"><span><i style="background:var(--accent)"></i>Covered</span><span><i style="background:var(--part)"></i>Partly covered</span><span><i style="background:var(--miss)"></i>Not covered</span></div>
-    </div>
-  </section>
-
-  <section aria-label="Filter" class="chips" id="chips"></section>
-
-  <div id="strands" style="display:flex;flex-direction:column;gap:36px"></div>
-
-  <section class="panel">
-    <p class="eyebrow">What is left</p>
-    <h2>Six expectations are only partly covered</h2>
-    <ol class="next">
-      <li><b>Communication (A1.1, B2.5).</b> Describing a rate in words and writing up a modelled answer. A multiple-choice app can't mark this; it needs paper and a tutor.</li>
-      <li><b>Proofs and investigations (A3.2, A2.6).</b> Reading proofs of the derivative rules, and finding e by experiment. Explained, not practised.</li>
-      <li><b>Exponential graphs (A2.5).</b> The derivative of aˣ by graph. Easy to add as more graph questions.</li>
-      <li><b>Second derivatives of rational functions (B1.3).</b> f″ for functions like 1 ÷ (x + 2). A small addition to the Rational and radical step.</li>
-    </ol>
-  </section>
-
-  <p class="small">Source: the specific expectations pasted from the Ontario Ministry of Education's MCV4U curriculum, saved in the repository as curriculum/MCV4U-calculus-and-vectors.md. Assessed against the app's 36 steps as of October 1, 2026.</p>
+  <header class="masthead"><a class="brand" href="./#progress">Chalk and Paper</a><a class="tally" href="./#progress">← back</a></header>
+  <h1 style="font-size:26px">The curriculum, square by square</h1>
+  <p class="lede" style="font-size:15px">All 51 specific expectations in Ontario’s Grade 12 Calculus and Vectors (MCV4U). Each one is tied to the steps that teach it, and coloured by how far you’ve got. Tap a square to jump to it, or a step to practise it.</p>
+  <main id="view" class="stack"><p class="small">Loading…</p></main>
+  <p class="note" style="margin-top:24px">Mastered means every step tied to that expectation is mastered. Progress is read from this device, so open the app and sign in first if you practise on another device. Source: the Ontario Ministry of Education’s MCV4U curriculum.</p>
 </div>
-
-<script>
-const STRANDS = {
-  A: { name: "Rate of change", groups: { A1: "Instantaneous rate of change at a point", A2: "The derivative function", A3: "Properties of derivatives" } },
-  B: { name: "Derivatives and their applications", groups: { B1: "Graphs of functions and their derivatives", B2: "Problems using models and derivatives" } },
-  C: { name: "Geometry and algebra of vectors", groups: { C1: "Representing vectors", C2: "Operating with vectors", C3: "Lines and planes as linear equations", C4: "Scalar, vector and parametric equations" } }
-};
-/* s: c covered, p partly, m missing */
-const EX = [
-  ["A1.1", "p", "Real-world examples of rates of change", "Every question ends with a real example, and scenarios use real rates. You never describe one in your own words."],
-  ["A1.2", "c", "Average rate and secant; instantaneous rate and tangent", "Slope and Tangent steps."],
-  ["A1.3", "c", "Secants closing in on the tangent", "First principles: the falling-phone secants 24.5, 20.09, 19.649 → 19.6 m/s."],
-  ["A1.4", "c", "Limits by example: asymptotes, Fibonacci ratios", "Limits step: limits at infinity, holes, (bʰ − 1)/h, and ratios of Fibonacci-style sequences."],
-  ["A1.5", "c", "The difference quotient and its limit", "First principles step, all tiers."],
-  ["A1.6", "c", "Rates at a point, with and without simplifying first", "First principles: limit at a point (easy) and simplified quotients (medium, hard)."],
-  ["A2.1", "c", "Where the rate is positive, negative or zero, from a graph or table", "Graphs of f′ step: 'where is f increasing?' read off a drawn graph, and revenue graphs."],
-  ["A2.2", "c", "Building the derivative's graph from tangent slopes", "Graphs of f′ step: see f, pick the drawing of f′."],
-  ["A2.3", "c", "Derivatives of polynomials by the limit definition", "First principles step."],
-  ["A2.4", "c", "The derivative of sin x and cos x, by graph", "Graphs of f′ step draws sine and cosine and asks for the graph of f′."],
-  ["A2.5", "p", "The derivative of aˣ, by graph", "The rule aˣ ln a is drilled and (bʰ − 1)/h → ln b is in Limits. Exponential graphs are not drawn yet."],
-  ["A2.6", "p", "Finding e as the base where f′ = f", "Explained in a why-question and in notes. Not investigated."],
-  ["A2.7", "c", "ln x as the inverse of eˣ", "ln and eˣ step: simplifying, solving e^(kt) = A, doubling time and carbon dating."],
-  ["A2.8", "c", "The derivative of aˣ is aˣ ln a", "Sine, cosine and eˣ; Growth rates."],
-  ["A3.1", "c", "The power rule for whole-number powers", "Power rule step."],
-  ["A3.2", "p", "Constant, multiple, sum and difference rules; reading their proofs", "The rules are used throughout. Proofs are not."],
-  ["A3.3", "c", "Polynomial derivatives; finding where a given rate happens", "Polynomials and Tangent, plus work-backwards questions such as 'at which x does the tangent touch?'"],
-  ["A3.4", "c", "The power rule for fractional powers", "Roots and powers step: √x, x^(2/3), 1 ÷ √x and negative powers."],
-  ["A3.5", "c", "Product and chain rules on polynomial, trig, exponential, rational and radical functions", "Rules combined, plus Rational and radical: a ÷ (x + b), √(ax² + b), (x² + a)(x − b)⁻¹."],
-  ["B1.1", "c", "Sketching f′ from a graph of f; spotting inflection points", "Graphs of f′ step, with drawn options."],
-  ["B1.2", "c", "The second derivative as the rate of change of the rate", "Concavity, plus Sketching: 'here is f, which graph is f″?'"],
-  ["B1.3", "p", "f″ of a polynomial or simple rational function, linked to graph features", "Polynomials in full. Rational functions get first derivatives and optimization, not f″ yet."],
-  ["B1.4", "c", "Features of f from information about f′ and f″", "Sketching step: pick f from a graph of f′ or from a sign chart."],
-  ["B1.5", "c", "Sketching a polynomial from its equation", "Sketching step: pick the graph of a cubic from its equation and derivative."],
-  ["B2.1", "c", "Motion: position, velocity, acceleration", "Motion step, plus puck, merging, ball and saving scenarios."],
-  ["B2.2", "c", "Derivatives in real settings: population, inflation, flow", "Growth rates step, notes and scenarios such as groceries, coffee and debt."],
-  ["B2.3", "c", "Instantaneous-rate problems from a given equation", "Scenarios: Toronto daylight, outlet voltage, cooling coffee, balloons."],
-  ["B2.4", "c", "Optimization with polynomial, rational and exponential models", "Optimization step, plus rational models in Rational and radical: cheapest run size, when a pill peaks."],
-  ["B2.5", "p", "Modelling a real situation and communicating the result", "Scenarios do the modelling. Written communication can't be marked by the app."],
-  ["C1.1", "c", "Vectors as magnitude and direction; real uses", "Vector basics, notes and scenarios."],
-  ["C1.2", "c", "2D vectors as arrows, with bearings like N 40° W", "Bearings step."],
-  ["C1.3", "c", "Converting between arrow form and coordinates with trig", "Bearings step: components from bearings, bearings from components, crosswinds."],
-  ["C1.4", "c", "3D points, distance and magnitude", "Vector basics."],
-  ["C2.1", "c", "Adding, subtracting and scaling vectors", "Vector basics and Bearings."],
-  ["C2.2", "c", "Properties of vector addition and scaling", "Vector laws step: pick the law that always holds."],
-  ["C2.3", "c", "Problems using vector addition", "Crosswind and portfolio-trade scenarios."],
-  ["C2.4", "c", "The dot product and its uses", "Dot product and Angles steps."],
-  ["C2.5", "c", "Properties of the dot product", "Vector laws step, plus perpendicular means zero."],
-  ["C2.6", "c", "The cross product and its magnitude", "Cross product step."],
-  ["C2.7", "c", "Properties of the cross product", "Vector laws step: order, distributing, not associative."],
-  ["C2.8", "c", "Projections, area, volume, work, torque", "Angles (projections), Cross product (area, torque), Vector laws (volume by triple product)."],
-  ["C3.1", "c", "Where two lines in 2D meet", "2D lines step."],
-  ["C3.2", "c", "A linear equation in 3D is a plane; two planes meet in a line", "Planes meeting step."],
-  ["C3.3", "c", "Configurations of up to three lines and planes", "Line meets plane, Planes meeting (one point, a line, none) and Skew lines."],
-  ["C4.1", "c", "Lines in 2D: scalar, vector and parametric forms", "2D lines step."],
-  ["C4.2", "c", "Lines in 3D: vector, parametric, and as two planes", "Lines, plus Plane forms: the direction where two planes meet."],
-  ["C4.3", "c", "Normals to a plane", "Planes step."],
-  ["C4.4", "c", "Scalar equation of a plane; three planes solved together", "Planes meeting step, including three-fund and meal-planning systems."],
-  ["C4.5", "c", "Writing a plane's scalar, vector and parametric equations", "Planes and Plane forms."],
-  ["C4.6", "c", "Converting a plane between forms", "Plane forms step, both directions."],
-  ["C4.7", "c", "Distances and intersections of lines and planes", "Distance, Line meets plane, and Skew lines: where lines meet and the gap between skew lines."]
-];
-const LAB = { c: "Covered", p: "Partly covered", m: "Not covered" };
-const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-const id = c => "x-" + c.replace(".", "-");
-let filter = "all";
-try { filter = localStorage.getItem("mcv4u-filter") || "all"; } catch (e) {}
-
-function totals() {
-  const n = k => EX.filter(e => e[1] === k).length;
-  document.getElementById("totals").innerHTML = [["c", "covered"], ["p", "partly covered"], ["m", "not covered"]]
-    .map(([k, w]) => '<div class="tot ' + k + '"><span class="n">' + n(k) + '</span><span class="k">of 51 ' + w + '</span></div>').join("");
-}
-function strip() {
-  document.getElementById("strip").innerHTML = Object.keys(STRANDS).map(s => {
-    const groups = Object.keys(STRANDS[s].groups);
-    const cells = groups.map(g => EX.filter(e => e[0].startsWith(g + ".")).map(e =>
-      '<a class="cell ' + e[1] + '" href="#' + id(e[0]) + '" title="' + e[0] + ' · ' + LAB[e[1]] + ' · ' + esc(e[2]) + '" aria-label="' + e[0] + ', ' + LAB[e[1]] + '">' + e[0].slice(1) + '</a>').join("")).join('<span class="gap"></span>');
-    return '<div class="srow"><span class="lab">' + s + '</span><div class="cells">' + cells + '</div></div>';
-  }).join("");
-  document.querySelectorAll(".cell").forEach(a => a.addEventListener("click", ev => {
-    const t = document.getElementById(a.getAttribute("href").slice(1));
-    if (!t) return;
-    ev.preventDefault();
-    if (t.hidden) { setFilter("all"); }
-    t.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
-    t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash");
-  }));
-}
-function chips() {
-  const opts = [["all", "All 51"], ["m", "Not covered"], ["p", "Partly covered"], ["c", "Covered"]];
-  const el = document.getElementById("chips");
-  el.innerHTML = opts.map(([k, w]) => '<button type="button" class="chip" id="f-' + k + '" data-f="' + k + '" aria-pressed="' + (filter === k) + '">' + w + '</button>').join("");
-  el.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => setFilter(b.dataset.f)));
-}
-function setFilter(f) {
-  filter = f;
-  try { localStorage.setItem("mcv4u-filter", f); } catch (e) {}
-  document.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === f)));
-  document.querySelectorAll(".ex").forEach(r => { r.hidden = f !== "all" && r.dataset.s !== f; });
-  document.querySelectorAll(".group").forEach(g => { g.hidden = !Array.from(document.querySelectorAll('.ex[data-g="' + g.dataset.g + '"]')).some(r => !r.hidden); });
-}
-function strands() {
-  document.getElementById("strands").innerHTML = Object.keys(STRANDS).map(s => {
-    const mine = EX.filter(e => e[0][0] === s), n = k => mine.filter(e => e[1] === k).length;
-    let h = '<section class="strand"><div class="shead"><h2>' + s + '. ' + STRANDS[s].name + '</h2><span class="sum">' + n("c") + ' covered · ' + n("p") + ' partly · ' + n("m") + ' not</span></div><div>';
-    for (const g of Object.keys(STRANDS[s].groups)) {
-      h += '<p class="group" data-g="' + g + '">' + g + ' · ' + STRANDS[s].groups[g] + '</p>';
-      h += EX.filter(e => e[0].startsWith(g + ".")).map(e => '<div class="ex" id="' + id(e[0]) + '" data-s="' + e[1] + '" data-g="' + g + '"><span class="code">' + e[0] + '</span><div class="body"><span class="what">' + esc(e[2]) + '</span><span class="pill ' + e[1] + '">' + LAB[e[1]] + '</span><span class="note">' + esc(e[3]) + '</span></div></div>').join("");
-    }
-    return h + '</div></section>';
-  }).join("");
-}
-totals(); strip(); chips(); strands(); setFilter(filter);
-</script>
-
+<script src="js/content.js"></script>
+<script src="js/content-more.js"></script>
+<script src="js/content-full.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/coverage.js"></script>
+<script>CP.coverage.page(document.getElementById("view"));</script>
 </body>
 </html>
