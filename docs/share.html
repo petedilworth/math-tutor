@@ -21,11 +21,15 @@
 <script src="js/config.js"></script>
 <script src="js/content.js"></script>
 <script src="js/content-more.js"></script>
+<script src="js/content-full.js"></script>
 <script src="js/notes.js"></script>
+<script src="js/notes-full.js"></script>
 <script src="js/generators.js"></script>
+<script src="js/graphs.js"></script>
 <script src="js/generators-more.js"></script>
 <script src="js/generators-context.js"></script>
 <script src="js/generators-modes.js"></script>
+<script src="js/generators-full.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/sync.js"></script>
 <script>
@@ -54,6 +58,7 @@
     if (weak) h += '<p class="small">Weakest step: <strong>' + esc(weak.name) + '</strong> at ' + Math.round(weak.acc * 100) + '%.</p>';
     h += '</div>';
     view.innerHTML = h;
+    if (CP.graph) CP.graph.hydrate(view);
   }).catch(e => { view.innerHTML = '<p class="small">' + esc(CP.sync.errorText(e)) + '</p>'; });
 })();
 </script>

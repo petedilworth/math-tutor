@@ -83,12 +83,22 @@ CP.due = id => { const s = stepState(id); return !!s.mastered && !!s.due && s.du
 function trackSteps(trackId) { return CP.STEPS.filter(s => s.track === trackId).sort((a, b) => a.order - b.order); }
 CP.trackSteps = trackSteps;
 
-/* the step a person is working on: first unmastered step whose prerequisite is mastered (or has none) */
+/* the step a person is working on: the first unmastered step, inside the chosen unit if one is chosen */
 CP.currentStep = function (trackId) {
   const steps = trackSteps(trackId);
+  const focus = S.profile.focus && CP.unitById ? CP.unitById(S.profile.focus) : null;
+  if (focus) for (const st of steps) if (focus.steps.includes(st.id) && !CP.mastered(st.id)) return st;
   for (const st of steps) if (!CP.mastered(st.id)) return st;
   return steps[steps.length - 1];
 };
+/* Jump to a unit, or back to course order with null. Today's lesson is rebuilt if nothing in it has been answered yet. */
+CP.setFocus = function (unitId) {
+  S.profile.focus = unitId || null;
+  const L = S.lessons[today()];
+  if (L && !L.answers.length) delete S.lessons[today()];
+  save();
+};
+CP.unitProgress = u => ({ mastered: u.steps.filter(id => CP.mastered(id)).length, total: u.steps.length });
 
 /* ---------- where this shows up ---------- */
 /* Each question carries the index of one real-life note for its step. The index rotates, so notes rarely repeat back to back. */
@@ -286,18 +296,19 @@ CP.TEST_CAP_MS = 600000; /* a question left open longer than 10 minutes counts a
 CP.testSteps = function (scope, stepId) {
   const trackId = S.profile.tracks[0] || "mcv4u", all = trackSteps(trackId);
   if (scope === "step") return [CP.stepById(stepId) || CP.currentStep(trackId)];
+  if (scope === "unit") { const u = CP.unitById(stepId) || CP.unitOf(CP.currentStep(trackId).id); return u.steps.map(id => CP.stepById(id)); }
   if (scope === "mastered") { const m = all.filter(s => CP.mastered(s.id)); return m.length ? m : null; }
   return all;
 };
-CP.testLabel = (scope, stepId) => scope === "step" ? (CP.stepById(stepId) || CP.currentStep(S.profile.tracks[0] || "mcv4u")).name : scope === "mastered" ? "Everything mastered" : "Whole course";
-const testKey = (scope, stepId, n) => (scope === "step" ? "step:" + stepId : scope) + ":" + n;
+CP.testLabel = (scope, stepId) => scope === "unit" ? (CP.unitById(stepId) || {}).name || "This unit" : scope === "step" ? (CP.stepById(stepId) || CP.currentStep(S.profile.tracks[0] || "mcv4u")).name : scope === "mastered" ? "Everything mastered" : "Whole course";
+const testKey = (scope, stepId, n) => (scope === "step" ? "step:" + stepId : scope === "unit" ? "unit:" + stepId : scope) + ":" + n;
 CP.testBest = (scope, stepId, n) => (S.testBests || {})[testKey(scope, stepId, n)] || null;
 CP.startTest = function (scope, n, stepId) {
   const steps = CP.testSteps(scope, stepId);
   if (!steps) return null;
   const order = []; while (order.length < n) order.push(...CP.gutil.shuffle(steps.slice()));
   const items = order.slice(0, n).map(st => { const tier = stepState(st.id).tier; return withNote(Object.assign(CP.freeze(CP.build(st.id, tier), st.id, tier), { kind: "test", noHint: true })); });
-  S.activeTest = { id: Date.now(), scope, stepId: scope === "step" ? steps[0].id : null, items, answers: [], started: Date.now() };
+  S.activeTest = { id: Date.now(), scope, stepId: scope === "step" ? steps[0].id : scope === "unit" ? CP.unitOf(steps[0].id).id : null, items, answers: [], started: Date.now() };
   save();
   return S.activeTest;
 };

@@ -9,7 +9,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, isFinite, Infinity };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP; /* browser: window is the global object */
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "notes.js", "generators.js", "generators-more.js", "generators-context.js", "generators-modes.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 const N = Number(process.env.VERIFY_N || 1000);
 
@@ -23,16 +23,17 @@ const sub = (a, b) => a.map((x, i) => x - b[i]);
 const isZero = v => v.every(x => x === 0);
 const to3 = v => v.length === 2 ? [v[0], v[1], 0] : v;
 const parallel = (a, b) => isZero(cross(to3(a), to3(b)));
-const keyOf = h => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, "");
+const keyOf = CP.h.keyOf;
 const same = CP.h.same;
 
 let fails = 0, total = 0, spotN = 0, revN = 0, ctxN = 0;
 const seenKinds = {};
-const bad = m => { const k = m.split(" ").slice(0, 3).join(" "); seenKinds[k] = (seenKinds[k] || 0) + 1; if (seenKinds[k] <= 2 && fails < 60) console.log("FAIL", m); fails++; };
+const bad = m => { const k = m.split(" ").slice(0, 3).join(" "); seenKinds[k] = (seenKinds[k] || 0) + 1; if (seenKinds[k] <= 2 && Object.keys(seenKinds).length <= 40) console.log("FAIL", m); fails++; };
 
 /* ---------- course structure ---------- */
 const ids = CP.STEPS.map(s => s.id);
-if (CP.STEPS.length !== 24) bad("expected 24 steps, got " + CP.STEPS.length);
+if (CP.STEPS.length !== 36) bad("expected 36 steps, got " + CP.STEPS.length);
+if (!CP.UNITS || CP.UNITS.reduce((a, u) => a + u.steps.length, 0) !== 36 || CP.STEPS.some(s => !s.unit)) bad("every step needs exactly one unit");
 CP.STEPS.forEach((s, i) => {
   if (s.order !== i + 1) bad("order gap at " + s.id);
   if (!s.short) bad("no short label " + s.id);
@@ -49,8 +50,9 @@ function checkForward(p, tag) {
   const keys = p.options.map(o => keyOf(o.html)); if (new Set(keys).size !== keys.length) bad(tag + " dup keys");
   if (p.options.some(o => !o.ok && !o.why)) bad(tag + " wrong option missing explanation");
   const c = p.options.find(o => o.ok), W = p.options.filter(o => !o.ok);
-  if (p.src && c.f) { for (const x of xs) if (!close(c.f(x), numd(p.src, x), 1e-3)) { bad(tag + " derivative wrong @" + x + " " + c.html); break; } }
-  for (const w of W) { if (w.f && c.f && xs.every(x => close(w.f(x), c.f(x), 1e-9))) bad(tag + " distractor equals correct: " + w.html); }
+  const XS = p.posOnly ? pxs : xs;
+  if (p.src && c.f) { for (const x of XS) if (!close(c.f(x), numd(p.src, x), 1e-3)) { bad(tag + " derivative wrong @" + x + " " + c.html); break; } }
+  for (const w of W) { if (w.f && c.f && XS.every(x => close(w.f(x), c.f(x), 1e-9))) bad(tag + " distractor equals correct: " + w.html); }
   if (p.truthN !== undefined && Math.abs(c.n - p.truthN) > 1e-6 * Math.max(1, Math.abs(p.truthN))) bad(tag + " numeric wrong " + c.n + " vs " + p.truthN);
   for (const w of W) { if (typeof w.n === "number" && typeof c.n === "number" && !isNaN(w.n) && Math.abs(w.n - c.n) < 1e-12) bad(tag + " numeric distractor equals correct"); }
   if (p.truthV && c.v.join() !== p.truthV.join()) bad(tag + " vector wrong " + c.v + " vs " + p.truthV);
@@ -73,8 +75,8 @@ function checkForward(p, tag) {
   }
   /* sign of the second derivative on an interval */
   if (p.signD) {
-    const g = x => numd2(p.src, x), grid = []; for (let x = -20; x <= 20; x += 0.25) if (Math.abs(g(x)) > 1e-6) grid.push(x);
-    const inside = (iv, x) => x > iv[0] && x < iv[1], right = iv => grid.every(x => (g(x) > 0) === inside(iv, x));
+    const g = x => p.signD === 1 ? numd(p.src, x) : numd2(p.src, x), grid = []; for (let x = -20; x <= 20; x += 0.25) if (Math.abs(g(x)) > 1e-6) grid.push(x);
+    const inside = (iv, x) => x > iv[0] && x < iv[1], right = iv => grid.every(x => (p.signNeg ? g(x) < 0 : g(x) > 0) === inside(iv, x));
     if (!right(c.iv)) bad(tag + " interval correct wrong " + c.html);
     for (const w of W) if (right(w.iv)) bad(tag + " interval distractor right " + w.html);
   }
@@ -97,6 +99,63 @@ function checkForward(p, tag) {
   if (p.meetCase) {
     const { P, d, n, D } = p.meetCase, cs = dot(n, d) !== 0 ? "one" : dot(n, P) === D ? "all" : "none";
     if (c.cs !== cs) bad(tag + " meet case wrong " + c.cs + " vs " + cs);
+  }
+  /* graph choices: compare shapes using numeric derivatives, independent of graphs.js's own derivative */
+  if (p.gq) {
+    const ev = CP.graph.ev, W2 = p.gq.w, want = x => ev(p.gq.want, x), dn = sp => x => numd(y => ev(sp, y), x);
+    const sgn = f => { const v = []; for (let i = 1; i < 97; i++) v.push(f(W2[0] + (W2[1] - W2[0]) * i / 97)); const m = Math.max(1e-12, ...v.map(Math.abs)); return v.map(y => Math.abs(y) < 0.04 * m ? 0 : Math.sign(y)); };
+    const alike = (f, g) => { const a = sgn(f), b = sgn(g); return a.every((s1, i) => s1 === 0 || b[i] === 0 || s1 === b[i]); };
+    const fits = sp => p.gq.comp === "f" ? alike(x => ev(sp, x), want) : p.gq.comp === "d" ? alike(dn(sp), want) : alike(x => ev(sp, x), want) && alike(dn(sp), dn(p.gq.want));
+    if (!fits(c.g)) bad(tag + " graph correct doesn't fit " + c.g + " vs " + p.gq.want);
+    if (p.gq.exact && !pxs.concat(xs).every(x => { const xx = W2[0] + (W2[1] - W2[0]) * ((x + 2) / 5); return close(ev(c.g, xx), want(xx), 1e-6); })) bad(tag + " graph correct not exact");
+    for (const w of W) if (fits(w.g)) bad(tag + " graph distractor looks the same: " + w.g + " vs " + c.g);
+    if (p.options.length !== 4) bad(tag + " graph opts");
+  }
+  if (p.laws) {
+    const R3 = () => [0, 1, 2].map(() => Math.floor(Math.random() * 9) - 4), eq = (a, b) => Array.isArray(a) ? a.every((x, i) => Math.abs(x - b[i]) < 1e-9) : Math.abs(a - b) < 1e-9;
+    const holds = law => { for (let i = 0; i < 40; i++) { const [l, r] = law(R3(), R3(), R3(), Math.floor(Math.random() * 7) - 3); if (!eq(l, r)) return false; } return true; };
+    if (!holds(c.law)) bad(tag + " law marked true fails: " + c.html);
+    for (const w of W) if (holds(w.law)) bad(tag + " law marked false holds: " + w.html);
+  }
+  if (p.line2d) {
+    const { P, d } = p.line2d, ok = l => (l[0] || l[1]) && l[0] * d[0] + l[1] * d[1] === 0 && l[0] * P[0] + l[1] * P[1] + l[2] === 0;
+    if (!ok(c.l)) bad(tag + " 2D line correct wrong"); for (const w of W) if (ok(w.l)) bad(tag + " 2D line distractor right " + w.html);
+  }
+  if (p.sys2) {
+    const ok = v => p.sys2.every(e => e[0] * v[0] + e[1] * v[1] + e[2] === 0) && (!p.onLine2 || (v[0] - p.onLine2.P[0]) * p.onLine2.d[1] - (v[1] - p.onLine2.P[1]) * p.onLine2.d[0] === 0);
+    if (!ok(c.v)) bad(tag + " 2D intersection correct wrong"); for (const w of W) if (ok(w.v)) bad(tag + " 2D intersection distractor right " + w.html);
+  }
+  if (p.sys || p.sysF) {
+    const S2 = p.sys || p.sysF, ok = v => S2.every(e => Math.abs(e[0] * v[0] + e[1] * v[1] + e[2] * v[2] - e[3]) < 1e-6 * Math.max(1, Math.abs(e[3])));
+    if (!ok(c.v)) bad(tag + " system correct wrong " + c.v); for (const w of W) if (ok(w.v)) bad(tag + " system distractor right " + w.html);
+  }
+  if (p.vecForm) {
+    const { n, d } = p.vecForm, ok = ([Q, a, b]) => dot(n, Q) === d && dot(n, a) === 0 && dot(n, b) === 0 && !isZero(cross(a, b));
+    if (!ok(c.vf)) bad(tag + " vector form correct wrong"); for (const w of W) if (ok(w.vf)) bad(tag + " vector form distractor right " + w.html);
+  }
+  const rank = Mx => { const A = Mx.map(r => r.slice()); let rk = 0; for (let col = 0; col < A[0].length && rk < A.length; col++) { let piv = rk; while (piv < A.length && Math.abs(A[piv][col]) < 1e-9) piv++; if (piv === A.length) continue; [A[rk], A[piv]] = [A[piv], A[rk]]; for (let r = 0; r < A.length; r++) if (r !== rk) { const f = A[r][col] / A[rk][col]; for (let k = col; k < A[0].length; k++) A[r][k] -= f * A[rk][k]; } rk++; } return rk; };
+  if (p.planes) {
+    const [a, b] = p.planes, rc = rank([a.slice(0, 3), b.slice(0, 3)]), ra = rank([a, b]);
+    const cs = rc === 2 ? "line" : ra === 2 ? "par" : "same";
+    if (c.cs !== cs) bad(tag + " two-plane case " + c.cs + " vs " + cs);
+  }
+  if (p.planes3) {
+    const P3 = p.planes3, rc = rank(P3.map(r => r.slice(0, 3))), ra = rank(P3);
+    const cs = ra > rc ? "none" : rc === 3 ? "point" : rc === 2 ? "line" : "same";
+    if (c.cs !== cs) bad(tag + " three-plane case " + c.cs + " vs " + cs);
+  }
+  if (p.lines) {
+    const [P, d1, Q, d2] = p.lines, par = isZero(cross(d1, d2));
+    const cs = par ? (isZero(cross(sub(Q, P), d1)) ? "same" : "par") : (dot(sub(Q, P), cross(d1, d2)) === 0 ? "meet" : "skew");
+    if (c.cs !== cs) bad(tag + " line case " + c.cs + " vs " + cs);
+  }
+  if (p.onBoth) {
+    const [P, d1, Q, d2] = p.onBoth, on = (A, d, X) => isZero(cross(sub(X, A), d)), ok = X => on(P, d1, X) && on(Q, d2, X);
+    if (!ok(c.v)) bad(tag + " meeting point wrong"); for (const w of W) if (ok(w.v)) bad(tag + " meeting distractor on both " + w.html);
+  }
+  if (p.bearing) {
+    const [e, n] = p.bearing, th = Math.round(Math.atan(Math.abs(e) / Math.abs(n)) * 180 / Math.PI), b = (n >= 0 ? "N" : "S") + " " + th + "° " + (e >= 0 ? "E" : "W");
+    if (c.b !== b) bad(tag + " bearing " + c.b + " vs " + b); for (const w of W) if (w.b === b) bad(tag + " bearing distractor right");
   }
   if (!p.walk || !p.walk.length) bad(tag + " no walkthrough");
 }
@@ -123,7 +182,7 @@ for (const st of CP.STEPS) {
     if (p.sid === undefined || !p.k) bad(tag + " missing label");
     checkForward(p, tag);
     if (/NaN|undefined|Infinity/.test(p.task + p.expr + p.options.map(o => o.html + (o.ok ? "" : o.why)).join() + p.walk.join())) bad(tag + " junk in text: " + p.task);
-    if (p.truthN === undefined && !p.truthV) bad(tag + " has no independent check");
+    if (p.truthN === undefined && !p.truthV && !["rootsD", "maxOf", "signD", "sys", "sysF", "sys2", "gq", "lines", "planes", "planes3", "plane", "onBoth"].some(k => p[k])) bad(tag + " has no independent check");
     const fz = CP.freeze(p, st.id, 2); if (fz.mode !== "ctx" || !fz.ctx) bad(tag + " freeze");
   }
   /* where this shows up */
@@ -152,7 +211,7 @@ for (const st of CP.STEPS) {
   for (let i = 0; i < Math.ceil(N * 0.8); i++) {
     const tag = st.id + "/rev"; let raw, p;
     try { raw = CP.REV[st.id](3); } catch (e) { bad(tag + " raw threw: " + e.message); break; }
-    if (!raw.cond(raw.correct.test)) bad(tag + " correct option fails its own condition: " + raw.correct.html + " for " + raw.expr);
+    if (raw && !raw.cond(raw.correct.test)) bad(tag + " correct option fails its own condition: " + raw.correct.html + " for " + raw.expr);
     try { p = CP.buildMode(st.id, "rev", 3); } catch (e) { bad(tag + " build: " + e.message); break; }
     total++; revN++;
     if (p.options.length !== 4 || p.options.filter(o => o.ok).length !== 1) bad(tag + " options");
@@ -205,6 +264,19 @@ const ret = t => 6 * (70 - 2 * t) + 3 * (20 + 1.5 * t) + (10 + 0.5 * t);
 chk("lineplane t=10, t=12", ret(10) === 420 && ret(12) === 406);
 chk("dist 4 m and 6 m", (2 * 3 + 6 + 2 * 15 - 30) / 3 === 4 && (2 * 3 + 6 + 2 * 18 - 30) / 3 === 6 && (30 - 6 - 6) / 2 === 9);
 for (const w of CP.WHY) { if (w.wrong.length !== 3) bad("why count"); const k = [w.right, ...w.wrong.map(x => x[0])]; if (new Set(k).size !== 4) bad("why dup"); if (w.wrong.some(x => !x[1])) bad("why missing reason"); }
+
+/* new practicals */
+chk("limits 62/17/12.05", 5000 / 100 + 12 === 62 && 5000 / 1000 + 12 === 17 && Math.abs(5000 / 100000 + 12 - 12.05) < 1e-9);
+chk("fracpow $30/$15/$10", 300 / Math.sqrt(100) === 30 && 300 / Math.sqrt(400) === 15 && 300 / Math.sqrt(900) === 10);
+chk("ratrad q=300 → $18, q=400", Math.sqrt(1800 / 0.02) === 300 && Math.abs(1800 / 300 + 6 + 0.02 * 300 - 18) < 1e-9 && Math.abs(Math.sqrt(3200 / 0.02) - 400) < 1e-9);
+chk("graphs R′ roots 2, 7", [2, 7].every(m => 6 * m * m - 54 * m + 84 === 0));
+chk("sketch week 5, 10", 30 - 6 * 5 === 0 && 30 * 10 - 3 * 100 === 0);
+chk("bearings 10 km, N53E", Math.hypot(8, 6) === 10 && Math.round(Math.atan(8 / 6) * 180 / Math.PI) === 53 && Math.hypot(5, 12) === 13);
+chk("triple 24 and 36", dot([4, 0, 0], cross([1, 3, 0], [0, 1, 2])) === 24 && dot([4, 0, 0], cross([1, 3, 0], [0, 1, 3])) === 36);
+chk("lines2d 300 and 200", Math.abs(30 + 0.1 * 300 - (45 + 0.05 * 300)) < 1e-9 && Math.abs(30 + 0.1 * 200 - (20 + 0.15 * 200)) < 1e-9);
+chk("planeforms (5,10,20)", 4 * 5 + 6 * 10 + 2 * 20 === 120);
+chk("planesys 15000/7500/7500 and 20000/0/10000", Math.abs(0.02 * 15000 + 0.04 * 7500 + 0.06 * 7500 - 1050) < 1e-9 && Math.abs(0.02 * 20000 + 0.06 * 10000 - 1000) < 1e-9);
+chk("skew 30 and 15", dot([0, 50, 30], cross([1, 0, 0], [0, 1, 0])) === 30 && dot([0, 50, 15], cross([1, 0, 0], [0, 1, 0])) === 15);
 
 console.log(fails === 0 ? "ALL CHECKS PASSED: " + total + " problems across " + CP.STEPS.length + " steps (" + (total - spotN - revN - ctxN) + " forward at 3 tiers, " + ctxN + " real situations, " + spotN + " spot the error, " + revN + " work backwards), " + CP.STEPS.length + " real-life calculations x 3 data sets, " + CP.WHY.length + " why-questions, " + Object.values(CP.NOTES).reduce((a, x) => a + x.length, 0) + " real-life notes" : fails + " FAILURES");
 process.exit(fails ? 1 : 0);

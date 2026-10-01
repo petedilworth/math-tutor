@@ -3,6 +3,8 @@
 (function () {
 const $ = (sel, root) => (root || document).querySelector(sel);
 const view = $("#view");
+/* draw any graph specs as soon as they land on the screen */
+if (CP.graph && window.MutationObserver) new MutationObserver(() => CP.graph.hydrate(view)).observe(view, { childList: true, subtree: true });
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const S = () => CP.state();
 let started = null; /* timestamp when the current question was shown */
@@ -90,7 +92,7 @@ function renderToday(dateOverride) {
   /* briefing */
   h += '<section class="card"><div class="row"><p class="kicker">' + dateLabel + ' · lesson ' + (Object.keys(S().lessons).length) + '</p>' +
        '<span class="mono">' + prog.total + ' questions' + (shortened ? " · eased" : "") + '</span></div>' +
-       '<h2>' + step.name + '</h2><p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
+       '<h2>' + step.name + '</h2>' + unitLine(step) + '<p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
        '<div class="rule" style="margin-top:12px;padding:0;border:0;background:none"><div class="rx"><div class="tipb" style="background:var(--tip-soft);padding:9px 10px;border-radius:2px"><b>Memory tip</b>' + step.rule.tip + '</div>' +
        '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care") + '</section>';
   /* dots */
@@ -187,6 +189,29 @@ function renderItem(lesson, answeredIx, stepBackOffer, ev) {
   if (nx) nx.focus({ preventScroll: true });
 }
 
+function unitLine(step) {
+  const u = CP.unitOf(step.id); if (!u) return "";
+  const focus = S().profile.focus, pr = CP.unitProgress(u);
+  return '<p class="small" style="margin:4px 0 0">' + (focus ? "Unit you chose: " : "Unit: ") + '<strong>' + esc(u.name) + '</strong> · ' + pr.mastered + ' of ' + pr.total + ' mastered · <a href="#units">' + (focus ? "change" : "jump to another unit") + '</a></p>';
+}
+
+/* ---------- Units ---------- */
+function renderUnits() {
+  const focus = S().profile.focus, cur = CP.currentStep(S().profile.tracks[0]);
+  let h = '<h1 style="font-size:24px">Units</h1><p class="lede" style="font-size:15px">Work through the course in order, or jump to the unit your class is on. Mastered steps stay mastered, and reviews keep coming from every unit.</p><div class="stack">';
+  h += '<section class="card' + (focus ? "" : " lift") + '"><div class="row"><p class="kicker">Course order</p>' + (focus ? "" : '<span class="mono">current</span>') + '</div><p class="small">The first step you haven’t mastered, from the start of the course.</p>' +
+       (focus ? '<div class="acts"><button class="btn ghost" type="button" data-u="">Go back to course order</button></div>' : "") + '</section>';
+  CP.UNITS.forEach((u, i) => {
+    const pr = CP.unitProgress(u), on = focus === u.id, steps = u.steps.map(id => CP.stepById(id));
+    h += '<section class="card' + (on ? " lift" : "") + '"><div class="row"><p class="kicker">Unit ' + (i + 1) + ' · ' + esc(u.name) + '</p><span class="mono">' + pr.mastered + ' of ' + pr.total + ' mastered</span></div>' +
+      '<div class="uchips">' + steps.map(s => '<a class="uchip ' + (CP.mastered(s.id) ? "done" : s.id === cur.id ? "cur" : "") + '" href="#practice/' + s.id + '">' + esc(s.short) + '</a>').join("") + '</div>' +
+      '<div class="acts">' + (on ? '<span class="small">Today’s lessons come from this unit.</span>' : '<button class="btn ghost" type="button" data-u="' + u.id + '">Work on this unit</button>') + '</div></section>';
+  });
+  h += '</div>';
+  view.innerHTML = h;
+  view.querySelectorAll("[data-u]").forEach(b => b.onclick = () => { CP.setFocus(b.dataset.u || null); location.hash = "#today"; });
+}
+
 /* ---------- Welcome back ---------- */
 function renderWelcome(gap) {
   CP.settleFreezes();
@@ -231,10 +256,11 @@ function renderProgress() {
   h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days · ' + st.freezesBanked + ' freeze' + (st.freezesBanked === 1 ? "" : "s") + ' ❄</span></div>' +
        '<div class="tile"><span class="k">Level ' + lv.n + ' · ' + esc(lv.title) + '</span><span class="v">' + S().points.toLocaleString("en-CA") + '</span><span class="s">points · ' + lv.toNext + ' to next</span></div>' +
        '<div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + ' steps</span></div></div>';
-  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">MCV4U</span></div><div class="map">' + steps.map(s => {
-    const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
-    return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';
-  }).join("") + '</div><div class="legend"><span><i style="background:var(--accent)"></i>mastered</span><span><i style="background:var(--accent-soft);border:1.5px dashed var(--accent)"></i>due for review</span><span><i style="background:var(--surface);border:1.5px solid var(--accent)"></i>working on</span></div><p class="note" style="margin-top:8px">Tap a step to practise it.</p></section>';
+  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div>' + CP.UNITS.map((u, i) =>
+    '<p class="ulab">' + (i + 1) + ' · ' + esc(u.name) + (S().profile.focus === u.id ? ' <span class="tagb">working on</span>' : "") + '</p><div class="map">' + u.steps.map(id => CP.stepById(id)).map(s => {
+      const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
+      return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';
+    }).join("") + '</div>').join("") + '<div class="legend"><span><i style="background:var(--accent)"></i>mastered</span><span><i style="background:var(--accent-soft);border:1.5px dashed var(--accent)"></i>due for review</span><span><i style="background:var(--surface);border:1.5px solid var(--accent)"></i>working on</span></div><p class="note" style="margin-top:8px">Tap a step to practise it.</p></section>';
   h += tiersCard(steps, cur);
   h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks · ' + practised + ' days</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + (d.today ? " today" : "") + '" title="' + d.date + ": " + d.q + '"></span>').join("") + '</div><p class="note" style="margin-top:8px">Darker means more questions. No red squares, ever.</p></section>';
   h += '<section class="card"><p class="kicker">Personal bests</p><div class="list">' +
@@ -280,8 +306,9 @@ function renderTest(arg) {
   const cur = CP.currentStep(S().profile.tracks[0]), hasMastered = !!CP.testSteps("mastered");
   if (testScope === null) { const last = (S().tests || []).slice(-1)[0]; testScope = last ? last.scope : "step"; testLen = last ? last.n : 8; } /* start from the last test's choices */
   if (testScope === "mastered" && !hasMastered) testScope = "step";
-  const best = CP.testBest(testScope, cur.id, testLen);
-  const scopes = [["step", "This step: " + cur.short], ["mastered", "Everything I’ve mastered"], ["course", "Whole course"]];
+  const unit = CP.unitOf(cur.id), sid = testScope === "unit" ? unit.id : cur.id;
+  const best = CP.testBest(testScope, sid, testLen);
+  const scopes = [["step", "This step: " + cur.short], ["unit", "This unit: " + unit.name], ["mastered", "Everything I’ve mastered"], ["course", "Whole course"]];
   let h = '<h1 style="font-size:24px">Test</h1><div class="stack"><section class="card lift"><p class="kicker">A test, on your own terms</p>' +
     '<p class="small">No hints and no answers until the end. Each step comes at its current tier. The clock is for you, not a limit. Close the app mid-test and it waits.</p>' +
     '<div class="field" style="margin-top:12px"><label>What to cover</label><div class="chips">' + scopes.map(([k, n]) => '<button type="button" class="chip" data-scope="' + k + '" aria-pressed="' + (testScope === k) + '"' + (k === "mastered" && !hasMastered ? " disabled" : "") + '>' + esc(n) + (k === "mastered" && !hasMastered ? " · none yet" : "") + '</button>').join("") + '</div>' +
@@ -296,7 +323,7 @@ function renderTest(arg) {
   view.innerHTML = h;
   view.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { testScope = b.dataset.scope; renderTest(); });
   view.querySelectorAll("[data-len]").forEach(b => b.onclick = () => { testLen = Number(b.dataset.len); renderTest(); });
-  $("#tstart").onclick = () => { if (CP.startTest(testScope, testLen, cur.id)) renderTest(); };
+  $("#tstart").onclick = () => { if (CP.startTest(testScope, testLen, sid)) renderTest(); };
 }
 function renderTestQuestion() {
   const T = S().activeTest, i = T.answers.length, it = T.items[i];
@@ -440,7 +467,7 @@ function renderMe() {
 function route() {
   const hash = location.hash.replace(/^#/, "") || "today";
   const [name, arg] = hash.split("/");
-  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.v === (name === "lesson" || name === "practice" ? "today" : name)));
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.v === (name === "lesson" || name === "practice" || name === "units" ? "today" : name)));
   clearInterval(testTimer);
   paintTally();
   if (name === "today") renderToday();
@@ -448,6 +475,7 @@ function route() {
   else if (name === "practice") renderPractice(arg);
   else if (name === "progress") renderProgress();
   else if (name === "test") renderTest(arg);
+  else if (name === "units") renderUnits();
   else if (name === "household") renderHousehold();
   else if (name === "me") renderMe();
   else renderToday();

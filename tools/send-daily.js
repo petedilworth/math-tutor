@@ -14,7 +14,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, Date, JSON, localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} } };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP;
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "notes.js", "generators.js", "generators-more.js", "generators-context.js", "generators-modes.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 let live = {}; try { live = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "docs", "data", "live.json"), "utf8")); } catch (e) {}
 const liveFresh = live.asOf && (Date.now() - Date.parse(live.asOf)) / 86400000 <= 4;

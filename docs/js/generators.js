@@ -518,13 +518,16 @@ CP.G.lines = function (tier) {
 };
 
 /* Build a ready-to-render problem: dedupe options, shuffle, retry if a generator cannot produce three distinct traps. */
-const keyOf = h => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, "");
+/* text of an option for spotting duplicates; a drawn graph counts by its spec */
+const keyOf = h => String(h).replace(/<span class="gph[^"]*" data-g="([^"]*)"[^>]*><\/span>/g, "[graph $1]").replace(/<[^>]+>/g, "").replace(/\s+/g, "");
 CP.build = function (stepId, tier) {
   const gen = CP.G[stepId];
   for (let tries = 0; tries < 60; tries++) {
     const p = gen(tier);
+    if (!p) continue; /* a generator may reject its random numbers and ask for another draw */
     const seen = new Set([keyOf(p.correct.html)]), w = [];
-    for (const o of p.wrong) { const k = keyOf(o.html); if (!seen.has(k)) { seen.add(k); w.push(o); } }
+    const cn = p.correct.n;
+    for (const o of p.wrong) { const k = keyOf(o.html); if (typeof cn === "number" && typeof o.n === "number" && Math.abs(o.n - cn) < 1e-12) continue; if (!seen.has(k)) { seen.add(k); w.push(o); } }
     if (w.length >= 3) {
       p.wrong = w.slice(0, 3);
       p.options = shuffle([Object.assign({ ok: true }, p.correct)].concat(p.wrong.map(o => Object.assign({ ok: false }, o))));

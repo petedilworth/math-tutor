@@ -53,6 +53,7 @@ const ask = "A student worked this out. One line has a mistake. Which line?";
 
 CP.SPOT = {};
 CP.REV = {};
+CP.h.mkSpot = mkSpot; CP.h.ask = ask;
 
 /* ================= exponents ================= */
 CP.SPOT.exp = function () {

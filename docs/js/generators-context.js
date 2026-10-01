@@ -659,7 +659,7 @@ CP.buildCtx = function (stepId, sid) {
     const p = fn();
     if (!p) continue;
     const seen = new Set([keyOf(p.correct.html)]), w = [];
-    for (const o of p.wrong) { const k = keyOf(o.html); if (!seen.has(k)) { seen.add(k); w.push(o); } }
+    for (const o of p.wrong) { const k = keyOf(o.html); if (typeof p.correct.n === "number" && typeof o.n === "number" && Math.abs(o.n - p.correct.n) < 1e-12) continue; if (!seen.has(k)) { seen.add(k); w.push(o); } }
     if (w.length < 3) continue;
     p.wrong = w.slice(0, 3); p.mode = "ctx"; p.prose = p.correct.html.length > 18;
     p.options = shuffle([Object.assign({ ok: true }, p.correct)].concat(p.wrong.map(o => Object.assign({ ok: false }, o))));

@@ -17,6 +17,10 @@ On a phone, open that address, use the browser's share or menu button, and choos
 | `js/generators.js` | The code that invents fresh problems, the forward problems at tiers 1 to 3 (Easy, Medium, Hard) for the first 14 steps. Verified by `tools/verify.js`. |
 | `js/content-more.js` | Ten more MCV4U steps (first principles through distance to a plane), the five tier names, and the full 24-step order. |
 | `js/generators-more.js` | Forward problems for those ten steps. |
+| `js/content-full.js` | Twelve steps that complete the course (limits, roots and powers, rational and radical, ln and eˣ, graphs of f′, sketching, bearings, vector laws, 2D lines, plane forms, planes meeting, skew lines), the seven units, and the 36-step order. |
+| `js/notes-full.js` | "Where this shows up" for those twelve steps. |
+| `js/graphs.js` | Drawn graphs. Questions store a short spec such as `p:0,-3,0,1`; this file draws it as an SVG when it reaches the screen. |
+| `js/generators-full.js` | Every kind of question for the twelve new steps. |
 | `js/notes.js` | "Where this shows up": eight real places each step's idea appears, about half money and half the rest of life. One follows every question. The easiest file to add to. |
 | `js/generators-context.js` | Questions set in real situations, two or three scenarios per step with fresh numbers each time. Mixed in from Hard up, and used as the real-life item on most lessons. |
 | `js/generators-modes.js` | Expert and Master: spot the error and work backwards for all 24 steps, and the dispatcher that mixes them in. |
