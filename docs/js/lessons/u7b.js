@@ -157,7 +157,7 @@ CP.LESSONS.planesys = {
     {
       h: "Two planes: tilt one until they stop crossing",
       text: "The teal plane is x + y + z = 2. The purple plane has normal n₂ = (1 + k, 1 − k, 1), so the tilt k turns it, and d₂ slides it. The orange line is where they cross. Its direction is n₁ × n₂.",
-      widget: { type: "vec3", range: 5, yaw: -0.7, pitch: 0.4,
+      widget: { type: "vec3", range: 5, yaw: 2.0, pitch: 0.4,
         params: [{ name: "k", label: "tilt k", min: -1, max: 1, step: 0.1, val: 1, show: v => fmt(v, 1) },
                  { name: "d2", label: "d₂", min: -4, max: 6, step: 0.5, val: 4, show: v => fmt(v, 1) }],
         scene: (p, V) => {
@@ -182,7 +182,7 @@ CP.LESSONS.planesys = {
     {
       h: "Three planes: one point, a line, or nothing",
       text: "Teal: x + z = 3. Purple: y + z = 1. They cross along the dashed orange line. The grey plane is x − y + kz = d₃. Take purple from teal to get x − y = 2. Take that from grey: x and y vanish, and kz = d₃ − 2 is left. The readout shows it.",
-      widget: { type: "vec3", range: 5, yaw: -0.5, pitch: 0.4,
+      widget: { type: "vec3", range: 5, yaw: 1.3, pitch: 0.4,
         params: [{ name: "k", label: "tilt k", min: -2, max: 2, step: 0.1, val: 1, show: v => fmt(v, 1) },
                  { name: "d3", label: "d₃", min: -2, max: 6, step: 0.5, val: 4, show: v => fmt(v, 1) }],
         scene: (p, V) => {
@@ -190,8 +190,8 @@ CP.LESSONS.planesys = {
             { t: "plane", n: PS.n1, d: PS.d1, c: 1, size: 3.6 },
             { t: "plane", n: PS.n2, d: PS.d2, c: 2, size: 3.6 },
             { t: "plane", n: n3, d: p.d3, c: 5, size: 3.6 },
-            { t: "line", p: L12, d: V.cross(PS.n1, PS.n2), c: 3, dash: true }];
-          [[PS.n1, PS.d1], [PS.n2, PS.d2]].forEach(([n, d]) => { const X = meet2(n, d, n3, p.d3); if (X) o.push({ t: "line", p: X, d: V.cross(n, n3), c: 5 }); });
+            { t: "line", p: L12, d: V.cross(PS.n1, PS.n2), c: 3, dash: !(Math.abs(p.k) < 1e-9 && Math.abs(p.d3 - 2) < 1e-9), label: Math.abs(p.k) < 1e-9 && Math.abs(p.d3 - 2) < 1e-9 ? "shared line" : "" }];
+          if (!(Math.abs(p.k) < 1e-9 && Math.abs(p.d3 - 2) < 1e-9)) [[PS.n1, PS.d1], [PS.n2, PS.d2]].forEach(([n, d]) => { const X = meet2(n, d, n3, p.d3); if (X) o.push({ t: "line", p: X, d: V.cross(n, n3), c: 5 }); });
           if (Math.abs(p.k) > 1e-9) { const z = (p.d3 - 2) / p.k, X = [3 - z, 1 - z, z]; if (inBox(X)) o.push({ t: "pt", at: X, c: 3, label: "meet" }); }
           return o;
         },
