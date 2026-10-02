@@ -394,7 +394,7 @@ CP.LESSONS.planeforms = {
     {
       h: "Where the normal comes from",
       text: "Now u = (2, 1, 0) is fixed and you control v = (a, 1, c). The plane passes through P = (1, 0, 1). The green arrow is n = u × v. Watch n · u and n · v as you move the sliders.",
-      widget: { type: "vec3", range: 4, yaw: -0.5, pitch: 0.6,
+      widget: { type: "vec3", range: 4, yaw: -0.9, pitch: 0.3,
         params: [{ name: "a", label: "a", min: -2, max: 3, step: 0.5, val: -1 }, { name: "c", label: "c", min: -2, max: 2, step: 0.5, val: -2 }],
         scene: (p, V) => {
           const v = gv(p), n = V.cross(GU, v), ok = V.norm(n) > 1e-9;

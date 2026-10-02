@@ -602,7 +602,8 @@ function vec2(el, cfg, emit) {
     for (let i = -R; i <= R; i++) { s += ln(F.sx(i), F.y0, F.sx(i), F.y0 + F.h, i ? "wgrid" : "waxis") + ln(F.x0, F.sy(i), F.x0 + F.w, F.sy(i), i ? "wgrid" : "waxis"); }
     return s;
   };
-  const cid = clipId(), clipDef = '<defs><clipPath id="' + cid + '"><rect x="0" y="0" width="' + W + '" height="' + H + '"/></clipPath></defs>';
+  const cid = clipId(), gid = clipId(), clipDef = '<defs><clipPath id="' + cid + '"><rect x="0" y="0" width="' + W + '" height="' + H + '"/></clipPath><clipPath id="' + gid + '"><rect x="' + F.x0 + '" y="' + F.y0 + '" width="' + F.w + '" height="' + F.h + '"/></clipPath></defs>';
+  const inGrid = el => '<g clip-path="url(#' + gid + ')">' + el + '</g>';
   function draw() {
     const S = st(); let s = grid();
     const O = P([0, 0]);
@@ -627,7 +628,7 @@ function vec2(el, cfg, emit) {
     } else if (mode === "dot") {
       const U = P(u), Vv = P(v), nv2 = V.dot(v, v) || 1, pr = V.scale(v, S.dot / nv2), Pp = P(pr);
       const cls = Math.abs(S.dot) < 1e-9 ? "s5" : S.dot > 0 ? "s4" : "s3";
-      s += ln(F.sx(-v[0] * R), F.sy(-v[1] * R), F.sx(v[0] * R), F.sy(v[1] * R), "wguide");
+      s += inGrid(ln(F.sx(-v[0] * R), F.sy(-v[1] * R), F.sx(v[0] * R), F.sy(v[1] * R), "wguide"));
       s += ln(U[0], U[1], Pp[0], Pp[1], "wguide wdash") + arrow(O[0], O[1], Pp[0], Pp[1], cls + " wvec wthick");
       s += arrow(O[0], O[1], U[0], U[1], "s1 wvec") + arrow(O[0], O[1], Vv[0], Vv[1], "s2 wvec");
       const a1 = Math.atan2(u[1], u[0]), a2 = Math.atan2(v[1], v[0]); let da = a2 - a1; while (da > PI) da -= 2 * PI; while (da < -PI) da += 2 * PI; const r = 22;
@@ -650,7 +651,7 @@ function vec2(el, cfg, emit) {
       readouts(ro, [["east", fmt(S.res[0], 2)], ["north", fmt(S.res[1], 2)], ["distance", fmt(S.resD, 2)], ["bearing", S.resD < 1e-9 ? "none" : String(Math.round(S.resB) % 360).padStart(3, "0") + "°"]]);
     } else if (mode === "line") {
       const A = P(u), D = P(V.add(u, v)), pt = P(S.pt);
-      s += ln(F.sx(u[0] - v[0] * 3 * R), F.sy(u[1] - v[1] * 3 * R), F.sx(u[0] + v[0] * 3 * R), F.sy(u[1] + v[1] * 3 * R), "s1 wthin");
+      s += inGrid(ln(F.sx(u[0] - v[0] * 3 * R), F.sy(u[1] - v[1] * 3 * R), F.sx(u[0] + v[0] * 3 * R), F.sy(u[1] + v[1] * 3 * R), "s1 wthin"));
       const nE = P(V.add(u, V.scale(V.unit(S.n), 2)));
       if (cfg.showNormal !== false) s += arrow(A[0], A[1], nE[0], nE[1], "s4 wvec") + tx(nE[0] + 4, nE[1] - 4, "normal", "wlab sm s4t");
       s += arrow(A[0], A[1], D[0], D[1], "s2 wvec") + tx(D[0] + 6, D[1] - 6, "d", "wlab s2t");
