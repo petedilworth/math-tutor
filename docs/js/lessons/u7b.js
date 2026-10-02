@@ -35,14 +35,14 @@ CP.LESSONS.lineplane = {
     {
       h: "Slide along the line until you hit the plane",
       text: "The teal plane is 2x + y + 2z = 4. The orange dot moves along the line r = (1, 2, 3) + t(0, −1, −1) as you change t. The readout puts the dot’s x, y and z into 2x + y + 2z and takes away 4. When that gap is 0, the dot is on the plane.",
-      widget: { type: "vec3", range: 5, yaw: -0.9, pitch: 0.35,
+      widget: { type: "vec3", range: 5, yaw: 0.3, pitch: 0.35,
         params: [{ name: "t", label: "t", min: -1, max: 3, step: 0.1, val: -1, show: v => fmt(v, 1) }],
         scene: (p, V) => {
           const r = V.add(LP.P, V.scale(LP.d, p.t));
           return [
             { t: "plane", n: LP.n, d: 4, c: 1, size: 4 },
             { t: "line", p: LP.P, d: LP.d, c: 2, label: "line" },
-            { t: "vec", from: [1, 0, 1], to: V.scale(V.unit(LP.n), 1.6), c: 4, label: "n" },
+            { t: "vec", from: [-1, 2, 2], to: V.scale(V.unit(LP.n), 1.6), c: 4, label: "n" },
             { t: "pt", at: LP.P, c: 5, label: "P" },
             { t: "pt", at: r, c: 3, label: "t = " + fmt(p.t, 1) }
           ];
@@ -62,8 +62,8 @@ CP.LESSONS.lineplane = {
     },
     {
       h: "Tilt the line until it runs parallel",
-      text: "The line now pivots about P = (1, 2, 3). Its direction is d = (1, −a, −1 − a), so the tilt a turns it. The plane is 2x + y + 2z = D, and D slides it. The purple arrow is d and the green arrow is the normal n. Watch n · d and the crossing.",
-      widget: { type: "vec3", range: 5, yaw: -0.9, pitch: 0.35,
+      text: "The line now pivots about P = (1, 2, 3), the grey dot. Its direction is d = (1, −a, −1 − a), so the tilt a turns it. The plane is 2x + y + 2z = D, and D slides it. The purple arrow is d and the green arrow is the normal n. Watch n · d and the crossing.",
+      widget: { type: "vec3", range: 5, yaw: 0.3, pitch: 0.35,
         params: [{ name: "a", label: "tilt a", min: -1, max: 1, step: 0.05, val: 1, show: v => fmt(v, 2) },
                  { name: "D", label: "plane’s D", min: -2, max: 10, step: 0.5, val: 4, show: v => fmt(v, 1) }],
         scene: (p, V) => {
@@ -72,7 +72,7 @@ CP.LESSONS.lineplane = {
             { t: "line", p: LP.P, d, c: 2 },
             { t: "vec", from: LP.P, to: d, c: 2, label: "d" },
             { t: "vec", from: LP.P, to: V.scale(V.unit(LP.n), 1.6), c: 4, label: "n" },
-            { t: "pt", at: LP.P, c: 5, label: "P" }];
+            { t: "pt", at: LP.P, c: 5 }];
           if (Math.abs(nd) > 1e-9) { const X = V.add(LP.P, V.scale(d, (p.D - 10) / nd)); if (inBox(X)) o.push({ t: "pt", at: X, c: 3, label: "crossing" }); }
           return o;
         },
