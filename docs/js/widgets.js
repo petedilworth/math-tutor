@@ -698,12 +698,13 @@ function vec3(el, cfg, emit) {
   const ro = h("div", "wros"); box.append(ro);
   const ctr = h("div", "wctl"); box.append(ctr);
   const sc = Math.min(W, H) / (R * 3.1);
-  /* z is up. Turn about z by yaw, then tip by pitch. */
+  /* z is up. Turn about z by yaw, then tip by pitch: a positive pitch looks down from above,
+     so x, y, z appear right-handed (from above, x turns anticlockwise to y). D grows away from the viewer. */
   function proj(a) {
     const [x, y, z] = a, cy = Math.cos(yaw), sy = Math.sin(yaw);
     const X = x * cy - y * sy, Y = x * sy + y * cy; /* Y points into the screen before tipping */
     const cp = Math.cos(pitch), sp = Math.sin(pitch);
-    const Z2 = z * cp - Y * sp, D = Y * cp + z * sp;
+    const Z2 = z * cp + Y * sp, D = Y * cp - z * sp;
     return [W / 2 + X * sc, H / 2 - Z2 * sc, D];
   }
   const state = () => ST.vec3(cfg, p, yaw, pitch);

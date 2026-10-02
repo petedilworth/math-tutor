@@ -1,7 +1,7 @@
 /* Chalk and Paper – offline support.
    The app shell is cached so the site opens without signal. Live data is fetched fresh when it can be. */
-const CACHE = "chalk-paper-v10";
-const SHELL = ["./", "index.html", "app.css", "js/config.js", "js/content.js", "js/content-more.js", "js/content-full.js", "js/notes-kit.js", "js/notes/u1a.js", "js/notes/u1b.js", "js/notes/u2a.js", "js/notes/u2b.js", "js/notes/u3.js", "js/notes/u4.js", "js/notes/u6.js", "js/notes/u7a.js", "js/notes/u7b.js", "js/generators.js", "js/graphs.js", "js/generators-more.js", "js/generators-context.js", "js/generators-modes.js", "js/generators-full.js", "js/engine.js", "js/sync.js", "js/app.js", "js/coverage.js", "share.html", "coverage.html", "manifest.webmanifest", "icon.svg"];
+const CACHE = "chalk-paper-v11";
+const SHELL = ["./", "index.html", "app.css", "js/config.js", "js/content.js", "js/content-more.js", "js/content-full.js", "js/notes-kit.js", "js/notes/u1a.js", "js/notes/u1b.js", "js/notes/u2a.js", "js/notes/u2b.js", "js/notes/u3.js", "js/notes/u4.js", "js/notes/u6.js", "js/notes/u7a.js", "js/notes/u7b.js", "js/generators.js", "js/graphs.js", "js/generators-more.js", "js/generators-context.js", "js/generators-modes.js", "js/generators-full.js", "js/engine.js", "js/sync.js", "js/app.js", "js/coverage.js", "js/widgets.js", "js/lesson.js", "js/lessons/u1.js", "js/lessons/u2a.js", "js/lessons/u2b.js", "js/lessons/u3a.js", "js/lessons/u3b.js", "js/lessons/u4.js", "js/lessons/u6a.js", "js/lessons/u6b.js", "js/lessons/u7a.js", "js/lessons/u7b.js", "share.html", "coverage.html", "lesson.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

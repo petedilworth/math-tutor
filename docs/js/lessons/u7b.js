@@ -281,8 +281,8 @@ CP.LESSONS.skew = {
   see: [
     {
       h: "Lift one line over the other",
-      text: "Line 1 (teal) is r = (−1, −2, −1) + t(1, 1, 0). Line 2 (purple) is level too: its direction is (cos θ, sin θ, 0), and h lifts it. Seen from straight above, the two lines cross unless they are parallel. Turn the picture to check whether they really do.",
-      widget: { type: "vec3", range: 5, yaw: -0.5, pitch: 0.3,
+      text: "Line 1 (teal) is r = (−1, −2, −1) + t(1, 1, 0). Both lines are level: z never changes along them. Line 2 (purple) has direction (cos θ, sin θ, 0), and h lifts it. Seen from straight above, the two lines cross unless they are parallel. Turn the picture to check whether they really do.",
+      widget: { type: "vec3", range: 5, yaw: -1.2, pitch: 0.5,
         params: [{ name: "th", label: "angle θ", min: 0, max: 180, step: 5, val: 120, show: v => fmt(v, 0) + "°" },
                  { name: "h", label: "lift h", min: -3, max: 3, step: 0.5, val: 2, show: v => fmt(v, 1) }],
         scene: (p, V) => {
@@ -290,7 +290,7 @@ CP.LESSONS.skew = {
             { t: "line", p: OV.P, d: OV.d1, c: 1, label: "line 1" },
             { t: "line", p: Q, d: ovD2(p.th), c: 2, label: "line 2" },
             { t: "pt", at: [1, 0, -1], c: 1 }];
-          if (Math.abs(p.h) > 1e-9) o.push({ t: "seg", a: [1, 0, -1], b: Q, c: 5, dash: true }, { t: "pt", at: Q, c: 2 });
+          if (Math.abs(p.h) > 1e-9) o.push({ t: "seg", a: [1, 0, -1], b: Q, c: 3, dash: true }, { t: "pt", at: Q, c: 2 });
           else if (!ovPar(p.th)) o.push({ t: "pt", at: [1, 0, -1], c: 3, label: "meet" });
           return o;
         },
@@ -407,7 +407,7 @@ CP.LESSONS.dist = {
     {
       h: "Move a point and watch its distance",
       text: "The teal plane is 2x + y + 2z = 4, with normal n = (2, 1, 2). The orange point Q moves up and down with z, and sideways with w. The green segment is the shortest path, along the normal. The grey dashed segment drops straight down.",
-      widget: { type: "vec3", range: 5, yaw: -0.4, pitch: 0.3,
+      widget: { type: "vec3", range: 5, yaw: 2.3, pitch: 0.3,
         params: [{ name: "z", label: "height z", min: -4, max: 5, step: 0.5, val: 3, show: v => fmt(v, 1) },
                  { name: "w", label: "slide w", min: -2, max: 2, step: 0.5, val: 0, show: v => fmt(v, 1) }],
         scene: (p, V) => {
@@ -426,16 +426,16 @@ CP.LESSONS.dist = {
         ] },
       tasks: [
         { ask: "Lower Q until it is on the plane.", check: s => Math.abs(s.z - 0.5) < 0.01, got: "At z = 0.5 the top is 0: Q makes 2x + y + 2z = 4 true. The distance is 0." },
-        { ask: "Raise Q until it is exactly 3 from the plane.", check: s => s.z > 0.5 && near(Math.abs(2 * s.z - 1) / 3, 3, 0.01), got: "z = 5. The top is 9, and 9 ÷ 3 = 3. But the drop straight down is 4.5: a sloped plane is closer than the point directly below." },
+        { ask: "Raise Q until it is exactly 3 from the plane.", check: s => s.z > 0.5 && near(Math.abs(2 * s.z - 1) / 3, 3, 0.01), got: "z = 5. The top is 9, and 9 ÷ 3 = 3. But the drop straight down is 4.5. On a sloped plane the shortest path is slanted, not straight down." },
         { ask: "Now slide Q sideways with w.", check: s => Math.abs(s.w) >= 0.49 && near(Math.abs(2 * s.z - 1) / 3, 3, 0.01), got: "Still 3. The slide runs along (1, −2, 0), and (1, −2, 0) · n = 0. So Q moves parallel to the plane and gets no closer." },
         { ask: "Find a spot 3 from the plane on the other side.", check: s => s.z < 0.5 && near(Math.abs(2 * s.z - 1) / 3, 3, 0.01), got: "z = −4. The top is −9 now. The sign tells you which side Q is on; the absolute value gives the distance, 3." }
       ],
-      after: "The top, n · Q − d, measures how far Q is from fitting the equation. Here it is always 3 times the true distance, because |n| = 3. Dividing by |n| corrects that. The shortest path runs along the normal, and it is straight down only when the plane is level."
+      after: "The top, n · Q − d, measures how far Q is from fitting the equation. Here its size is always 3 times the true distance, because |n| = 3. Dividing by |n| corrects that. The shortest path runs along the normal, and it is straight down only when the plane is level."
     },
     {
       h: "Double the equation: the distance must not change",
       text: "Teal: 2x + y + 2z = 4. Purple: 4x + 2y + 4z = D, a parallel plane written with doubled numbers. The green segment is the gap between them, along the normal. Move D and read the distance.",
-      widget: { type: "vec3", range: 5, yaw: -0.4, pitch: 0.3,
+      widget: { type: "vec3", range: 5, yaw: 2.3, pitch: 0.3,
         params: [{ name: "D", label: "D", min: -10, max: 20, step: 1, val: 14, show: v => fmt(v, 0) }],
         scene: (p, V) => {
           const A = V.scale(DN, 4 / 9), B = V.scale(DN, p.D / 18), o = [

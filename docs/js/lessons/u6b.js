@@ -39,7 +39,7 @@ CP.LESSONS.angle = {
     {
       h: "Angles you can’t see: the same rule in 3D",
       text: "Here v = (2, 2, 1) points up out of the floor, and u, of length 3, turns around in the floor. Both have length 3, so |u||v| = 9 and cos θ = u · v ÷ 9. The orange arrow is the vector projection of u on v.",
-      widget: { type: "vec3", range: 3, yaw: 0.3, pitch: -0.6,
+      widget: { type: "vec3", range: 3, yaw: 0.3, pitch: 0.6,
         params: [{ name: "phi", label: "turn u", min: 0, max: 360, step: 1, val: 0, show: v => Math.round(v) + "°" }],
         scene: (p, V) => {
           const u = AU(p), k = V.dot(u, AV) / 9, pr = V.scale(AV, k);
@@ -148,7 +148,7 @@ CP.LESSONS.crossp = {
     {
       h: "Its length is the area",
       text: "u lies along the x-axis. v has length 2 and turns in the floor. The shaded parallelogram is the one u and v make. The orange arrow is u × v. Drag the picture to look from the side.",
-      widget: { type: "vec3", range: 4, yaw: -0.5, pitch: -0.45,
+      widget: { type: "vec3", range: 4, yaw: -0.5, pitch: 0.45,
         params: [{ name: "phi", label: "turn v", min: 0, max: 360, step: 1, val: 40, show: v => Math.round(v) + "°" }],
         scene: (p, V) => {
           const v = CV1(p), w = V.cross(CU1, v);
@@ -176,7 +176,7 @@ CP.LESSONS.crossp = {
     {
       h: "Always at right angles to both",
       text: "Now u = (2, 1, 0) lies in the floor and v = (−1, 1, h) can lift out of it. The dashed line drops from v’s tip to the floor. The last two readouts test the right angles.",
-      widget: { type: "vec3", range: 4, yaw: -1.2, pitch: -0.42,
+      widget: { type: "vec3", range: 4, yaw: -1.2, pitch: 0.42,
         params: [{ name: "h", label: "lift v (h)", min: -2, max: 2, step: 0.5, val: 1.5, show: v => fmt(v, 1) },
                  { name: "order", label: "order", min: 0, max: 1, step: 1, val: 0, show: v => v >= 0.5 ? "v × u" : "u × v" }],
         scene: (p, V) => {
@@ -298,7 +298,7 @@ CP.LESSONS.triple = {
     {
       h: "Volume is base times height",
       text: "The base is the parallelogram of v = (3, 0, 0) and w = (1, 2, 0), so v × w = (0, 0, 6) and the base area is 6. The third edge is u = (0, a, h). Slide it sideways or change its height and watch the volume.",
-      widget: { type: "vec3", range: 4, yaw: -0.5, pitch: -0.35,
+      widget: { type: "vec3", range: 4, yaw: -0.5, pitch: 0.35,
         params: [{ name: "a", label: "slide u (a)", min: -2, max: 2, step: 0.5, val: 0, show: v => fmt(v, 1) },
                  { name: "h", label: "height of u (h)", min: -2, max: 3, step: 0.25, val: 2, show: v => fmt(v, 2) }],
         scene: (p, V) => {
@@ -329,7 +329,7 @@ CP.LESSONS.triple = {
     {
       h: "When is the box flat?",
       text: "u = (1, 0, 1) and v = (0, 2, 1) are fixed, and the grey square is the plane they lie in. Their parallelogram is the base. Slide k to move w = (2, 1, k). The dashed line is w’s height off that plane.",
-      widget: { type: "vec3", range: 4, yaw: 0.4, pitch: -0.3,
+      widget: { type: "vec3", range: 4, yaw: 0.4, pitch: 0.3,
         params: [{ name: "k", label: "k", min: -2, max: 3, step: 0.5, val: 0, show: v => fmt(v, 1) }],
         scene: (p, V) => {
           const w = PW(p), t = V.dot(w, PN) / 9, foot = V.sub(w, V.scale(PN, t));
