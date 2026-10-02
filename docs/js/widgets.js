@@ -254,12 +254,12 @@ function tracer(el, cfg, emit) {
     if (panel2) {
       s += axes(G, ticks, { ywant: 3, noXLabels: false });
       s += '<g clip-path="url(#' + c2.id + ')">';
-      if (cfg.ghost && ghost) s += '<path d="' + pathOf(G, cfg.ghost, p, xr[0], xr[1]) + '" class="wcurve s4 wghost"/>';
+      if (cfg.ghost && ghost) s += '<path d="' + pathOf(G, cfg.ghost, p, xr[0], xr[1]) + '" class="wcurve ' + (cfg.ghostWrong ? "s3" : "s4") + ' wghost"/>';
       const pts = Array.from(seen.entries()).sort((a, b) => a[0] - b[0]);
       for (const [, v] of pts) if (isFinite(v[1])) s += dot(G.sx(v[0]), G.sy(v[1]), "f2 wtr", 2.2);
       if (isFinite(m)) s += ln(G.sx(x), G.sy(0 > dyr[0] && 0 < dyr[1] ? 0 : dyr[0]), G.sx(x), G.sy(m), "wguide") + dot(G.sx(x), G.sy(clamp(m, dyr[0], dyr[1])), "f2", 5);
       s += '</g>' + tx(G.x0 + 6, G.y0 + 13, cfg.dlabel || "slope", "wlab s2t");
-      if (cfg.ghost && ghost) s += tx(G.x0 + G.w - 6, G.y0 + 13, cfg.ghostLabel || "", "wlab s4t", "end");
+      if (cfg.ghost && ghost) s += tx(G.x0 + G.w - 6, G.y0 + 13, cfg.ghostLabel || "", "wlab " + (cfg.ghostWrong ? "s3t" : "s4t"), "end");
     }
     svg.innerHTML = s;
     const st = state();

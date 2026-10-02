@@ -32,7 +32,7 @@ CP.LESSONS.prod = {
       h: "Why u′v′ fails",
       text: "Here y = (x + 1)(x − 2), so u = x + 1 and v = x − 2. Both have slope 1, so the guess u′v′ says the slope is 1 × 1 = 1 everywhere. Drag along the curve and compare the slope with the two formulas in the readouts.",
       widget: { type: "tracer", f: x => (x + 1) * (x - 2), df: x => 2 * x - 1, x: [-2, 3], y: [-3, 5], dy: [-5.5, 7], x0: 2, ticks: 1,
-        label: "y = (x + 1)(x − 2)", dlabel: "slope", ghost: () => 1, ghostLabel: "u′v′",
+        label: "y = (x + 1)(x − 2)", dlabel: "slope", ghost: () => 1, ghostLabel: "u′v′", ghostWrong: true,
         readouts: [{ label: "u′v + uv′", value: s => fmt((s.x - 2) + (s.x + 1), 3) }, { label: "u′v′", value: () => "1" }] },
       tasks: [
         { ask: "Drag to the bottom of the U.", check: s => near(s.x, 0.5, 0.04),
@@ -138,7 +138,7 @@ CP.LESSONS.chain = {
       h: "The factor people forget",
       text: "This curve is y = (kx + 1)³, and the slider sets k, the slope of the inside. The dashed curve is 3(kx + 1)²: the answer you get if you forget to multiply by the inside’s derivative. The last readout divides the true slope by the dashed one.",
       widget: { type: "tracer", f: (x, k) => Math.pow(k * x + 1, 3), df: (x, k) => 3 * k * Math.pow(k * x + 1, 2), x: [-1, 0.5], x0: 0, ticks: 0.5,
-        label: "y = (kx + 1)³", dlabel: "slope", ghost: (x, k) => 3 * Math.pow(k * x + 1, 2), ghostLabel: "3(kx + 1)²",
+        label: "y = (kx + 1)³", dlabel: "slope", ghost: (x, k) => 3 * Math.pow(k * x + 1, 2), ghostLabel: "3(kx + 1)²", ghostWrong: true,
         param: { name: "k", label: "k, the inside’s slope", min: 1, max: 3, step: 0.1, val: 2, show: v => fmt(v, 1) },
         readouts: [{ label: "slope ÷ dashed", value: s => { const g = 3 * Math.pow(s.p * s.x + 1, 2); return g < 1e-9 ? "0 ÷ 0" : fmt(s.m / g, 3); } }] },
       tasks: [
@@ -230,7 +230,7 @@ CP.LESSONS.combo = {
         readouts: [{ label: "u′v", value: s => fmt(Math.pow(s.x - 2, 3), 3) }, { label: "uv′", value: s => fmt(3 * s.x * Math.pow(s.x - 2, 2), 3) }] },
       tasks: [
         { ask: "Find the bottom of the dip.", check: s => near(s.x, 0.5, 0.025),
-          got: "Slope about 0 at x = 0.5. Here u′v ≈ −3.375 and uv′ ≈ 3.375: the two halves cancel." },
+          got: "Slope about 0 at x = 0.5. Here u′v is about −3.4 and uv′ is about 3.4: the two halves cancel." },
         { ask: "There is a second flat spot. Find it.", check: s => near(s.x, 2, 0.025),
           got: "At x = 2 both halves are 0, because each one contains (x − 2). The curve flattens for a moment, then keeps climbing. Flat does not always mean a turn." },
         { ask: "Press Sweep, or drag all the way across, to trace every slope.", check: s => s.covered > 0.85,
@@ -244,7 +244,7 @@ CP.LESSONS.combo = {
       h: "Forget the chain factor, miss the peak",
       text: "Now y = x(2x − 3)². Here v′ = 2(2x − 3) · 2, and the last 2 is the inside’s slope. The dashed curve is the slope you get if you drop it. Look where each one says the slope is zero.",
       widget: { type: "tracer", f: x => x * Math.pow(2 * x - 3, 2), df: x => (2 * x - 3) * (6 * x - 3), x: [0, 2], y: [-0.4, 2.6], dy: [-4, 12.5], x0: 1.1, ticks: 0.5,
-        label: "y = x(2x − 3)²", dlabel: "slope", ghost: x => (2 * x - 3) * (4 * x - 3), ghostLabel: "the wrong slope" },
+        label: "y = x(2x − 3)²", dlabel: "slope", ghost: x => (2 * x - 3) * (4 * x - 3), ghostLabel: "the wrong slope", ghostWrong: true },
       tasks: [
         { ask: "Find the top of the hump.", check: s => near(s.x, 0.5, 0.015),
           got: "Slope about 0 at x = 0.5, at height 2. That is the real peak." },
@@ -353,7 +353,7 @@ CP.LESSONS.ratrad = {
       h: "A root with an inside",
       text: "This is y = √(x² + 5) = (x² + 5)<sup>1/2</sup>. The dashed curve is 1 ÷ (2√(x² + 5)): the power rule alone, without the chain rule’s factor. The last readout divides the true slope by it.",
       widget: { type: "tracer", f: x => Math.sqrt(x * x + 5), df: x => x / Math.sqrt(x * x + 5), x: [-3, 3], y: [2, 4], dy: [-1, 1.4], x0: 1, ticks: 1,
-        label: "y = √(x² + 5)", dlabel: "slope", ghost: x => 1 / (2 * Math.sqrt(x * x + 5)), ghostLabel: "1 ÷ (2√(x² + 5))",
+        label: "y = √(x² + 5)", dlabel: "slope", ghost: x => 1 / (2 * Math.sqrt(x * x + 5)), ghostLabel: "1 ÷ (2√(x² + 5))", ghostWrong: true,
         readouts: [{ label: "slope ÷ dashed", value: s => fmt(s.m * 2 * Math.sqrt(s.x * s.x + 5), 3) }] },
       tasks: [
         { ask: "Drag to the bottom of the curve.", check: s => near(s.x, 0, 0.04),
