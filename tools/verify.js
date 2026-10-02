@@ -9,7 +9,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, isFinite, Infinity };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP; /* browser: window is the global object */
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "coverage.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "content-full.js", "notes-kit.js", "notes/u1a.js", "notes/u1b.js", "notes/u2a.js", "notes/u2b.js", "notes/u3.js", "notes/u4.js", "notes/u6.js", "notes/u7a.js", "notes/u7b.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "coverage.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 const N = Number(process.env.VERIFY_N || 1000);
 
@@ -194,7 +194,7 @@ for (const st of CP.STEPS) {
   if (notes.length < 8) bad(st.id + " needs 8 notes, has " + notes.length);
   const fin = notes.filter(n => n.k === "Finance").length;
   if (fin < 3 || notes.length - fin < 3) bad(st.id + " notes should mix finance and other life: " + fin + " of " + notes.length);
-  if (notes.some(n => !n.k || !n.t || !n.x) || new Set(notes.map(n => n.t)).size !== notes.length) bad(st.id + " notes incomplete or repeated");
+  if (notes.some(n => !n.k || !n.t || typeof n.build !== "function") || new Set(notes.map(n => n.t)).size !== notes.length) bad(st.id + " notes incomplete or repeated");
 
   /* spot the error */
   for (let i = 0; i < Math.ceil(N * 0.8); i++) {

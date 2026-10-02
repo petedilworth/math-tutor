@@ -18,10 +18,10 @@ On a phone, open that address, use the browser's share or menu button, and choos
 | `js/content-more.js` | Ten more MCV4U steps (first principles through distance to a plane), the five tier names, and the full 24-step order. |
 | `js/generators-more.js` | Forward problems for those ten steps. |
 | `js/content-full.js` | Twelve steps that complete the course (limits, roots and powers, rational and radical, ln and eˣ, graphs of f′, sketching, bearings, vector laws, 2D lines, plane forms, planes meeting, skew lines), the seven units, and the 36-step order. |
-| `js/notes-full.js` | "Where this shows up" for those twelve steps. |
 | `js/graphs.js` | Drawn graphs. Questions store a short spec such as `p:0,-3,0,1`; this file draws it as an SVG when it reaches the screen. |
 | `js/generators-full.js` | Every kind of question for the twelve new steps. |
-| `js/notes.js` | "Where this shows up": eight real places each step's idea appears, about half money and half the rest of life. One follows every question. The easiest file to add to. |
+| `js/notes-kit.js` | Shared helpers for the notes (number formats, live-data names) and `CP.workNote`, which runs a note against today's live data. |
+| `js/notes/*.js` | "Where this shows up": eight worked calculations per step, at least three on money and three on the rest of life. Each note has a setup, 3 to 5 lines of working, and one takeaway. Every number comes from code, and notes marked `live` use Bank of Canada figures. One follows every question. Check with `node tools/check-notes.js` (add `--print stepId` to read a step's notes as text). |
 | `js/generators-context.js` | Questions set in real situations, two or three scenarios per step with fresh numbers each time. Mixed in from Hard up, and used as the real-life item on most lessons. |
 | `js/generators-modes.js` | Expert and Master: spot the error and work backwards for all 24 steps, and the dispatcher that mixes them in. |
 | `js/engine.js` | Saving, spaced review, the daily lesson, the safety net, streaks, freezes, points |

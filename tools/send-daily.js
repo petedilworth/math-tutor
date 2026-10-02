@@ -14,7 +14,7 @@ const docs = path.join(__dirname, "..", "docs", "js");
 const ctx = { window: {}, Math, Number, String, Array, Object, Set, Error, console, Date, JSON, localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} } };
 ctx.window.CP = {}; ctx.CP = ctx.window.CP;
 vm.createContext(ctx);
-for (const f of ["content.js", "content-more.js", "content-full.js", "notes.js", "notes-full.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
+for (const f of ["content.js", "content-more.js", "content-full.js", "notes-kit.js", "notes/u1a.js", "notes/u1b.js", "notes/u2a.js", "notes/u2b.js", "notes/u3.js", "notes/u4.js", "notes/u6.js", "notes/u7a.js", "notes/u7b.js", "generators.js", "graphs.js", "generators-more.js", "generators-context.js", "generators-modes.js", "generators-full.js", "engine.js"]) vm.runInContext(fs.readFileSync(path.join(docs, f), "utf8"), ctx, { filename: f });
 const CP = ctx.window.CP;
 let live = {}; try { live = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "docs", "data", "live.json"), "utf8")); } catch (e) {}
 const liveFresh = live.asOf && (Date.now() - Date.parse(live.asOf)) / 86400000 <= 4;
@@ -37,7 +37,7 @@ function lessonFor(profile) {
   const streak = CP.streak();
   const due = CP.trackSteps("mcv4u").filter(s => s.id !== step.id && CP.due(s.id)).length;
   const open = CP.openLessons().length;
-  return { step, pr, streak, due, open, tier: CP.TIERS[CP.stepState(step.id).tier], note: (function () { const pool = CP.NOTES[step.id] || []; return pool.length ? pool[Object.keys(CP.state().lessons || {}).length % pool.length] : null; })(), size: profile.lesson_size || 5, live: liveFresh && !!step.practical.live };
+  return { step, pr, streak, due, open, tier: CP.TIERS[CP.stepState(step.id).tier], note: (function () { const pool = CP.NOTES[step.id] || []; if (!pool.length) return null; let i = Object.keys(CP.state().lessons || {}).length % pool.length; if (pool[i].live && pool[i].live === step.practical.live) i = (i + 1) % pool.length; return pool[i]; })(), size: profile.lesson_size || 5, live: liveFresh && !!step.practical.live };
 }
 
 /* a worked note: setup, the working as a small table, then what it means */

@@ -209,7 +209,11 @@ CP.makeLesson = function (date) {
   const n = lessonSize();
   const items = [];
   const onStep = Object.values(S.lessons).filter(l => l.stepId === step.id).length;
-  const lessonNote = CP.nextNote(step.id);
+  let lessonNote = CP.nextNote(step.id);
+  /* the practical uses the same live figure as some notes: skip one that would repeat its calculation */
+  const usePractical = onStep % 3 === 0 || !CP.buildCtx || !(CP.CTX || {})[step.id];
+  const sameAsPractical = ix => { const n = CP.noteFor(step.id, ix); return !!(n && n.live && n.live === step.practical.live); };
+  if (usePractical && sameAsPractical(lessonNote)) lessonNote = CP.nextNote(step.id);
   /* worked example first time on a step */
   if (!ss.seenDemo) { const p = CP.build(step.id, 0); items.push(Object.assign(CP.freeze(p, step.id, 0), { kind: "demo" })); }
   for (let i = 0; i < n; i++) { const p = CP.build(step.id, ss.tier); items.push(Object.assign(CP.freeze(p, step.id, ss.tier), { kind: "skill" })); }
@@ -222,7 +226,7 @@ CP.makeLesson = function (date) {
   items.push({ kind: "why", step: null, task: "Pick the best reason.", expr: w.q, prose: true, explain: w.explain,
     options: CP.gutil.shuffle([{ html: w.right, ok: true, why: "" }].concat(w.wrong.map(x => ({ html: x[0], ok: false, why: x[1] })))) });
   /* the real-life slot: the step's worked calculation on its first lesson and every third after; otherwise a fresh real situation */
-  if (onStep % 3 === 0 || !CP.buildCtx || !(CP.CTX || {})[step.id]) {
+  if (usePractical) {
     const L = Object.assign({}, CP.LIVE_FALLBACK, CP.liveData || {});
     const pr = step.practical.build(L);
     items.push({ kind: "practical", step: step.id, live: !!(CP.liveData && step.practical.live), source: pr.source, setup: pr.setup, lines: pr.lines,
