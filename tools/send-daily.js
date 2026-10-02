@@ -40,6 +40,13 @@ function lessonFor(profile) {
   return { step, pr, streak, due, open, tier: CP.TIERS[CP.stepState(step.id).tier], note: (function () { const pool = CP.NOTES[step.id] || []; return pool.length ? pool[Object.keys(CP.state().lessons || {}).length % pool.length] : null; })(), size: profile.lesson_size || 5, live: liveFresh && !!step.practical.live };
 }
 
+/* a worked note: setup, the working as a small table, then what it means */
+function noteText(n) {
+  if (!n.build) return n.x;
+  const w = n.build(L);
+  const rows = w.lines.map(x => '<tr><td style="padding:2px 10px 2px 0;color:#51575F">' + x[0] + '</td><td style="padding:2px 10px 2px 0">' + x[1] + '</td><td style="padding:2px 0;color:#3A6627">' + (x[2] || "") + '</td></tr>').join("");
+  return w.setup + '<table style="border-collapse:collapse;font-family:monospace;font-size:12px;margin:8px 0"><tbody>' + rows + '</tbody></table>' + w.take;
+}
 function html(name, l) {
   const first = name.charAt(0).toUpperCase() + name.slice(1);
   const lines = l.pr.lines.map(x => '<tr><td style="padding:3px 12px 3px 0;color:#51575F">' + x[0] + '</td><td style="padding:3px 12px 3px 0">' + x[1] + '</td><td style="padding:3px 0;color:#3A6627">' + (x[2] || "") + '</td></tr>').join("");
@@ -51,7 +58,7 @@ function html(name, l) {
     '<p style="font-family:Georgia,serif;font-size:21px;font-weight:600;margin:0 0 6px">' + esc(l.step.name) + ' <span style="font-family:monospace;font-size:11px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#51575F">· ' + esc(l.tier) + '</span></p>' +
     '<p style="font-family:Georgia,serif;font-size:16px;line-height:1.5;margin:0 0 10px">' + l.step.rule.r + '</p>' +
     '<p style="font-size:13.5px;line-height:1.5;color:#51575F;margin:0"><span style="font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B4E0E">Memory tip</span> &nbsp;' + l.step.rule.tip + '</p></div>' +
-    (l.note ? '<div style="background:#F4ECD6;border-left:3px solid #6B4E0E;padding:12px 14px;margin:0 0 18px;font-size:14px;line-height:1.55"><span style="display:block;font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B4E0E;margin-bottom:4px">Why you’d care · ' + esc(l.note.k) + '</span><b>' + l.note.t + '.</b> ' + l.note.x + '</div>' : '') +
+    (l.note ? '<div style="background:#F4ECD6;border-left:3px solid #6B4E0E;padding:12px 14px;margin:0 0 18px;font-size:14px;line-height:1.55"><span style="display:block;font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B4E0E;margin-bottom:4px">Why you’d care · ' + esc(l.note.k) + '</span><b>' + l.note.t + '.</b> ' + noteText(l.note) + '</div>' : '') +
     '<p style="font-family:monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#0B6E68;margin:0 0 6px">In real life · ' + esc(l.pr.source) + (l.live ? "" : " (fixed example)") + '</p>' +
     '<p style="font-size:14px;line-height:1.6;margin:0 0 10px">' + l.pr.setup + '</p>' +
     '<table style="border-collapse:collapse;font-family:monospace;font-size:12.5px;background:#F4F4F1;padding:10px;margin:0 0 10px"><tbody>' + lines + '</tbody></table>' +

@@ -48,10 +48,19 @@ function walkHtml(walk, title) { return '<p class="h4">' + (title || "How to get
 /* ---------- tiers ---------- */
 const tierName = t => CP.TIERS[t] || "";
 const modeLabel = it => it.mode === "spot" ? " · spot the error" : it.mode === "rev" ? " · work backwards" : it.mode === "ctx" ? " · real life" : "";
-/* one real place this idea shows up; rotates per question */
-function noteHtml(stepId, ix, lead) {
-  const n = CP.noteFor(stepId, ix); if (!n) return "";
-  return '<div class="rl"><span class="lbl">' + (lead || "Where this shows up") + ' · ' + esc(n.k) + '</span><b>' + n.t + '.</b> ' + n.x + '</div>';
+/* one real place this idea shows up, worked through; rotates per question */
+function noteBody(n) {
+  const lines = n.lines.map((l, i, a) => { const last = i === a.length - 1 ? " last" : ""; return '<span class="l' + last + '">' + l[0] + '</span><span class="' + last.trim() + '">' + l[1] + '</span><span class="r' + last + '">' + (l[2] || "") + '</span>'; }).join("");
+  return '<p class="rl-setup">' + n.setup + '</p><div class="calc">' + lines + '</div><p class="rl-take">' + n.take + '</p>' +
+    (n.source ? '<p class="rl-src"><span class="tag' + (n.live ? "" : " off") + '">' + (n.live ? "live" : "fixed example") + '</span> ' + esc(n.source) + '</p>' : "");
+}
+function noteHtml(stepId, ix, lead, folded) {
+  const raw = CP.noteFor(stepId, ix); if (!raw) return "";
+  if (!raw.build) return '<div class="rl"><span class="lbl">' + (lead || "Where this shows up") + ' · ' + esc(raw.k) + '</span><b>' + raw.t + '.</b> ' + raw.x + '</div>';
+  let n; try { n = CP.workNote(raw); } catch (e) { return ""; }
+  const head = '<span class="lbl">' + (lead || "Where this shows up") + ' · ' + esc(n.k) + '</span><b class="rl-t">' + n.t + '</b>';
+  return folded ? '<details class="rl"><summary>' + head + '<span class="rl-more">Show the working</span></summary>' + noteBody(n) + '</details>'
+                : '<div class="rl">' + head + noteBody(n) + '</div>';
 }
 function tierBar(stepId, withNames) {
   const tp = CP.tierProgress(stepId), top = CP.TIERS.length - 1;
@@ -94,7 +103,7 @@ function renderToday(dateOverride) {
        '<span class="mono">' + prog.total + ' questions' + (shortened ? " · eased" : "") + '</span></div>' +
        '<h2>' + step.name + '</h2>' + unitLine(step) + '<p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
        '<div class="rule" style="margin-top:12px;padding:0;border:0;background:none"><div class="rx"><div class="tipb" style="background:var(--tip-soft);padding:9px 10px;border-radius:2px"><b>Memory tip</b>' + step.rule.tip + '</div>' +
-       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care") + '</section>';
+       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care", true) + '</section>';
   /* dots */
   const qItems = lesson.items.map((it, i) => ({ it, i })).filter(x => x.it.kind !== "demo");
   h += '<div class="dots">' + qItems.map(({ it, i }) => {

@@ -276,3 +276,16 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-si
 .cov-pill.m,.cov-pill.ac{background:var(--accent-soft);color:var(--accent)}
 .cov-pill.w,.cov-pill.ap{background:var(--tip-soft);color:var(--tip)}
 .cov-pill.n{background:var(--surface-2);color:var(--ink-3)}
+/* worked notes */
+.rl .rl-t{display:block;font-weight:600;margin-bottom:4px}
+.rl .rl-setup{margin:0}
+.rl .calc{background:var(--surface);margin:10px 0}
+.rl .rl-take{margin:0}
+.rl .rl-src{margin:8px 0 0;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.rl .rl-src .tag{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--accent);border-radius:2px;color:var(--accent);margin-right:4px}
+.rl .rl-src .tag.off{border-color:var(--line-2);color:var(--ink-3)}
+details.rl summary{cursor:pointer;list-style:none}
+details.rl summary::-webkit-details-marker{display:none}
+details.rl .rl-more{display:block;font-size:12.5px;color:var(--accent);text-decoration:underline;text-underline-offset:3px;margin-top:2px}
+details.rl[open] .rl-more{display:none}
+details.rl[open] .rl-setup{margin-top:6px}
