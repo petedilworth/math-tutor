@@ -28,6 +28,9 @@ On a phone, open that address, use the browser's share or menu button, and choos
 | `js/app.js` | The screens |
 | `js/config.js` | The two Supabase values that connect the site to its shared record |
 | `js/sync.js` | Sign-in, push and pull, merging two devices' records, households, sharing |
+| `lesson.html`, `js/lesson.js` | The full lessons. `lesson.html#stepId` opens one; `lesson.html` lists all 36. Each lesson has pictures to play with and "try this" challenges that tick off as you go, the rule, why it is true (folded), three worked examples revealed a step at a time, the usual mistakes, three fresh check questions from the generators, a worked real-life note, and teaching notes (a two-minute script, questions to ask, where it goes wrong) behind the **Teaching notes** switch. Opening a lesson and the check score are saved and shown on the share page. |
+| `js/widgets.js` | The interactive pictures, plain SVG, finger or mouse: `tracer` (drag along a curve, tangent, slope trace, secant, a slider), `limit`, `blocks` (exponent laws by counting), `area` (product rule), `chain`, `motion`, `optim`, `sign` (sketching from sign charts), `vec2` (add, subtract, scale, components, dot, bearings, lines) and `vec3` (3D scenes you can turn). What each reports is in its `ST` function. |
+| `js/lessons/*.js` | The lesson text, one `CP.LESSONS[stepId]` per step. `u3a.js` (sine, cosine and eˣ) is the model. Check with `node tools/check-lessons.js`: it checks the shape and house style, and proves every challenge can be met and is not already met at the start. Add `--print stepId` to read a lesson as text. |
 | `share.html` | The read-only progress page a share link opens |
 | `sw.js`, `manifest.webmanifest`, `icon.svg` | Offline support and the home-screen install |
 | `data/live.json` | The real numbers, written each morning by the workflow in `.github/workflows/daily-data.yml` |

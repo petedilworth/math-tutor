@@ -31,8 +31,10 @@ function paintTally() {
 /* ---------- shared pieces ---------- */
 function ruleHtml(step) {
   return '<div class="rule"><p class="kicker">The rule</p><p class="rr">' + step.rule.r + '</p>' +
-    '<div class="rx"><div class="tipb"><b>Memory tip</b>' + step.rule.tip + '</div><div class="trapb"><b>Watch out</b>' + step.rule.trap + '</div></div></div>';
+    '<div class="rx"><div class="tipb"><b>Memory tip</b>' + step.rule.tip + '</div><div class="trapb"><b>Watch out</b>' + step.rule.trap + '</div></div>' + lessonLink(step.id) + '</div>';
 }
+/* the full lesson for a step: a picture to play with, the reasoning, examples and mistakes */
+const lessonLink = (id, text) => '<a class="lmore" href="lesson.html#' + id + '">' + (text || "Read the full lesson, with a picture you can move →") + '</a>';
 function optionsHtml(item, answeredIx) {
   const prose = item.prose, spot = item.mode === "spot";
   return '<div class="opts' + (prose ? " one" : "") + '">' + item.options.map((o, i) => {
@@ -79,7 +81,7 @@ function eventBanner(ev) {
 /* what went wrong, and for spot the error, where the mistake really was */
 function explainHtml(it, chosenIx) {
   const chosen = it.options[chosenIx];
-  let h = chosen && !chosen.ok ? '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + '</div>' : "";
+  let h = chosen && !chosen.ok ? '<div class="mistake"><span class="lbl">What went wrong</span>' + chosen.why + (it.step ? '<br>' + lessonLink(it.step, "Stuck? See it explained in the full lesson →") : "") + '</div>' : "";
   if (it.mode === "spot") { const b = it.options.findIndex(o => o.ok); h += '<div class="fixbox"><span class="lbl">The mistake is in line ' + (b + 1) + '</span>' + it.spotWhy + '<br>It should read: <span class="m">' + it.fix + '</span></div>'; }
   return h;
 }
@@ -103,7 +105,7 @@ function renderToday(dateOverride) {
        '<span class="mono">' + prog.total + ' questions' + (shortened ? " · eased" : "") + '</span></div>' +
        '<h2>' + step.name + '</h2>' + unitLine(step) + '<p class="lede" style="margin:6px 0 0;font-size:16px">' + step.rule.r + '</p>' +
        '<div class="rule" style="margin-top:12px;padding:0;border:0;background:none"><div class="rx"><div class="tipb" style="background:var(--tip-soft);padding:9px 10px;border-radius:2px"><b>Memory tip</b>' + step.rule.tip + '</div>' +
-       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div></div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care", true) + '</section>';
+       '<div class="trapb" style="background:var(--miss-soft);padding:9px 10px;border-radius:2px"><b>Watch out</b>' + step.rule.trap + '</div></div>' + lessonLink(step.id) + '</div>' + tierBar(step.id) + noteHtml(step.id, lesson.noteIx, "Why you’d care", true) + '</section>';
   /* dots */
   const qItems = lesson.items.map((it, i) => ({ it, i })).filter(x => x.it.kind !== "demo");
   h += '<div class="dots">' + qItems.map(({ it, i }) => {
@@ -265,7 +267,7 @@ function renderProgress() {
   h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days · ' + st.freezesBanked + ' freeze' + (st.freezesBanked === 1 ? "" : "s") + ' ❄</span></div>' +
        '<div class="tile"><span class="k">Level ' + lv.n + ' · ' + esc(lv.title) + '</span><span class="v">' + S().points.toLocaleString("en-CA") + '</span><span class="s">points · ' + lv.toNext + ' to next</span></div>' +
        '<div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + ' steps</span></div></div>';
-  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div><p class="small" style="margin:-2px 0 10px">Your progress against all 51 Ontario expectations: <a href="coverage.html">the curriculum map</a>.</p>' + CP.UNITS.map((u, i) =>
+  h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div><p class="small" style="margin:-2px 0 10px">Your progress against all 51 Ontario expectations: <a href="coverage.html">the curriculum map</a>. Every rule explained, with pictures you can move: <a href="lesson.html">the full lessons</a>' + (Object.keys(S().read || {}).length ? " (" + Object.keys(S().read).length + " opened)" : "") + '.</p>' + CP.UNITS.map((u, i) =>
     '<p class="ulab">' + (i + 1) + ' · ' + esc(u.name) + (S().profile.focus === u.id ? ' <span class="tagb">working on</span>' : "") + '</p><div class="map">' + u.steps.map(id => CP.stepById(id)).map(s => {
       const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
       return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';

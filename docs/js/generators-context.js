@@ -299,14 +299,14 @@ C.combo = [
 const DAYS = [[80, "March 21"], [110, "April 20"], [141, "May 21"], [172, "June 21"], [264, "September 21"], [355, "December 21"]];
 C.trigexp = [
   function daylight() {
-    const [t, name] = pick(DAYS), D = x => 12.2 + 3.1 * Math.sin(2 * Math.PI * (x - 80) / 365), w = 2 * Math.PI / 365, c = Math.cos(w * (t - 80));
-    const ans = 3.1 * w * c * 60;
-    return { k: "Weather", sid: "daylight", task: "Toronto's day length is about D(t) = 12.2 + 3.1 sin(2π(t − 80)/365) hours on day t of the year. On " + name + ", how many minutes a day is it changing by?", expr: "D′(t) = 3.1 × (2π/365) × cos(2π(t − 80)/365) hours",
+    const [t, name] = pick(DAYS), D = x => 12.2 + 3.2 * Math.sin(2 * Math.PI * (x - 80) / 365), w = 2 * Math.PI / 365, c = Math.cos(w * (t - 80));
+    const ans = 3.2 * w * c * 60;
+    return { k: "Weather", sid: "daylight", task: "Toronto's day length is about D(t) = 12.2 + 3.2 sin(2π(t − 80)/365) hours on day t of the year. On " + name + ", how many minutes a day is it changing by?", expr: "D′(t) = 3.2 × (2π/365) × cos(2π(t − 80)/365) hours",
       correct: opt(fN(ans, 2) + " min/day", ans), truthN: numd(D, t, 1e-4) * 60,
-      wrong: [opt(fN(3.1 * c * 60, 2) + " min/day", 3.1 * c * 60, "You forgot the chain rule's factor 2π/365. The inside changes slowly: once around per year."),
-              opt(fN(3.1 * w * c, 2) + " min/day", 3.1 * w * c, "That is in hours per day. Multiply by 60."),
-              opt(fN(3.1 * w * Math.sin(w * (t - 80)) * 60, 2) + " min/day", 3.1 * w * Math.sin(w * (t - 80)) * 60, "Sine differentiates to cosine, not to sine.")],
-      walk: ["D′(t) = 3.1 × (2π/365) × cos(2π(t − 80)/365).", "On " + name + " the cosine is " + fN(c, 3) + ".", "3.1 × 0.01721 × " + fN(c, 3) + " × 60 ≈ " + m_(fN(ans, 2) + " minutes a day") + "."] };
+      wrong: [opt(fN(3.2 * c * 60, 2) + " min/day", 3.2 * c * 60, "You forgot the chain rule's factor 2π/365. The inside changes slowly: once around per year."),
+              opt(fN(3.2 * w * c, 2) + " min/day", 3.2 * w * c, "That is in hours per day. Multiply by 60."),
+              opt(fN(3.2 * w * Math.sin(w * (t - 80)) * 60, 2) + " min/day", 3.2 * w * Math.sin(w * (t - 80)) * 60, "Sine differentiates to cosine, not to sine.")],
+      walk: ["D′(t) = 3.2 × (2π/365) × cos(2π(t − 80)/365).", "On " + name + " the cosine is " + fN(c, 3) + ".", "3.2 × 0.01721 × " + fN(c, 3) + " × 60 ≈ " + m_(fN(ans, 2) + " minutes a day") + "."] };
   },
   function ac() {
     const [ph, ts] = pick([[0, "0"], [Math.PI / 6, "1/720"], [Math.PI / 3, "1/360"], [Math.PI / 4, "1/480"]]), w = 120 * Math.PI, ans = 170 * w * Math.cos(ph);
