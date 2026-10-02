@@ -30,7 +30,8 @@ function fresh() {
     testBests: {},    /* scope key -> { pct, right, n, ms, date } */
     activeTest: null, /* the test in progress, saved on every tap */
     lastTest: null,   /* the last finished test with its questions, for the review screen */
-    noteIx: {}        /* step -> next "where this shows up" note to show */
+    noteIx: {},       /* step -> next "where this shows up" note to show */
+    read: {}          /* step -> { n, first, last, best } full lessons opened, and the best "check yourself" score out of 3 */
   };
 }
 let S = fresh();
@@ -78,6 +79,16 @@ CP.tierProgress = function (id) {
 };
 CP.stepState = stepState;
 CP.mastered = id => !!stepState(id).mastered;
+/* full lessons: opening one, and the "check yourself" score, are kept so the share page can show which rules needed help */
+CP.lessonRecord = id => (S.read || {})[id] || null;
+CP.markRead = function (id) {
+  S.read = S.read || {}; const r = S.read[id] || { n: 0, first: Date.now(), best: null };
+  r.n++; r.last = Date.now(); S.read[id] = r; save(); return r;
+};
+CP.markCheck = function (id, right) {
+  S.read = S.read || {}; const r = S.read[id] || { n: 0, first: Date.now(), last: Date.now(), best: null };
+  r.best = Math.max(r.best == null ? 0 : r.best, right); S.read[id] = r; save();
+};
 CP.due = id => { const s = stepState(id); return !!s.mastered && !!s.due && s.due <= today(); };
 
 function trackSteps(trackId) { return CP.STEPS.filter(s => s.track === trackId).sort((a, b) => a.order - b.order); }

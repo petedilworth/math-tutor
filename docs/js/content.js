@@ -275,7 +275,7 @@ CP.STEPS = [
     id: "trigexp", track: "mcv4u", order: 9, name: "Sine, cosine and eˣ", code: "MCV4U A2.4, A2.6, A2.8", prereq: "chain", weight: 2,
     rule: {
       r: "(sin x)′ = cos x. (cos x)′ = −sin x. (eˣ)′ = eˣ. For any other base, (aˣ)′ = aˣ · ln a.",
-      tip: "Picture the graphs. Cosine starts at its peak and heads down, so its slope starts negative: that is where the minus comes from.",
+      tip: "Picture the graphs. Sine leaves 0 climbing, so its slope starts at +1, which is cos 0. Cosine leaves its peak heading down, so just after 0 its slope turns negative: that is where the minus comes from.",
       trap: "The power rule does not work on eˣ or 2ˣ. The x is up in the exponent, not down in the base, so “bring the power down” makes no sense."
     },
     practical: {

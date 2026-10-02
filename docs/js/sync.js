@@ -68,6 +68,9 @@ CP.sync.merge = function (a, b) {
   for (const k in (b.testBests || {})) { const x = out.testBests[k], y = b.testBests[k]; if (!x || y.pct > x.pct || (y.pct === x.pct && y.ms < x.ms)) out.testBests[k] = y; }
   /* a test in progress, and the last result screen, stay with the device they happened on */
   out.noteIx = Object.assign({}, b.noteIx || {}, a.noteIx || {});
+  /* full lessons read: add up nothing, keep the larger count and score, the earliest first read and the latest last */
+  out.read = Object.assign({}, a.read || {});
+  for (const id in (b.read || {})) { const x = out.read[id], y = b.read[id]; out.read[id] = !x ? y : { n: Math.max(x.n || 0, y.n || 0), first: Math.min(x.first || Infinity, y.first || Infinity), last: Math.max(x.last || 0, y.last || 0), best: Math.max(x.best == null ? -1 : x.best, y.best == null ? -1 : y.best) < 0 ? null : Math.max(x.best == null ? -1 : x.best, y.best == null ? -1 : y.best) }; }
   /* lessons: per date, the one with more answers */
   out.lessons = out.lessons || {};
   for (const d in (b.lessons || {})) { const x = out.lessons[d], y = b.lessons[d]; if (!x || (y.answers || []).length > (x.answers || []).length) out.lessons[d] = y; }
