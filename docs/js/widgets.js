@@ -100,7 +100,9 @@ const clipId = (() => { let n = 0; return () => "wc" + (++n); })();
 function clipRect(F) { const id = clipId(); return { id, def: '<clipPath id="' + id + '"><rect x="' + F.x0 + '" y="' + F.y0 + '" width="' + F.w + '" height="' + F.h + '"/></clipPath>' }; }
 const dot = (X, Y, cls, r) => '<circle cx="' + X.toFixed(1) + '" cy="' + Y.toFixed(1) + '" r="' + (r || 4.5) + '" class="' + cls + '"/>';
 const ln = (a, b, c, d, cls) => '<line x1="' + a.toFixed(1) + '" y1="' + b.toFixed(1) + '" x2="' + c.toFixed(1) + '" y2="' + d.toFixed(1) + '" class="' + cls + '"/>';
-const tx = (X, Y, s, cls, anchor) => '<text x="' + X.toFixed(1) + '" y="' + Y.toFixed(1) + '" class="' + (cls || "wlab") + '"' + (anchor ? ' text-anchor="' + anchor + '"' : "") + '>' + s + '</text>';
+/* SVG text cannot hold <sup>, so raise those parts with tspans */
+const supT = s => String(s).replace(/<sup>(.*?)<\/sup>/g, '<tspan dy="-4" font-size="75%">$1</tspan><tspan dy="4">\u200b</tspan>');
+const tx = (X, Y, s, cls, anchor) => '<text x="' + X.toFixed(1) + '" y="' + Y.toFixed(1) + '" class="' + (cls || "wlab") + '"' + (anchor ? ' text-anchor="' + anchor + '"' : "") + '>' + supT(s) + '</text>';
 function arrow(X1, Y1, X2, Y2, cls, head) {
   head = head || 8; const a = Math.atan2(Y2 - Y1, X2 - X1), L = Math.hypot(X2 - X1, Y2 - Y1);
   if (L < 0.5) return "";
@@ -261,7 +263,7 @@ function tracer(el, cfg, emit) {
     }
     svg.innerHTML = s;
     const st = state();
-    readouts(ro, [["x", fx(x, ticks)], [cfg.ylabel || "height", fmt(st.y, 3)], [cfg.mlabel || "slope", fmt(st.m, 3)],
+    readouts(ro, [[cfg.xname || "x", fx(x, ticks)], [cfg.ylabel || "height", fmt(st.y, 3)], cfg.mlabel === false ? null : [cfg.mlabel || "slope", fmt(st.m, 3)],
       cfg.secant ? ["secant slope", fmt(st.ms, 4)] : null].concat((cfg.readouts || []).map(r => [r.label, r.value(st)])));
     if (!quiet) emit(st);
   }
@@ -279,7 +281,7 @@ function tracer(el, cfg, emit) {
     x = xr[0]; playB.textContent = "■ Stop"; quiet = true;
     playing = setInterval(() => { if (x >= xr[1]) { stop(); return; } setX(x + span / 120); }, 22);
   });
-  ctr.append(playB);
+  if (panel2 || cfg.sweep) ctr.append(playB);
   if (cfg.ghost) { const gb = btn(ghost ? "Hide " + (cfg.ghostLabel || "") : "Show " + (cfg.ghostLabel || ""), () => { ghost = !ghost; gb.textContent = (ghost ? "Hide " : "Show ") + (cfg.ghostLabel || ""); draw(); }, "ghost"); ctr.append(gb); }
   if (panel2) ctr.append(btn("Clear trace", () => { seen.clear(); draw(); }, "ghost"));
   if (cfg.secant) ctr.append(slider("h, the gap", cfg.secant.min != null ? cfg.secant.min : 0.01, cfg.secant.max || 2, 0.01, hsec, v => { hsec = Math.max(v, 1e-3); draw(); }, v => fmt(v, 2)));
@@ -351,6 +353,8 @@ function blocks(el, cfg, emit) {
     const lhs = mode === "mul" ? base + sup(m) + " · " + base + sup(n) : mode === "div" ? base + sup(m) + " ÷ " + base + sup(n) : "(" + base + sup(m) + ")" + sup(n);
     vis.innerHTML = hh;
     readouts(ro, [["you wrote", lhs], ["count them", res]]);
+    s1.querySelector(".wsl-l").textContent = mode === "pow" ? "inside power" : mode === "div" ? "power on top" : "first power";
+    s2.querySelector(".wsl-l").textContent = mode === "pow" ? "outside power" : mode === "div" ? "power below" : "second power";
     emit(S);
   }
   const s1 = slider(mode === "pow" ? "inside power" : "first power", 0, cfg.max || 6, 1, m, v => { m = v; draw(); }, v => String(v));
@@ -511,6 +515,18 @@ function roots(c, a, b) {
     if (Math.abs(y) < 1e-12 || py * y < 0) { let lo = px, hi = x; for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (pEval(c, lo) * pEval(c, m) <= 0) hi = m; else lo = m; } const z = (lo + hi) / 2; if (!r.length || Math.abs(r[r.length - 1] - z) > (b - a) / 400) r.push(z); }
     px = x; py = y;
   }
+  /* a root where the curve only touches the axis (like x² at 0) has no sign change: find it as a flat point that sits on the axis */
+  const d = pDer(c);
+  if (d.length > 1) {
+    const scale = 1e-7 * (1 + c.reduce((m, a) => Math.max(m, Math.abs(a)), 0));
+    let qx = a, qy = pEval(d, a);
+    for (let i = 1; i <= N; i++) {
+      const x = a + (b - a) * i / N, y = pEval(d, x);
+      if (qy * y < 0 || y === 0) { let lo = qx, hi = x; for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (pEval(d, lo) * pEval(d, m) <= 0) hi = m; else lo = m; } const z = (lo + hi) / 2; if (Math.abs(pEval(c, z)) < scale && !r.some(w => Math.abs(w - z) < (b - a) / 400)) r.push(z); }
+      qx = x; qy = y;
+    }
+    r.sort((p, q) => p - q);
+  }
   return r.map(z => Math.abs(z - Math.round(z)) < 1e-6 ? Math.round(z) : z);
 }
 function sign(el, cfg, emit) {
@@ -525,9 +541,10 @@ function sign(el, cfg, emit) {
   const ctr = h("div", "wctl"); box.append(ctr);
   const yr = cfg.y || autoRange(x => pEval(c, x), xr[0], xr[1]);
   const st = () => ST.sign(cfg, step);
-  function row(Y, rts, cp, label, symP, symN) {
+  function row(Y, rts, cp, label, symP, symN, known) {
     const F = frame(30, Y, W - 40, 22, xr, [0, 1]);
     let s = ln(F.x0, Y + 11, F.x0 + F.w, Y + 11, "waxis") + tx(4, Y + 15, label, "wlab sm");
+    if (!known) { for (const z of rts) s += ln(F.sx(z), Y, F.sx(z), Y + 22, "wcut") + tx(F.sx(z), Y + 34, fmt(z, 2), "wtick", "middle"); return s + tx(F.x0 + F.w / 2, Y + 15, "sign: next step", "wlab sm", "middle"); }
     const cuts = [xr[0]].concat(rts).concat([xr[1]]);
     for (let i = 0; i < cuts.length - 1; i++) {
       const m = (cuts[i] + cuts[i + 1]) / 2, v = pEval(cp, m), X = (F.sx(cuts[i]) + F.sx(cuts[i + 1])) / 2;
@@ -548,8 +565,8 @@ function sign(el, cfg, emit) {
     if (step >= 2) for (const z of r1) { const y = pEval(c, z); s += dot(F.sx(z), F.sy(y), "f2", 4.5); if (step >= 5) { const k = pEval(d2, z); s += tx(F.sx(z), F.sy(y) + (k < 0 ? -9 : 16), k < 0 ? "max" : k > 0 ? "min" : "flat", "wlab sm", "middle"); } }
     if (step >= 4) for (const z of r2) s += dot(F.sx(z), F.sy(pEval(c, z)), "f3", 4);
     s += '</g>';
-    if (step >= 1) s += row(196, step >= 2 ? r1 : [], step >= 2 ? d1 : [0], "f′", "↗ +", "↘ −");
-    if (step >= 3) s += row(250, step >= 4 ? r2 : [], step >= 4 ? d2 : [0], "f″", "∪ +", "∩ −");
+    if (step >= 1) s += row(196, r1, d1, "f′", "↗ +", "↘ −", step >= 2);
+    if (step >= 3) s += row(250, r2, d2, "f″", "∪ +", "∩ −", step >= 4);
     svg.innerHTML = s;
     nb.disabled = step === steps.length - 1;
     emit(st());
@@ -630,7 +647,7 @@ function vec2(el, cfg, emit) {
         at = V.add(at, d);
       });
       const E = P(at); s += arrow(O[0], O[1], E[0], E[1], "s3 wvec wthick") + lbl(E[0] + 6, E[1] + 14, "result", "wlab s3t");
-      readouts(ro, [["east", fmt(S.res[0], 2)], ["north", fmt(S.res[1], 2)], ["distance", fmt(S.resD, 2)], ["bearing", String(Math.round(S.resB)).padStart(3, "0") + "°"]]);
+      readouts(ro, [["east", fmt(S.res[0], 2)], ["north", fmt(S.res[1], 2)], ["distance", fmt(S.resD, 2)], ["bearing", S.resD < 1e-9 ? "none" : String(Math.round(S.resB) % 360).padStart(3, "0") + "°"]]);
     } else if (mode === "line") {
       const A = P(u), D = P(V.add(u, v)), pt = P(S.pt);
       s += ln(F.sx(u[0] - v[0] * 3 * R), F.sy(u[1] - v[1] * 3 * R), F.sx(u[0] + v[0] * 3 * R), F.sy(u[1] + v[1] * 3 * R), "s1 wthin");
