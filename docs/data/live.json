@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-10-03",
+  "asOf": "2026-10-04",
   "note": "Written each morning by .github/workflows/daily-data.yml. Until it runs, the site shows fixed examples.",
   "notes": [],
   "usdcad": 1.4083,
@@ -10,10 +10,10 @@
   "bond10": 3.83,
   "policy": 2.25,
   "temp": {
-    "noon": 14.4,
-    "max": 15.2,
-    "min": 7.3,
-    "sunrise": "07:17",
-    "sunset": "18:54"
+    "noon": 15.7,
+    "max": 19,
+    "min": 10.1,
+    "sunrise": "07:18",
+    "sunset": "18:52"
   }
 }
