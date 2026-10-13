@@ -41,6 +41,7 @@
 <script src="js/engine.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/coverage.js"></script>
+<script src="js/stepview.js"></script>
 <script>
 (function () {
   const view = document.getElementById("view");
@@ -50,13 +51,17 @@
   CP.sync.rpc("cp_share", { p_token: token }).then(r => {
     /* load the shared record into the engine, read-only, so the same progress code renders it */
     CP.replaceState(Object.assign({ v: 1 }, r.state, { profile: { name: r.name, tracks: ["mcv4u"], size: 5 } }));
+    const paint = () => { const m = /^#step\/(\w+)$/.exec(location.hash); if (m && CP.stepById(m[1])) { view.innerHTML = '<p style="margin:0 0 6px"><a class="link" href="#">← ' + esc(r.name) + '’s progress</a></p>' + CP.stepView.html(m[1], { readOnly: true, name: r.name }); CP.stepView.bind(view, m[1]); } else main(); window.scrollTo(0, 0); };
+    window.addEventListener("hashchange", paint);
+    paint();
+    function main() {
     const steps = CP.trackSteps("mcv4u"), cur = CP.currentStep("mcv4u"), st = CP.streak(), lv = CP.level();
     const mastered = steps.filter(s => CP.mastered(s.id)).length, b = CP.bests(), weak = CP.weakest(), mis = CP.mistakes(), cal = CP.calendar(8);
     const q = n => n === 0 ? "" : n < 4 ? "q1" : n < 8 ? "q2" : "q3";
     const S = CP.state();
     let h = '<h1 style="font-size:24px">' + esc(r.name) + '</h1><p class="lede" style="font-size:15px">Shared progress. Updated as they practise.</p><div class="stack">';
     h += '<div class="tiles"><div class="tile"><span class="k">Streak</span><span class="v">' + st.days + '</span><span class="s">days</span></div><div class="tile"><span class="k">Level ' + lv.n + '</span><span class="v">' + S.points.toLocaleString("en-CA") + '</span><span class="s">points</span></div><div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + '</span></div></div>';
-    h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + ' · ' + CP.TIERS[CP.stepState(cur.id).tier] + '</span></div><div class="map">' + steps.map(s => { const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : ""; return '<div class="st"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></div>'; }).join("") + '</div></section>';
+    h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><span class="mono">now on: ' + esc(cur.name) + ' · ' + CP.TIERS[CP.stepState(cur.id).tier] + '</span></div><div class="map">' + steps.map(s => '<a class="st" href="#step/' + s.id + '">' + CP.stepView.pip(s, cur.id) + '<span class="nm">' + esc(s.short) + '</span></a>').join("") + '</div><p class="note" style="margin-top:8px">Bars show the tier reached, Easy to Master; the tint is how often they were right lately. Tap a step for every question they answered.</p></section>';
     h += '<section class="card" id="cov"></section>';
     h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + '" title="' + d.date + '"></span>').join("") + '</div></section>';
     /* the tutor view: per step accuracy and the mistakes they keep making */
@@ -73,6 +78,7 @@
     view.innerHTML = h;
     if (CP.coverage) CP.coverage.compact(document.getElementById("cov"));
     if (CP.graph) CP.graph.hydrate(view);
+    }
   }).catch(e => { view.innerHTML = '<p class="small">' + esc(CP.sync.errorText(e)) + '</p>'; });
 })();
 </script>

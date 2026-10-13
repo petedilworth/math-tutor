@@ -31,7 +31,9 @@ function fresh() {
     activeTest: null, /* the test in progress, saved on every tap */
     lastTest: null,   /* the last finished test with its questions, for the review screen */
     noteIx: {},       /* step -> next "where this shows up" note to show */
-    read: {}          /* step -> { n, first, last, best } full lessons opened, and the best "check yourself" score out of 3 */
+    read: {},         /* step -> { n, first, last, best } full lessons opened, and the best "check yourself" score out of 3 */
+    hist: []          /* every answer ever, oldest first: { t, step, src, tier, ok, c (chosen index), ms, q } where q is the question itself
+                         for practice and tests, or { d, i } pointing into lessons[d].items for a daily lesson. Never capped; see trimRecord. */
   };
 }
 let S = fresh();
@@ -43,7 +45,30 @@ function load() {
   if (RO()) return;
   try { const r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && r.v === 1) S = Object.assign(fresh(), r); } catch (e) {}
 }
-function save() { if (RO()) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (CP.afterSave) CP.afterSave(); }
+/* The record grows forever. Past 1.5 MB the shared record would be refused and a phone's storage runs short, so the question
+   text of the oldest right answers is dropped first, then of the oldest wrong ones. Every answer stays as a row. */
+CP.RECORD_SOFT_MAX = 1500000;
+function trimRecord(json) {
+  let n = 0;
+  if (json.length <= CP.RECORD_SOFT_MAX) return 0;
+  const H = S.hist || [];
+  const rounds = [h => h.ok && h.q && !h.q.d, h => h.q && !h.q.d, h => h.ok && h.q && h.q.d, h => h.q && h.q.d];
+  for (const keep of rounds) {
+    for (const h of H) {
+      if (!keep(h)) continue;
+      if (h.q && h.q.d) { const L = S.lessons[h.q.d]; if (L && L.items[h.q.i]) { const it = L.items[h.q.i]; delete it.walk; it.options = it.options.map(o => ({ html: o.html, ok: o.ok })); } }
+      h.q = null; h.lost = true; n++;
+      if (n % 25 === 0 && JSON.stringify(S).length <= CP.RECORD_SOFT_MAX) return n;
+    }
+  }
+  return n;
+}
+function save() {
+  if (RO()) return;
+  try { let j = JSON.stringify(S); if (j.length > CP.RECORD_SOFT_MAX && trimRecord(j)) j = JSON.stringify(S); localStorage.setItem(KEY, j); } catch (e) {}
+  if (CP.afterSave) CP.afterSave();
+}
+CP.recordSize = () => JSON.stringify(S).length;
 CP.save = save;
 CP.replaceState = function (next) { S = Object.assign(fresh(), next); if (RO()) return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 CP.reset = () => { S = fresh(); save(); };
@@ -127,12 +152,16 @@ function bumpDay(ok) {
   const d = S.days[today()] || (S.days[today()] = { q: 0, right: 0 });
   d.q++; if (ok) d.right++;
 }
-CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms, tier }) {
+/* the question itself, kept with the answer so it can be read back later; graphs stay as their short specs */
+const keepQ = it => ({ task: it.task, expr: it.expr, prose: !!it.prose || undefined, mode: it.mode, walk: it.walk, options: it.options.map(o => ({ html: o.html, ok: !!o.ok, why: o.why || "" })), spotWhy: it.spotWhy, fix: it.fix, noteIx: it.noteIx });
+CP.recordAnswer = function ({ stepId, kind, ok, chosen, ms, tier, item, ref, chosenIx }) {
   let ev = null;
   const tr = typeof tier === "number" ? tier : 0;
   const t = today();
-  S.answers.push({ t: Date.now(), step: stepId, kind, ok, chosen, ms: ms || null });
+  const now = Date.now();
+  S.answers.push({ t: now, step: stepId, kind, ok, chosen, ms: ms || null });
   if (S.answers.length > 2000) S.answers = S.answers.slice(-2000);
+  if (stepId && kind !== "why") { S.hist = S.hist || []; S.hist.push({ t: now, step: stepId, src: kind, tier: typeof tier === "number" ? tier : null, ok, c: chosenIx, ms: ms || null, q: ref ? { d: ref.d, i: ref.i } : item ? keepQ(item) : null }); }
   bumpDay(ok);
   S.lastActive = t;
   /* points: never deducted */
@@ -272,7 +301,7 @@ CP.answerLesson = function (lesson, itemIx, chosenIx, ms) {
   if (it.kind === "demo") { lesson.ix = itemIx + 1; stepState(it.step).seenDemo = true; save(); return { demo: true }; }
   const ok = !!it.options[chosenIx].ok;
   lesson.answers.push({ i: itemIx, chosen: chosenIx, ok, t: Date.now() });
-  const ev = CP.recordAnswer({ stepId: it.step, kind: it.kind, ok, chosen: it.options[chosenIx].html, ms, tier: it.tier });
+  const ev = CP.recordAnswer({ stepId: it.step, kind: it.kind, ok, chosen: it.options[chosenIx].html, ms, tier: it.tier, ref: { d: lesson.date, i: itemIx }, chosenIx });
   lesson.ix = itemIx + 1;
   if (lesson.ix >= lesson.items.length) lesson.done = true;
   save();
@@ -332,7 +361,7 @@ CP.answerTest = function (chosenIx, ms) {
   const i = T.answers.length, it = T.items[i]; if (!it) return null;
   const ok = !!it.options[chosenIx].ok, t = Math.max(0, Math.min(ms || 0, CP.TEST_CAP_MS));
   T.answers.push({ i, chosen: chosenIx, ok, ms: t });
-  CP.recordAnswer({ stepId: it.step, kind: "test", ok, chosen: it.options[chosenIx].html, ms: t, tier: it.tier });
+  CP.recordAnswer({ stepId: it.step, kind: "test", ok, chosen: it.options[chosenIx].html, ms: t, tier: it.tier, item: it, chosenIx });
   return { ok, done: T.answers.length >= T.items.length };
 };
 CP.finishTest = function () {
@@ -374,6 +403,27 @@ CP.weakest = function () {
   for (const st of CP.STEPS) { const s = S.steps[st.id]; if (!s || s.attempts < 3) continue; const acc = s.correct / s.attempts; if (!w || acc < w.acc) w = { acc, name: st.name, id: st.id }; }
   return w;
 };
+/* ---------- one step's record ---------- */
+/* every answer on a step, newest first, with the question read back where it is still kept */
+CP.stepHistory = function (id) {
+  const out = [];
+  for (const h of (S.hist || [])) {
+    if (h.step !== id) continue;
+    let q = null;
+    if (h.q && h.q.d != null) { const L = S.lessons[h.q.d]; q = L && L.items[h.q.i] ? L.items[h.q.i] : null; } else if (h.q) q = h.q;
+    out.push({ t: h.t, src: h.src, tier: h.tier, ok: h.ok, c: h.c, ms: h.ms, q, lost: !!h.lost || (!q && h.q != null) });
+  }
+  return out.reverse();
+};
+/* accuracy by week for the last n weeks, oldest first, from the full history */
+CP.stepWeeks = function (id, n = 10) {
+  const end = dayNum(today()), weeks = [];
+  for (let k = n - 1; k >= 0; k--) { const a = end - 7 * k - 6; weeks.push({ from: isoFromDayNum(a), to: isoFromDayNum(a + 6), a: 0, c: 0 }); }
+  for (const h of (S.hist || [])) { if (h.step !== id) continue; const d = Math.floor(h.t / DAY); const k = n - 1 - Math.floor((end - d) / 7); if (k >= 0 && k < n) { weeks[k].a++; if (h.ok) weeks[k].c++; } }
+  return weeks;
+};
+/* accuracy over the last 10 answers, for the map's tint; null before any answer */
+CP.recentAcc = function (id) { const h = stepState(id).hist.slice(-10); return h.length ? h.filter(Boolean).length / h.length : null; };
 CP.mistakes = function () {
   /* which wrong option was chosen most, per step, from stored answers */
   const by = {};

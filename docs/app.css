@@ -460,3 +460,49 @@ details.rl[open] .rl-setup{margin-top:6px}
 .ldot.done{background:var(--good)}.ldot.prog{background:var(--accent)}
 .lmore{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500}
 .mistake .lmore{margin-top:8px;color:var(--miss)}
+
+/* ---------- map squares with tier bars, and one step's record (stepview.js) ---------- */
+.map .st{text-decoration:none;color:inherit}
+.map .pip{width:38px;height:38px;border-radius:6px;flex-direction:column;gap:3px;padding-top:3px;font-size:11.5px;position:relative}
+.map .pip b{font-weight:500;line-height:1}
+.map .pip .tb{display:flex;gap:2px;width:26px}
+.map .pip .tb i{flex:1;height:4px;border-radius:1px;background:var(--line)}
+.map .pip .tb i.on{background:var(--ink-2)}
+.map .pip.hi{background:var(--good-soft);border-color:var(--good)}.map .pip.hi .tb i.on{background:var(--good)}
+.map .pip.mid{background:var(--tip-soft);border-color:var(--tip)}.map .pip.mid .tb i.on{background:var(--tip)}
+.map .pip.lo{background:var(--miss-soft);border-color:var(--miss)}.map .pip.lo .tb i.on{background:var(--miss)}
+.map .pip.done,.map .pip.done.hi,.map .pip.done.mid,.map .pip.done.lo{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.map .pip.done .tb i{background:rgba(255,255,255,.35)}.map .pip.done .tb i.on{background:var(--on-accent)}
+.map .pip.due{background:var(--accent-soft);border:2px dashed var(--accent);color:var(--accent)}.map .pip.due .tb i.on{background:var(--accent)}
+.map .pip.cur{border:2px solid var(--accent)}
+.legend .lg-bars{display:inline-flex;gap:1px;width:14px;height:10px;border-radius:0;align-items:flex-end}
+.legend .lg-bars b{flex:1;height:4px;background:var(--ink-2)}
+.legend .lg-tint{background:linear-gradient(90deg,var(--miss-soft),var(--tip-soft),var(--good-soft));border:1px solid var(--line-2);border-radius:2px}
+.ladder{display:flex;flex-direction:column}
+.lad{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.lad:first-child{border-top:0}
+.lad .ln{display:flex;align-items:center;gap:8px}
+.lad .ln i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);border:1.5px solid var(--line-2);flex:none}
+.lad.done .ln i{background:var(--accent);border-color:var(--accent)}
+.lad.cur .ln i{background:var(--surface);border:2.5px solid var(--accent)}
+.lad.best .ln i{border-style:dashed;border-color:var(--accent)}
+.lad.todo{color:var(--ink-3)}
+.lad.cur .ln{font-weight:600}
+.lad .lv{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.lad .ld{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;min-width:60px;text-align:right}
+.wk{width:100%;height:auto;display:block}
+.wk .ax{stroke:var(--line-2);stroke-width:1}
+.wk .gr{stroke:var(--line);stroke-width:1}
+.wk .gl{font:9.5px var(--mono);fill:var(--ink-3)}
+.wk .vl{font:10px var(--mono);fill:var(--ink-2)}
+.wk .bar{fill:var(--accent)}
+.wk .bar:hover{fill:var(--good)}
+.wk .empty{fill:var(--line)}
+.wtab summary{cursor:pointer;font-size:12px;color:var(--accent);margin-top:6px}
+.wtab table{width:100%;border-collapse:collapse;font:12px var(--mono);margin-top:6px}
+.wtab th,.wtab td{text-align:right;padding:3px 6px;border-bottom:1px solid var(--line)}
+.wtab th:first-child,.wtab td:first-child{text-align:left}
+.hfilt{margin-bottom:6px}
+.hlist .rq:first-child{border-top:0}
+.hlist .rq summary .mono{color:var(--ink-3);font-size:10.5px}
+.hmore{margin-top:10px}

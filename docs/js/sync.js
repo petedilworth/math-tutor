@@ -49,6 +49,10 @@ CP.sync.merge = function (a, b) {
   const seen = new Set((out.answers || []).map(x => x.t));
   for (const x of (b.answers || [])) if (!seen.has(x.t)) { out.answers.push(x); seen.add(x.t); }
   out.answers.sort((x, y) => x.t - y.t); if (out.answers.length > 2000) out.answers = out.answers.slice(-2000);
+  /* every answer ever: union by time, never capped */
+  const hs = new Set((out.hist || []).map(x => x.t + "|" + x.step)); out.hist = out.hist || [];
+  for (const x of (b.hist || [])) { const k = x.t + "|" + x.step; if (!hs.has(k)) { out.hist.push(x); hs.add(k); } }
+  out.hist.sort((x, y) => x.t - y.t);
   /* days: take the larger count each day */
   out.days = out.days || {};
   for (const d in (b.days || {})) { const x = out.days[d] || { q: 0, right: 0 }; out.days[d] = { q: Math.max(x.q, b.days[d].q), right: Math.max(x.right, b.days[d].right) }; }

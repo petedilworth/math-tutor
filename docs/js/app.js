@@ -250,7 +250,7 @@ function renderPractice(stepId) {
     else { const c = item.options[answered]; h += '<div class="fb">' + eventBanner(ev) + '<span class="verdict ' + (c.ok ? "y" : "n") + '">' + (c.ok ? "Correct" : "Not quite") + '</span>' + explainHtml(item, answered) + noteHtml(item.step, item.noteIx) + walkHtml(item.walk, walkTitle(item)) + ruleHtml(step) + '<div class="acts"><button class="btn" id="next" type="button">Another</button><a class="btn ghost" href="#today">Back to today</a></div></div>'; }
     h += '</section><section class="card"><p class="kicker">Tier on this step</p>' + tierBar(step.id, true) + '</section></div>';
     view.innerHTML = h; started = Date.now();
-    view.querySelectorAll(".opt").forEach(b => b.onclick = () => { if (answered != null) return; answered = Number(b.dataset.i); ev = CP.recordAnswer({ stepId: step.id, kind: "practice", ok: !!item.options[answered].ok, chosen: item.options[answered].html, ms: Date.now() - started, tier: item.tier }); paintTally(); draw(); });
+    view.querySelectorAll(".opt").forEach(b => b.onclick = () => { if (answered != null) return; answered = Number(b.dataset.i); ev = CP.recordAnswer({ stepId: step.id, kind: "practice", ok: !!item.options[answered].ok, chosen: item.options[answered].html, ms: Date.now() - started, tier: item.tier, item, chosenIx: answered }); paintTally(); draw(); });
     const hint = $("#hint"); if (hint) hint.onclick = () => { $("#hintbox").innerHTML = ruleHtml(step); hint.hidden = true; };
     const nx = $("#next"); if (nx) nx.onclick = () => { item = CP.practiceProblem(step.id); answered = null; ev = null; draw(); };
   };
@@ -268,10 +268,9 @@ function renderProgress() {
        '<div class="tile"><span class="k">Level ' + lv.n + ' · ' + esc(lv.title) + '</span><span class="v">' + S().points.toLocaleString("en-CA") + '</span><span class="s">points · ' + lv.toNext + ' to next</span></div>' +
        '<div class="tile"><span class="k">Mastered</span><span class="v">' + mastered + '</span><span class="s">of ' + steps.length + ' steps</span></div></div>';
   h += '<section class="card"><div class="row"><p class="kicker">Calculus and Vectors</p><a class="mono" href="#units">choose a unit</a></div><p class="small" style="margin:-2px 0 10px">Your progress against all 51 Ontario expectations: <a href="coverage.html">the curriculum map</a>. Every rule explained, with pictures you can move: <a href="lesson.html">the full lessons</a>' + (Object.keys(S().read || {}).length ? " (" + Object.keys(S().read).length + " opened)" : "") + '.</p>' + CP.UNITS.map((u, i) =>
-    '<p class="ulab">' + (i + 1) + ' · ' + esc(u.name) + (S().profile.focus === u.id ? ' <span class="tagb">working on</span>' : "") + '</p><div class="map">' + u.steps.map(id => CP.stepById(id)).map(s => {
-      const c = CP.mastered(s.id) ? (CP.due(s.id) ? "due" : "done") : s.id === cur.id ? "cur" : "";
-      return '<button type="button" class="st" data-s="' + s.id + '"><span class="pip ' + c + '">' + s.order + '</span><span class="nm">' + esc(s.short) + '</span></button>';
-    }).join("") + '</div>').join("") + '<div class="legend"><span><i style="background:var(--accent)"></i>mastered</span><span><i style="background:var(--accent-soft);border:1.5px dashed var(--accent)"></i>due for review</span><span><i style="background:var(--surface);border:1.5px solid var(--accent)"></i>working on</span></div><p class="note" style="margin-top:8px">Tap a step to practise it.</p></section>';
+    '<p class="ulab">' + (i + 1) + ' · ' + esc(u.name) + (S().profile.focus === u.id ? ' <span class="tagb">working on</span>' : "") + '</p><div class="map">' + u.steps.map(id => CP.stepById(id)).map(s =>
+      '<button type="button" class="st" data-s="' + s.id + '">' + CP.stepView.pip(s, cur.id) + '<span class="nm">' + esc(s.short) + '</span></button>').join("") + '</div>').join("") +
+    '<div class="legend"><span><i class="lg-bars"><b></b><b></b><b></b></i>bars: tier reached, Easy to Master</span><span><i class="lg-tint"></i>tint: right lately</span><span><i style="background:var(--accent)"></i>✓ mastered</span><span><i style="background:var(--accent-soft);border:1.5px dashed var(--accent)"></i>due for review</span><span><i style="background:var(--surface);border:1.5px solid var(--accent)"></i>working on</span></div><p class="note" style="margin-top:8px">Tap a step to practise it.</p></section>';
   h += tiersCard(steps, cur);
   h += '<section class="card"><div class="row"><p class="kicker">Days practised</p><span class="mono">last 8 weeks · ' + practised + ' days</span></div><div class="cal">' + cal.map(d => '<span class="' + q(d.q) + (d.today ? " today" : "") + '" title="' + d.date + ": " + d.q + '"></span>').join("") + '</div><p class="note" style="margin-top:8px">Darker means more questions. No red squares, ever.</p></section>';
   h += '<section class="card"><p class="kicker">Personal bests</p><div class="list">' +
@@ -287,7 +286,7 @@ function renderProgress() {
   h += '<button class="btn ghost block" type="button" id="share">' + (canShare ? "Copy my read-only progress link" : "Share a read-only link to this page") + '</button>' +
        (canShare ? "" : '<p class="note" style="text-align:center">' + (CP.sync.enabled ? "Sign in on the Me screen and switch sharing on." : "Sharing needs the shared record; see the setup guide.") + '</p>') + '</div>';
   view.innerHTML = h;
-  view.querySelectorAll(".st").forEach(b => b.onclick = () => { location.hash = "#practice/" + b.dataset.s; });
+  view.querySelectorAll(".st").forEach(b => b.onclick = () => { location.hash = "#step/" + b.dataset.s; });
   $("#share").onclick = () => { if (!canShare) { location.hash = "#me"; return; } navigator.clipboard.writeText(CP.sync.shareUrl()).then(() => { $("#share").textContent = "Copied"; }).catch(() => { $("#share").textContent = CP.sync.shareUrl(); }); };
 }
 
@@ -303,8 +302,15 @@ function tiersCard(steps, cur) {
   }).join("");
   const log = (S().tierLog || []).slice(-5).reverse();
   return '<section class="card"><div class="row"><p class="kicker">Tiers</p><span class="mono">' + CP.TIERS.join(" · ").toLowerCase() + '</span></div>' +
-    '<p class="note" style="margin:-2px 0 8px">The number on the right is your accuracy at the current tier. Four of five right moves a step up; two misses in a row moves it down. Tap a step to practise it.</p>' + rows +
+    '<p class="note" style="margin:-2px 0 8px">The number on the right is your accuracy at the current tier. Four of five right moves a step up; two misses in a row moves it down. Tap a step for its full record.</p>' + rows +
     (log.length ? '<p class="h4" style="margin-top:12px">Recent changes</p><div class="list">' + log.map(e => '<div class="li"><span class="k">' + esc((CP.stepById(e.step) || {}).short || e.step) + ' ' + (e.dir > 0 ? "up to" : "down to") + ' ' + tierName(e.tier) + '</span><span class="v">' + new Date(e.t).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + '</span></div>').join("") + '</div>' : "") + '</section>';
+}
+
+/* ---------- One step's record ---------- */
+function renderStep(id) {
+  if (!CP.stepById(id)) { location.hash = "#progress"; return; }
+  view.innerHTML = '<p style="margin:0 0 6px"><a class="link" href="#progress">← Progress</a></p>' + CP.stepView.html(id, { readOnly: false });
+  CP.stepView.bind(view, id);
 }
 
 /* ---------- Test ---------- */
@@ -485,6 +491,7 @@ function route() {
   else if (name === "lesson") renderToday(arg);
   else if (name === "practice") renderPractice(arg);
   else if (name === "progress") renderProgress();
+  else if (name === "step") renderStep(arg);
   else if (name === "test") renderTest(arg);
   else if (name === "units") renderUnits();
   else if (name === "household") renderHousehold();
