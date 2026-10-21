@@ -37,15 +37,14 @@ function questionBody(q, c) {
   return h + '</div>';
 }
 
-/* ---- the map square: number (or a check), five tier bars, tinted by recent accuracy ---- */
+/* ---- the map square: the step number, five tier bars, tinted by recent accuracy. No other states: the bars and the tint say it all ---- */
 CP.stepView = {};
-CP.stepView.pip = function (step, curId) {
-  const ss = CP.stepState(step.id), acc = CP.recentAcc(step.id), done = CP.mastered(step.id);
-  const cls = done ? (CP.due(step.id) ? "due" : "done") : step.id === curId ? "cur" : "";
+CP.stepView.pip = function (step) {
+  const ss = CP.stepState(step.id), acc = CP.recentAcc(step.id);
   const tint = acc == null ? "" : acc >= 0.8 ? " hi" : acc >= 0.5 ? " mid" : " lo";
   const lit = ss.attempts ? ss.tier + 1 : 0;
   const title = step.name + (ss.attempts ? " · " + tierName(ss.tier) + " · " + Math.round(acc * 100) + "% of the last " + Math.min(10, ss.attempts) : " · not started");
-  return '<span class="pip ' + cls + tint + '" title="' + esc(title) + '"><b>' + (done ? "✓" : step.order) + '</b><span class="tb">' + [0, 1, 2, 3, 4].map(i => '<i class="' + (i < lit ? "on" : "") + '"></i>').join("") + '</span></span>';
+  return '<span class="pip' + tint + '" title="' + esc(title) + '"><b>' + step.order + '</b><span class="tb">' + [0, 1, 2, 3, 4].map(i => '<i class="' + (i < lit ? "on" : "") + '"></i>').join("") + '</span></span>';
 };
 
 /* ---- the tier ladder ---- */
