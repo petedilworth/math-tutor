@@ -1,21 +1,19 @@
 {
-  "asOf": "2026-11-20",
+  "asOf": "2026-11-21",
   "note": "Written each morning by .github/workflows/daily-data.yml. Until it runs, the site shows fixed examples.",
-  "notes": [
-    "weather: open-meteo 429"
-  ],
-  "usdcad": 1.3917,
-  "eurcad": 1.6064,
-  "gbpcad": 1.8762,
-  "usdcad30": 1.4021,
+  "notes": [],
+  "usdcad": 1.3947,
+  "eurcad": 1.6073,
+  "gbpcad": 1.8743,
+  "usdcad30": 1.3993,
   "bond5": 3.39,
   "bond10": 3.67,
   "policy": 2.5,
   "temp": {
-    "noon": 13.8,
-    "max": 15.9,
-    "min": 2.9,
-    "sunrise": "07:16",
-    "sunset": "16:48"
+    "noon": 9.4,
+    "max": 10.7,
+    "min": 4.8,
+    "sunrise": "07:19",
+    "sunset": "16:47"
   }
 }
